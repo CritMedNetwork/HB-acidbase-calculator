@@ -787,7 +787,7 @@
 
             // Traditional Analysis
             if (document.getElementById('showTraditional').checked) {
-                output += buildTraditionalAnalysis(pH, pCO2_mmhg, HCO3, units);
+                output += buildTraditionalAnalysis(pH, pCO2_mmhg, HCO3, Na, K, Cl, Albumin, AnGap, units);
             }
 
             // Stewart Analysis
@@ -868,93 +868,201 @@
             return html;
         }
 
-        function buildTraditionalAnalysis(pH, pCO2, HCO3, units) {
+        function buildTraditionalAnalysis(pH, pCO2, HCO3, Na, K, Cl, Albumin, AnGap, units) {
             const acidaemia = pH < 7.35;
             const alkalaemia = pH > 7.45;
-            const normalPH = pH >= 7.35 && pH <= 7.45;
 
+            // STEP 1: Primary disorder
             let primaryDisorder = '';
-            let expectedCompensation = '';
-            let expectedRange = '';
-            let actualValue = '';
-            let withinRange = false;
+            let primaryType = '';
 
             if (acidaemia) {
                 if (pCO2 > 45) {
                     primaryDisorder = 'Respiratory Acidosis';
-                    expectedCompensation = 'Metabolic (HCO3 should increase)';
-                    // Boston rules: Acute: +1 HCO3 per 10 mmHg above 40; Chronic: +4 HCO3 per 10 mmHg above 40
-                    const deltaCO2 = pCO2 - 40;
-                    const acuteExpected = 24 + (deltaCO2 / 10) * 1;
-                    const chronicExpected = 24 + (deltaCO2 / 10) * 4;
-                    expectedRange = `Acute: ${acuteExpected.toFixed(1)} | Chronic: ${chronicExpected.toFixed(1)}`;
-                    actualValue = `${HCO3.toFixed(1)}`;
-                    withinRange = HCO3 >= acuteExpected - 1 && HCO3 <= chronicExpected + 1;
+                    primaryType = 'respiratory';
                 } else if (pCO2 < 35) {
                     primaryDisorder = 'Metabolic Acidosis';
-                    expectedCompensation = 'Respiratory (PaCO2 should decrease)';
-                    // Boston rules: Expected PaCO2 = 1.2 * HCO3 + 15 ± 2
-                    const expectedPaCO2 = 1.2 * HCO3 + 15;
-                    expectedRange = `${(expectedPaCO2 - 2).toFixed(0)}–${(expectedPaCO2 + 2).toFixed(0)} mmHg`;
-                    actualValue = `${pCO2.toFixed(0)}`;
-                    withinRange = pCO2 >= (expectedPaCO2 - 2) && pCO2 <= (expectedPaCO2 + 2);
+                    primaryType = 'metabolic';
                 } else {
-                    primaryDisorder = 'Acidaemia (primary disorder unclear from pH/PaCO2/HCO3 alone)';
+                    primaryDisorder = 'Acidaemia (mixed or unclear)';
                 }
             } else if (alkalaemia) {
                 if (pCO2 < 35) {
                     primaryDisorder = 'Respiratory Alkalosis';
-                    expectedCompensation = 'Metabolic (HCO3 should decrease)';
-                    // Boston rules: Acute: -2 HCO3 per 10 mmHg below 40; Chronic: -5 HCO3 per 10 mmHg below 40
-                    const deltaCO2 = 40 - pCO2;
-                    const acuteExpected = 24 - (deltaCO2 / 10) * 2;
-                    const chronicExpected = 24 - (deltaCO2 / 10) * 5;
-                    expectedRange = `Acute: ${acuteExpected.toFixed(1)} | Chronic: ${chronicExpected.toFixed(1)}`;
-                    actualValue = `${HCO3.toFixed(1)}`;
-                    withinRange = HCO3 <= acuteExpected + 1 && HCO3 >= chronicExpected - 1;
+                    primaryType = 'respiratory';
                 } else if (pCO2 > 45) {
                     primaryDisorder = 'Metabolic Alkalosis';
-                    expectedCompensation = 'Respiratory (PaCO2 should increase)';
-                    // Copenhagen rules: Expected PaCO2 = 0.7 * HCO3 + 21 ± 2
-                    const expectedPaCO2 = 0.7 * HCO3 + 21;
-                    expectedRange = `${(expectedPaCO2 - 2).toFixed(0)}–${(expectedPaCO2 + 2).toFixed(0)} mmHg`;
-                    actualValue = `${pCO2.toFixed(0)}`;
-                    withinRange = pCO2 >= (expectedPaCO2 - 2) && pCO2 <= (expectedPaCO2 + 2);
+                    primaryType = 'metabolic';
                 } else {
-                    primaryDisorder = 'Alkalaemia (primary disorder unclear from pH/PaCO2/HCO3 alone)';
+                    primaryDisorder = 'Alkalaemia (mixed or unclear)';
                 }
             } else {
-                primaryDisorder = 'Normal pH';
+                primaryDisorder = 'Normal pH (but check for mixed disturbances)';
+                primaryType = 'normal';
             }
+
+            // STEP 2: Expected compensation using BOTH Boston and Copenhagen rules
+            let bostonExpected = '';
+            let copenhagenExpected = '';
+            let bostonActualMatch = false;
+            let copenhagenActualMatch = false;
+
+            if (primaryType === 'respiratory' && pCO2 > 45) {
+                // Respiratory Acidosis - BOSTON RULES for metabolic compensation
+                const deltaCO2 = pCO2 - 40;
+                const acuteExpected = 24 + (deltaCO2 / 10) * 1;
+                const chronicExpected = 24 + (deltaCO2 / 10) * 4;
+                bostonExpected = `Acute: ${acuteExpected.toFixed(1)} | Chronic: ${chronicExpected.toFixed(1)} mmol/L`;
+                bostonActualMatch = HCO3 >= acuteExpected - 1 && HCO3 <= chronicExpected + 1;
+            } else if (primaryType === 'respiratory' && pCO2 < 35) {
+                // Respiratory Alkalosis - BOSTON RULES for metabolic compensation
+                const deltaCO2 = 40 - pCO2;
+                const acuteExpected = 24 - (deltaCO2 / 10) * 2;
+                const chronicExpected = 24 - (deltaCO2 / 10) * 5;
+                bostonExpected = `Acute: ${acuteExpected.toFixed(1)} | Chronic: ${chronicExpected.toFixed(1)} mmol/L`;
+                bostonActualMatch = HCO3 <= acuteExpected + 1 && HCO3 >= chronicExpected - 1;
+            } else if (primaryType === 'metabolic' && HCO3 < 22) {
+                // Metabolic Acidosis - Boston rules for respiratory compensation
+                const expectedPaCO2 = 1.2 * HCO3 + 15;
+                bostonExpected = `Expected: ${(expectedPaCO2 - 2).toFixed(0)}–${(expectedPaCO2 + 2).toFixed(0)} mmHg`;
+                bostonActualMatch = pCO2 >= (expectedPaCO2 - 2) && pCO2 <= (expectedPaCO2 + 2);
+            } else if (primaryType === 'metabolic' && HCO3 > 26) {
+                // Metabolic Alkalosis - Copenhagen rules for respiratory compensation
+                const expectedPaCO2 = 0.7 * HCO3 + 21;
+                copenhagenExpected = `Expected: ${(expectedPaCO2 - 2).toFixed(0)}–${(expectedPaCO2 + 2).toFixed(0)} mmHg`;
+                copenhagenActualMatch = pCO2 >= (expectedPaCO2 - 2) && pCO2 <= (expectedPaCO2 + 2);
+            }
+
+            // STEP 3: Anion Gap analysis
+            const normal_alb = 40;
+            const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
+            const AG_elevated = AG_corrected > 16;
+            const AG_low = AG_corrected < 8;
+
+            // STEP 4: Delta ratio (only if HAGMA present)
+            const deltaAG = AnGap - 12; // Normal AG = 12
+            const deltaHCO3 = 24 - HCO3;
+            let deltaRatio = deltaAG > 0 && deltaHCO3 > 0 ? deltaAG / deltaHCO3 : 0;
+            let deltaInterpretation = '';
+
+            if (AG_elevated && HCO3 < 24) {
+                if (deltaRatio > 2) deltaInterpretation = 'ΔAG/ΔHCO3 > 2: HCO3 decreased less than expected → concurrent metabolic ALKALOSIS';
+                else if (deltaRatio < 1) deltaInterpretation = 'ΔAG/ΔHCO3 < 1: HCO3 decreased more than expected → concurrent metabolic ACIDOSIS (NAGMA component)';
+                else deltaInterpretation = 'ΔAG/ΔHCO3 ≈ 1: Appropriate HCO3 response';
+            }
+
+            // STEP 5: Differentials
+            const hagma_list = `
+                <strong>GOLDMARK (newer, comprehensive):</strong><br/>
+                • <strong>G</strong>lycols (ethylene glycol, propylene glycol)<br/>
+                • <strong>O</strong>xoproline (acetaminophen toxicity)<br/>
+                • <strong>L</strong>-lactate (tissue hypoperfusion, sepsis, liver failure)<br/>
+                • <strong>D</strong>-lactate (short bowel syndrome, bacterial overgrowth)<br/>
+                • <strong>M</strong>ethanol<br/>
+                • <strong>A</strong>spirin (salicylate overdose)<br/>
+                • <strong>R</strong>enal failure (uremia, phosphate, sulfate)<br/>
+                • <strong>K</strong>etoacidosis (DKA, alcoholic, starvation)<br/><br/>
+                <strong>MUDPILES (older, still useful):</strong><br/>
+                • <strong>M</strong>ethanol<br/>
+                • <strong>U</strong>remia<br/>
+                • <strong>D</strong>iabetic ketoacidosis<br/>
+                • <strong>P</strong>araldehyde/Phenformin<br/>
+                • <strong>I</strong>noniazid/Iron<br/>
+                • <strong>L</strong>actic acidosis<br/>
+                • <strong>E</strong>thylene glycol<br/>
+                • <strong>S</strong>alicylates
+            `;
+
+            const nagma_list = `
+                • <strong>U</strong>reterosigmoidostomy / Ureteric diversion<br/>
+                • <strong>S</strong>aline excess / Chloride overload (0.9% NaCl infusion)<br/>
+                • <strong>E</strong>ndocrine (Addison's disease, hypoaldosteronism, type 4 RTA)<br/>
+                • <strong>D</strong>iarrhea (bicarbonate loss)<br/>
+                • <strong>C</strong>arbonic anhydrase inhibitors (acetazolamide)<br/>
+                • <strong>A</strong>mmonium chloride<br/>
+                • <strong>R</strong>enal Tubular Acidosis (RTA types 1, 2, 4)<br/>
+                • <strong>S</strong>pironolactone / K-sparing diuretics
+            `;
 
             let html = `
                 <div class="analysis-section traditional fade-in">
-                    <div class="section-title">Traditional (Boston/Copenhagen Rules)</div>
+                    <div class="section-title">Traditional: Boston/Copenhagen + AG Analysis</div>
                     <div class="framework-steps">
                         <div class="step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                                <div class="step-label">Primary Disorder</div>
+                                <div class="step-label">Primary Acid-Base Disorder</div>
                                 <div class="step-value">${primaryDisorder}</div>
-                                <div class="step-interpretation">Only needs pH, PaCO2, and HCO3 to determine primary disturbance and expected compensation</div>
+                                <div class="step-interpretation">pH ${pH.toFixed(2)} ${acidaemia ? '(acidaemia)' : alkalaemia ? '(alkalaemia)' : '(normal)'} | PaCO2 ${pCO2.toFixed(0)} mmHg | HCO3 ${HCO3.toFixed(1)} mmol/L</div>
                             </div>
                         </div>
-                        ${expectedRange ? `
+
+                        ${bostonExpected || copenhagenExpected ? `
                         <div class="step">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                                <div class="step-label">Expected Compensation (Boston/Copenhagen)</div>
-                                <div class="step-value">${expectedCompensation}</div>
-                                <div class="step-interpretation">Expected range: ${expectedRange}</div>
+                                <div class="step-label">Expected Compensation (BOSTON & COPENHAGEN)</div>
+                                <div class="step-value">
+                                    ${bostonExpected ? `<strong>Boston:</strong> ${bostonExpected}<br/>Actual: ${HCO3.toFixed(1)} mmol/L<br/>${bostonActualMatch ? '✓ Match' : '✗ Mismatch'}` : ''}
+                                    ${copenhagenExpected ? `<strong>Copenhagen:</strong> ${copenhagenExpected}<br/>Actual: ${pCO2.toFixed(0)} mmHg<br/>${copenhagenActualMatch ? '✓ Match' : '✗ Mismatch'}` : ''}
+                                </div>
+                                <div class="step-interpretation">
+                                    ${!bostonActualMatch && !copenhagenActualMatch ? '⚠️ <strong>Compensation inadequate/excessive: CONCURRENT SECOND DISTURBANCE</strong>' : '✓ Compensation appropriate'}
+                                </div>
                             </div>
                         </div>
+                        ` : ''}
+
                         <div class="step">
                             <div class="step-number">3</div>
                             <div class="step-content">
-                                <div class="step-label">Actual vs. Expected</div>
-                                <div class="step-value">Actual: ${actualValue} ${expectedRange.includes('HCO3') ? 'mmol/L' : 'mmHg'} | Expected: ${expectedRange}</div>
-                                <div class="step-interpretation">
-                                    ${withinRange ? '✓ Compensation is APPROPRIATE (no second disturbance)' : '✗ Compensation is INADEQUATE or EXCESSIVE (concurrent second disturbance present)'}
+                                <div class="step-label">Anion Gap (Raw vs. Corrected)</div>
+                                <div class="step-value">Raw AG: ${AnGap.toFixed(0)} mmol/L | Corrected for Albumin ${Albumin.toFixed(0)}g/L: ${AG_corrected.toFixed(1)} mmol/L</div>
+                                <div class="equation-box">
+                                    AG_corrected = AG_measured + ((40 − Albumin) / 4)<br/>
+                                    = ${AnGap.toFixed(0)} + ((40 − ${Albumin.toFixed(0)}) / 4) = ${AG_corrected.toFixed(1)}<br/><br/>
+                                    Normal: 8–16 mmol/L | ${AG_elevated ? '<strong>ELEVATED: Unmeasured anions present (HAGMA)</strong>' : AG_low ? '<strong>LOW: Unmeasured cations or loss of anions</strong>' : '<strong>NORMAL: No significant AG disturbance</strong>'}
+                                </div>
+                            </div>
+                        </div>
+
+                        ${AG_elevated && HCO3 < 24 ? `
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-label">Delta Ratio (ΔAG / ΔHCO3) - Detects Mixed HAGMA</div>
+                                <div class="step-value">ΔAG = ${deltaAG.toFixed(1)} | ΔHCO3 = ${deltaHCO3.toFixed(1)} | Ratio = ${deltaRatio.toFixed(2)}</div>
+                                <div class="equation-box">
+                                    ΔAG = AG_corrected − 12 = ${AG_corrected.toFixed(1)} − 12 = ${deltaAG.toFixed(1)}<br/>
+                                    ΔHCO3 = 24 − HCO3 = 24 − ${HCO3.toFixed(1)} = ${deltaHCO3.toFixed(1)}<br/>
+                                    Ratio = ${deltaAG.toFixed(1)} / ${deltaHCO3.toFixed(1)} = ${deltaRatio.toFixed(2)}<br/><br/>
+                                    <strong>Interpretation:</strong> ${deltaInterpretation}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${AG_elevated ? `
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">HAGMA Differential Diagnosis</div>
+                                <div class="step-value">High Anion Gap Metabolic Acidosis</div>
+                                <div class="comparison-box">
+                                    ${hagma_list}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${!AG_elevated && HCO3 < 22 ? `
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">NAGMA Differential Diagnosis</div>
+                                <div class="step-value">Normal Anion Gap Metabolic Acidosis</div>
+                                <div class="comparison-box">
+                                    ${nagma_list}
                                 </div>
                             </div>
                         </div>
