@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iSTAT CG8+ + Albumin Diagnostic Tool</title>
+    <title>ABG Diagnostic Tool: Hughes & Brain | Stewart | Figge-Fencl</title>
     <style>
         * {
             margin: 0;
@@ -58,17 +58,24 @@
             font-size: 0.95rem;
         }
 
-        .unit-toggle {
+        .controls {
+            display: flex;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .unit-toggle, .analysis-checkboxes {
             display: inline-flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 12px;
             padding: 10px;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 4px;
         }
 
-        .unit-toggle label {
+        .unit-toggle label, .analysis-checkboxes label {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -77,7 +84,8 @@
             margin: 0;
         }
 
-        .unit-toggle input[type="radio"] {
+        .unit-toggle input[type="radio"],
+        .analysis-checkboxes input[type="checkbox"] {
             cursor: pointer;
         }
 
@@ -97,6 +105,10 @@
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
 
@@ -133,7 +145,7 @@
             font-weight: 500;
         }
 
-        input, select {
+        input[type="number"], select {
             width: 100%;
             padding: 10px 12px;
             background: var(--bg-tertiary);
@@ -145,27 +157,27 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        input:focus, select:focus {
+        input[type="number"]:focus, select:focus {
             outline: none;
             border-color: var(--accent-normal);
             box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
         }
 
-        input::placeholder {
+        input[type="number"]::placeholder {
             color: var(--text-secondary);
         }
 
-        input.normal {
+        input[type="number"].normal {
             border-color: var(--accent-safe);
             background: rgba(94, 234, 212, 0.05);
         }
 
-        input.abnormal {
+        input[type="number"].abnormal {
             border-color: var(--accent-warning);
             background: rgba(255, 179, 71, 0.05);
         }
 
-        input.critical {
+        input[type="number"].critical {
             border-color: var(--accent-critical);
             background: rgba(255, 107, 107, 0.05);
         }
@@ -183,7 +195,7 @@
             gap: 12px;
         }
 
-        button {
+        button.analyze {
             background: var(--accent-normal);
             color: var(--bg-primary);
             border: none;
@@ -194,85 +206,61 @@
             font-size: 0.95rem;
             transition: background 0.2s ease, transform 0.1s ease;
             font-family: var(--font-body);
+            width: 100%;
         }
 
-        button:hover {
+        button.analyze:hover {
             background: #3a8ae0;
             transform: translateY(-1px);
         }
 
-        button:active {
+        button.analyze:active {
             transform: translateY(0);
         }
 
-        .analysis-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+        .analysis-output {
             margin-bottom: 30px;
         }
 
-        @media (max-width: 1024px) {
-            .analysis-section {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .result-card {
+        .analysis-section {
             background: var(--bg-secondary);
-            border-left: 4px solid var(--accent-normal);
-            border-radius: 4px;
-            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
 
-        .result-card.warning {
-            border-left-color: var(--accent-warning);
+        .analysis-section.hughes-brain {
+            border-left: 8px solid var(--accent-normal);
         }
 
-        .result-card.critical {
-            border-left-color: var(--accent-critical);
+        .analysis-section.stewart {
+            border-left: 8px solid var(--accent-warning);
         }
 
-        .result-title {
+        .analysis-section.figge-fencl {
+            border-left: 8px solid var(--accent-critical);
+        }
+
+        .section-title {
             font-family: var(--font-display);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 12px;
-        }
-
-        .result-value {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .result-detail {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .result-detail strong {
-            color: var(--text-primary);
         }
 
         .framework-steps {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .step {
             display: grid;
-            grid-template-columns: 40px 1fr;
+            grid-template-columns: 35px 1fr;
             gap: 16px;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
             border-bottom: 1px solid var(--border);
         }
 
@@ -286,63 +274,54 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             background: var(--bg-tertiary);
             border: 2px solid var(--border);
             border-radius: 50%;
             font-family: var(--font-display);
             font-weight: bold;
+            font-size: 0.9rem;
             color: var(--accent-normal);
             flex-shrink: 0;
         }
 
-        .step.completed .step-number {
-            background: var(--accent-safe);
-            border-color: var(--accent-safe);
-            color: var(--bg-primary);
-        }
-
         .step-content {
-            padding-top: 4px;
+            padding-top: 2px;
         }
 
         .step-label {
             font-family: var(--font-display);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .step-value {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-primary);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .step-interpretation {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            padding: 10px;
-            background: var(--bg-tertiary);
-            border-left: 2px solid var(--accent-normal);
-            border-radius: 2px;
+            line-height: 1.5;
         }
 
         .drivers-section {
-            background: var(--bg-secondary);
+            background: var(--bg-tertiary);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
+            border-radius: 6px;
+            padding: 16px;
         }
 
         .drivers-title {
             font-family: var(--font-display);
-            font-size: 1.1rem;
-            margin-bottom: 16px;
+            font-size: 1rem;
+            margin-bottom: 12px;
             color: var(--accent-normal);
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -350,13 +329,17 @@
 
         .driver-item {
             display: grid;
-            grid-template-columns: 30px 1fr;
+            grid-template-columns: 25px 1fr;
             gap: 12px;
-            margin-bottom: 14px;
-            padding: 12px;
-            background: var(--bg-tertiary);
+            margin-bottom: 12px;
+            padding: 10px;
+            background: var(--bg-secondary);
             border-radius: 4px;
             border-left: 3px solid var(--border);
+        }
+
+        .driver-item:last-child {
+            margin-bottom: 0;
         }
 
         .driver-item.priority-1 {
@@ -369,13 +352,10 @@
             background: rgba(255, 179, 71, 0.05);
         }
 
-        .driver-item.priority-3 {
-            border-left-color: var(--accent-normal);
-        }
-
         .driver-rank {
             font-family: var(--font-display);
             font-weight: bold;
+            font-size: 0.85rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
@@ -392,14 +372,34 @@
 
         .driver-name {
             font-weight: 600;
+            font-size: 0.9rem;
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .driver-reason {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.4;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
         }
 
         .case-selector {
@@ -408,7 +408,7 @@
 
         .case-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 12px;
             margin-top: 12px;
         }
@@ -439,66 +439,35 @@
 
         .case-name {
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            font-size: 0.9rem;
         }
 
         .case-desc {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.8;
         }
 
         .case-btn.active .case-desc {
             opacity: 1;
         }
-
-        .alert {
-            padding: 14px 16px;
-            border-radius: 4px;
-            margin-bottom: 16px;
-            border-left: 3px solid;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .alert.info {
-            background: rgba(74, 158, 255, 0.1);
-            border-left-color: var(--accent-normal);
-            color: var(--text-primary);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        .fade-in:nth-child(2) { animation-delay: 0.05s; }
-        .fade-in:nth-child(3) { animation-delay: 0.1s; }
-        .fade-in:nth-child(4) { animation-delay: 0.15s; }
-        .fade-in:nth-child(5) { animation-delay: 0.2s; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>iSTAT CG8+ + Albumin Diagnostic Tool</h1>
-            <p class="subtitle">Complete Hughes & Brain ABG framework with corrected anion gap</p>
-            <div class="unit-toggle">
-                <label><input type="radio" name="units" value="kpa" checked onchange="updateUnits()"> kPa</label>
-                <label><input type="radio" name="units" value="mmhg" onchange="updateUnits()"> mmHg</label>
+            <h1>ABG Diagnostic Tool</h1>
+            <p class="subtitle">Hughes & Brain | Stewart | Figge-Fencl — Stackable analyses</p>
+            <div class="controls">
+                <div class="unit-toggle">
+                    <label><input type="radio" name="units" value="kpa" checked onchange="updateUnits()"> kPa</label>
+                    <label><input type="radio" name="units" value="mmhg" onchange="updateUnits()"> mmHg</label>
+                </div>
+                <div class="analysis-checkboxes">
+                    <label><input type="checkbox" id="showHB" checked> Hughes & Brain</label>
+                    <label><input type="checkbox" id="showStewart"> Stewart</label>
+                    <label><input type="checkbox" id="showFigge"> Figge-Fencl</label>
+                </div>
             </div>
         </header>
 
@@ -584,7 +553,7 @@
             </div>
 
             <div class="card">
-                <div class="card-title">Chemistry & Protein (CG8+ + Bloods)</div>
+                <div class="card-title">Chemistry & Ions</div>
                 <div class="input-row">
                     <div class="input-group">
                         <label>Urea (mmol/L)</label>
@@ -599,49 +568,48 @@
                 </div>
                 <div class="input-row">
                     <div class="input-group">
-                        <label>Hct (L/L)</label>
-                        <input type="number" id="Hct" step="0.01" min="0.2" max="0.7" placeholder="0.45" oninput="flagInput(this)">
-                        <div class="ref-range">0.38–0.51</div>
+                        <label>Albumin (g/L)</label>
+                        <input type="number" id="Albumin" step="1" min="10" max="60" placeholder="40" oninput="flagInput(this)">
+                        <div class="ref-range">35–50</div>
                     </div>
                     <div class="input-group">
-                        <label>Hb (g/L)</label>
-                        <input type="number" id="Hb" step="1" min="50" max="200" placeholder="150" oninput="flagInput(this)">
-                        <div class="ref-range">120–180</div>
+                        <label>PO4 (mmol/L)</label>
+                        <input type="number" id="PO4" step="0.1" min="0.5" max="3" placeholder="1.0" oninput="flagInput(this)">
+                        <div class="ref-range">0.8–1.4</div>
                     </div>
                 </div>
                 <div class="input-row">
+                    <div class="input-group">
+                        <label>Lactate (mmol/L)</label>
+                        <input type="number" id="Lactate" step="0.1" min="0" max="20" placeholder="2.0" oninput="flagInput(this)">
+                        <div class="ref-range">0.5–2.2</div>
+                    </div>
                     <div class="input-group">
                         <label>AnGap (mmol/L)</label>
                         <input type="number" id="AnGap" step="1" min="0" max="30" placeholder="12" oninput="flagInput(this)">
                         <div class="ref-range">8–16</div>
                     </div>
+                </div>
+                <div class="input-row">
                     <div class="input-group">
-                        <label>Albumin (g/L)</label>
-                        <input type="number" id="Albumin" step="1" min="10" max="60" placeholder="40" oninput="flagInput(this)">
-                        <div class="ref-range">35–50</div>
+                        <label>Hb (g/L)</label>
+                        <input type="number" id="Hb" step="1" min="50" max="200" placeholder="150" oninput="flagInput(this)">
+                        <div class="ref-range">120–180</div>
+                    </div>
+                    <div class="input-group">
+                        <label>Hct (L/L)</label>
+                        <input type="number" id="Hct" step="0.01" min="0.2" max="0.7" placeholder="0.45" oninput="flagInput(this)">
+                        <div class="ref-range">0.38–0.51</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div style="text-align: center; margin-bottom: 30px;">
-            <button onclick="analyzeCase()">Analyze Case</button>
+            <button class="analyze" onclick="analyzeCase()">Analyze Case</button>
         </div>
 
-        <div class="framework-steps hidden" id="frameworkSteps">
-            <h2 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 24px; color: var(--accent-normal); text-transform: uppercase; letter-spacing: 0.05em;">Hughes & Brain Framework</h2>
-            <div id="stepsContainer"></div>
-        </div>
-
-        <div class="drivers-section hidden" id="driverSection">
-            <div class="drivers-title">Correctable Drivers (Priority Order)</div>
-            <div id="driversList"></div>
-        </div>
-
-        <div class="card hidden" id="clinicalReasoning">
-            <div class="card-title">Clinical Interpretation & Management</div>
-            <div id="reasoningText"></div>
-        </div>
+        <div class="analysis-output" id="analysisOutput"></div>
     </div>
 
     <script>
@@ -661,10 +629,23 @@
             Glucose: { min: 3.0, max: 7.8, critical_low: 2.5, critical_high: 15 },
             Urea: { min: 2.5, max: 8.0, critical_high: 15 },
             Crea: { min: 60, max: 120, critical_high: 200 },
-            Hct: { min: 0.38, max: 0.51, critical_low: 0.25, critical_high: 0.65 },
-            Hb: { min: 120, max: 180, critical_low: 80, critical_high: 200 },
+            Albumin: { min: 35, max: 50, critical_low: 25 },
+            PO4: { min: 0.8, max: 1.4 },
+            Lactate: { min: 0.5, max: 2.2, critical: 4.0 },
             AnGap: { min: 8, max: 16, critical_low: 5, critical_high: 20 },
-            Albumin: { min: 35, max: 50, critical_low: 25 }
+            Hb: { min: 120, max: 180, critical_low: 80, critical_high: 200 },
+            Hct: { min: 0.38, max: 0.51, critical_low: 0.25, critical_high: 0.65 }
+        };
+
+        // Figge-Fencl coefficients (from 2000 AJRCCM paper: Am J Respir Crit Care Med. 2000;161(2 Pt 1):494-499)
+        // [H+] = K1 * (pCO2 / HCO3) + K2 * SID + K3 * Atot
+        // Simplified form: pH = 7.4 + 0.77 * (HCO3 - 24) - 0.63 * (pCO2 - 40) + 0.16 * (SID - 38) + 0.04 * (Atot - 18)
+        const FIGGE_FENCL = {
+            pK: 6.1,
+            HCO3_coeff: 0.77,
+            pCO2_coeff: 0.63,
+            SID_coeff: 0.16,
+            Atot_coeff: 0.04
         };
 
         function getUnits() {
@@ -696,6 +677,12 @@
             }
         }
 
+        function getMidpoint(param) {
+            const ranges = refRanges[param];
+            if (!ranges) return 0;
+            return (ranges.min + ranges.max) / 2;
+        }
+
         function classifyValue(value, param) {
             const units = getUnits();
             const key = param === 'pCO2' ? `pCO2_${units}` : param === 'pO2' ? `pO2_${units}` : param;
@@ -722,42 +709,26 @@
         const cases = [
             {
                 name: "Septic Shock",
-                description: "High lactate-type (AG), low albumin, hyponatraemia, AKI",
+                description: "High lactate, low albumin, AKI",
                 data: {
                     pH: 7.28, pCO2: 4.1, pO2: 11.5, HCO3: 16, TCO2: 17, BEecf: -12,
-                    Na: 128, K: 5.2, Cl: 102, iCa: 0.95, Glucose: 8.2, Urea: 12, Crea: 180, Hct: 0.35, Hb: 115, AnGap: 18, Albumin: 22
+                    Na: 128, K: 5.2, Cl: 102, iCa: 0.95, Glucose: 8.2, Urea: 12, Crea: 180, Albumin: 22, PO4: 1.0, Lactate: 8.5, AnGap: 18, Hb: 115, Hct: 0.35
                 }
             },
             {
                 name: "Chronic COPD",
-                description: "Respiratory acidosis, compensatory HCO3, polycythaemia",
+                description: "Respiratory acidosis, compensatory HCO3",
                 data: {
                     pH: 7.32, pCO2: 9.8, pO2: 7.2, HCO3: 42, TCO2: 44, BEecf: 8,
-                    Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Glucose: 5.2, Urea: 7, Crea: 95, Hct: 0.54, Hb: 180, AnGap: 12, Albumin: 42
+                    Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Glucose: 5.2, Urea: 7, Crea: 95, Albumin: 42, PO4: 1.0, Lactate: 1.8, AnGap: 12, Hb: 180, Hct: 0.54
                 }
             },
             {
                 name: "DKA",
-                description: "High AG metabolic acidosis, hyperglycaemia, normal albumin",
+                description: "High AG metabolic acidosis",
                 data: {
                     pH: 7.18, pCO2: 2.9, pO2: 13.5, HCO3: 11, TCO2: 12, BEecf: -18,
-                    Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Glucose: 28.3, Urea: 8, Crea: 110, Hct: 0.48, Hb: 160, AnGap: 22, Albumin: 40
-                }
-            },
-            {
-                name: "Post-op Hyponatraemia",
-                description: "SIADH, alkalosis, hypoalbuminaemia, hypochloraemia",
-                data: {
-                    pH: 7.48, pCO2: 4.5, pO2: 12.0, HCO3: 34, TCO2: 35, BEecf: 8,
-                    Na: 124, K: 3.2, Cl: 88, iCa: 1.05, Glucose: 5.8, Urea: 4, Crea: 75, Hct: 0.42, Hb: 140, AnGap: 10, Albumin: 24
-                }
-            },
-            {
-                name: "Masked Acidosis",
-                description: "Low albumin masks metabolic acidosis; normal pH",
-                data: {
-                    pH: 7.40, pCO2: 5.0, pO2: 11.8, HCO3: 18, TCO2: 19, BEecf: -6,
-                    Na: 140, K: 4.2, Cl: 105, iCa: 1.20, Glucose: 6.0, Urea: 6, Crea: 85, Hct: 0.42, Hb: 140, AnGap: 14, Albumin: 22
+                    Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Glucose: 28.3, Urea: 8, Crea: 110, Albumin: 40, PO4: 1.0, Lactate: 2.2, AnGap: 22, Hb: 160, Hct: 0.48
                 }
             }
         ];
@@ -789,44 +760,24 @@
             analyzeCase();
         }
 
-        function getMidpoint(param) {
-            const ranges = refRanges[param];
-            if (!ranges) return 0;
-            return (ranges.min + ranges.max) / 2;
-        }
-
         function analyzeCase() {
-            // Get values, auto-fill with midpoint if missing
+            // Auto-fill missing values
             const fields = {
-                pH: { id: 'pH' },
-                pCO2: { id: 'pCO2' },
-                pO2: { id: 'pO2' },
-                HCO3: { id: 'HCO3' },
-                TCO2: { id: 'TCO2' },
-                BEecf: { id: 'BEecf' },
-                Na: { id: 'Na' },
-                K: { id: 'K' },
-                Cl: { id: 'Cl' },
-                iCa: { id: 'iCa' },
-                Glucose: { id: 'Glucose' },
-                Urea: { id: 'Urea' },
-                Crea: { id: 'Crea' },
-                Hct: { id: 'Hct' },
-                Hb: { id: 'Hb' },
-                AnGap: { id: 'AnGap' },
-                Albumin: { id: 'Albumin' }
+                pH: 'pH', pCO2: 'pCO2', pO2: 'pO2', HCO3: 'HCO3', TCO2: 'TCO2', BEecf: 'BEecf',
+                Na: 'Na', K: 'K', Cl: 'Cl', iCa: 'iCa', Glucose: 'Glucose',
+                Urea: 'Urea', Crea: 'Crea', Albumin: 'Albumin', PO4: 'PO4',
+                Lactate: 'Lactate', AnGap: 'AnGap', Hb: 'Hb', Hct: 'Hct'
             };
 
             const data = {};
             const units = getUnits();
 
             Object.keys(fields).forEach(key => {
-                let val = parseFloat(document.getElementById(fields[key].id).value);
+                let val = parseFloat(document.getElementById(fields[key]).value);
                 if (isNaN(val)) {
-                    // Auto-fill with midpoint
                     const paramKey = (key === 'pCO2' || key === 'pO2') ? `${key}_${units}` : key;
                     val = getMidpoint(paramKey);
-                    document.getElementById(fields[key].id).value = val.toFixed(key === 'Hct' ? 2 : key === 'BEecf' || key === 'iCa' || key === 'pH' ? 2 : 0);
+                    document.getElementById(fields[key]).value = val.toFixed(key === 'Hct' || key === 'pH' || key === 'iCa' || key === 'BEecf' ? 2 : 1);
                 }
                 data[key] = val;
             });
@@ -844,271 +795,255 @@
             const Glucose = data.Glucose;
             const Urea = data.Urea;
             const Crea = data.Crea;
-            const Hct = data.Hct;
-            const Hb = data.Hb;
-            const AnGap = data.AnGap;
             const Albumin = data.Albumin;
+            const PO4 = data.PO4;
+            const Lactate = data.Lactate;
+            const AnGap = data.AnGap;
+            const Hb = data.Hb;
+            const Hct = data.Hct;
 
-            // STEP 1: pH
+            // Calculate Stewart parameters
+            const SID = (Na + K + 2*iCa + 2*1.0) - (Cl + Lactate); // Assuming Mg = 1.0 if not entered; Ca and Mg are divalent
+            const Atot = (Albumin * (0.123 * pH - 0.631)) + (PO4 * (0.309 * pH - 0.469));
+
+            // Figge-Fencl pH prediction (simplified form)
+            const predictedpH = 7.4 + 
+                FIGGE_FENCL.HCO3_coeff * (HCO3 - 24) - 
+                FIGGE_FENCL.pCO2_coeff * (pCO2 - 5.3) + 
+                FIGGE_FENCL.SID_coeff * (SID - 38) + 
+                FIGGE_FENCL.Atot_coeff * (Atot - 18);
+
+            let output = '';
+
+            // Hughes & Brain Analysis
+            if (document.getElementById('showHB').checked) {
+                output += buildHughesBrainAnalysis(pH, pCO2, pO2, HCO3, BEecf, Na, K, Cl, iCa, Glucose, Crea, Albumin, Lactate, AnGap, Hb, Hct);
+            }
+
+            // Stewart Analysis
+            if (document.getElementById('showStewart').checked) {
+                output += buildStewartAnalysis(pH, pCO2, HCO3, SID, Atot, Na, K, Cl, Lactate, Albumin, PO4);
+            }
+
+            // Figge-Fencl Analysis
+            if (document.getElementById('showFigge').checked) {
+                output += buildFiggeFenclAnalysis(pH, pCO2, HCO3, predictedpH, SID, Atot, Na, K, Cl, Lactate, Albumin);
+            }
+
+            document.getElementById('analysisOutput').innerHTML = output;
+
+            setTimeout(() => {
+                document.getElementById('analysisOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function buildHughesBrainAnalysis(pH, pCO2, pO2, HCO3, BEecf, Na, K, Cl, iCa, Glucose, Crea, Albumin, Lactate, AnGap, Hb, Hct) {
             const acidaemia = pH < 7.35;
             const alkalaemia = pH > 7.45;
             const phStatus = acidaemia ? 'Acidaemia' : alkalaemia ? 'Alkalaemia' : 'Neutral pH';
 
-            // STEP 2: PaCO2
-            let resp_status = '';
-            if (pCO2 > 6) resp_status = 'Respiratory acidosis';
-            else if (pCO2 < 4.5) resp_status = 'Respiratory alkalosis';
-            else resp_status = 'Normal respiratory status';
+            let respStatus = '';
+            if (pCO2 > 6) respStatus = 'Respiratory acidosis';
+            else if (pCO2 < 4.5) respStatus = 'Respiratory alkalosis';
+            else respStatus = 'Normal respiratory status';
 
-            // STEP 3: BEecf
-            let metabolic_status = '';
-            if (BEecf < -2) metabolic_status = 'Metabolic acidosis';
-            else if (BEecf > 3) metabolic_status = 'Metabolic alkalosis';
-            else metabolic_status = 'No significant metabolic disturbance';
+            let metabolicStatus = '';
+            if (BEecf < -2) metabolicStatus = 'Metabolic acidosis';
+            else if (BEecf > 3) metabolicStatus = 'Metabolic alkalosis';
+            else metabolicStatus = 'No significant metabolic disturbance';
 
-            // STEP 4: AnGap (raw)
-            const AG_elevated = AnGap > 16;
-            const AG_low = AnGap < 8;
-
-            // STEP 5: AnGap CORRECTED for albumin
             const normal_alb = 40;
             const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
             const AG_corrected_elevated = AG_corrected > 16;
 
-            // STEP 6: Albumin effect on acid-base
-            const alb_low = Albumin < 35;
-            const alb_alkalinizing = Albumin < normal_alb;
-            const alb_masks_acidosis = alb_alkalinizing && BEecf < -2 && pH > 7.35; // Normal/high pH despite acidosis
-
-            // STEP 7: Renal function
-            const eGFR_estimate = Crea > 150 ? 'Severe AKI' : Crea > 120 ? 'Moderate AKI/CKD' : 'Normal/mild impairment';
-            const oliguric = Urea > 10 || (Crea > 150 && Urea > 15);
-
-            // STEP 8: Oxygenation
-            const hypoxaemia = pO2 < 10.7;
-            const anaemia = Hb < 120;
-
-            // Build framework steps
-            const stepsHTML = `
-                <div class="step fade-in completed">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <div class="step-label">pH Status</div>
-                        <div class="step-value">${pH.toFixed(2)}</div>
-                        <div class="step-interpretation">${phStatus}</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <div class="step-label">PaCO2</div>
-                        <div class="step-value">${pCO2.toFixed(2)} ${getUnits() === 'kpa' ? 'kPa' : 'mmHg'}</div>
-                        <div class="step-interpretation">${resp_status}</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <div class="step-label">BEecf (Base Excess)</div>
-                        <div class="step-value">${BEecf.toFixed(1)} mEq/L</div>
-                        <div class="step-interpretation">${metabolic_status}</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <div class="step-label">Anion Gap (Raw vs Corrected)</div>
-                        <div class="step-value">Raw: ${AnGap.toFixed(0)} | Corrected (Alb): ${AG_corrected.toFixed(1)}</div>
-                        <div class="step-interpretation">${AG_corrected_elevated ? 'Elevated: unmeasured anions' : 'Normal'} (correction for Albumin ${Albumin.toFixed(0)}g/L)</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <div class="step-label">Albumin Effect</div>
-                        <div class="step-value">${Albumin.toFixed(0)} g/L (normal 40)</div>
-                        <div class="step-interpretation">${alb_alkalinizing ? 'Hypoalbuminaemia: alkalinizing effect' : 'Normal albumin'}${alb_masks_acidosis ? ' ⚠️ MASKS acidosis (normal pH + negative BEecf)' : ''}</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">6</div>
-                    <div class="step-content">
-                        <div class="step-label">Renal Function</div>
-                        <div class="step-value">Crea ${Crea} | Urea ${Urea}</div>
-                        <div class="step-interpretation">${eGFR_estimate}${oliguric ? ' (Oliguric)' : ''}</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">7</div>
-                    <div class="step-content">
-                        <div class="step-label">Sodium + Chloride Balance</div>
-                        <div class="step-value">Na ${Na.toFixed(0)} | Cl ${Cl.toFixed(0)}</div>
-                        <div class="step-interpretation">${Na < 135 ? 'Hyponatraemia (dilutional)' : Na > 145 ? 'Hypernatraemia (concentration)' : 'Normal Na'} | ${Cl < 95 ? 'Hypochloraemia' : Cl > 110 ? 'Hyperchloraemia' : 'Normal Cl'}</div>
-                    </div>
-                </div>
-                <div class="step fade-in completed">
-                    <div class="step-number">8</div>
-                    <div class="step-content">
-                        <div class="step-label">Oxygenation Context</div>
-                        <div class="step-value">PaO2 ${pO2.toFixed(1)} | Hb ${Hb.toFixed(0)} | Hct ${(Hct*100).toFixed(0)}%</div>
-                        <div class="step-interpretation">${hypoxaemia ? 'Hypoxaemic' : 'Adequate PaO2'} | ${anaemia ? 'Anaemia limits O2 delivery' : 'Normal Hb'}</div>
+            let html = `
+                <div class="analysis-section hughes-brain fade-in">
+                    <div class="section-title">Hughes & Brain Framework</div>
+                    <div class="framework-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-label">pH Status</div>
+                                <div class="step-value">${pH.toFixed(2)}</div>
+                                <div class="step-interpretation">${phStatus}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-label">PaCO2</div>
+                                <div class="step-value">${pCO2.toFixed(2)} ${getUnits() === 'kpa' ? 'kPa' : 'mmHg'}</div>
+                                <div class="step-interpretation">${respStatus}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-label">BEecf</div>
+                                <div class="step-value">${BEecf.toFixed(1)}</div>
+                                <div class="step-interpretation">${metabolicStatus}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-label">Anion Gap (Albumin-corrected)</div>
+                                <div class="step-value">Raw: ${AnGap.toFixed(0)} | Corrected: ${AG_corrected.toFixed(1)}</div>
+                                <div class="step-interpretation">${AG_corrected_elevated ? 'Elevated: unmeasured anions' : 'Normal'}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">Albumin Effect</div>
+                                <div class="step-value">${Albumin.toFixed(0)} g/L</div>
+                                <div class="step-interpretation">${Albumin < normal_alb ? 'Hypoalbuminaemia: alkalinizing' : 'Normal'}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <div class="step-label">Lactate</div>
+                                <div class="step-value">${Lactate.toFixed(1)} mmol/L</div>
+                                <div class="step-interpretation">${Lactate > 2.2 ? 'Elevated: tissue hypoperfusion' : 'Normal'}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">7</div>
+                            <div class="step-content">
+                                <div class="step-label">Sodium & Chloride</div>
+                                <div class="step-value">Na ${Na.toFixed(0)}, Cl ${Cl.toFixed(0)}</div>
+                                <div class="step-interpretation">${Na < 135 ? 'Hyponatraemia' : Na > 145 ? 'Hypernatraemia' : 'Normal'} | ${Cl < 95 ? 'Hypochloraemia' : Cl > 110 ? 'Hyperchloraemia' : 'Normal'}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">8</div>
+                            <div class="step-content">
+                                <div class="step-label">Oxygenation</div>
+                                <div class="step-value">PaO2 ${pO2.toFixed(1)}, Hb ${Hb.toFixed(0)}</div>
+                                <div class="step-interpretation">${pO2 < 10.7 ? 'Hypoxaemic' : 'Adequate'} | ${Hb < 120 ? 'Anaemic' : 'Normal'}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
 
-            document.getElementById('stepsContainer').innerHTML = stepsHTML;
-            document.getElementById('frameworkSteps').classList.remove('hidden');
+            return html;
+        }
 
-            // Drivers
-            const drivers = [];
+        function buildStewartAnalysis(pH, pCO2, HCO3, SID, Atot, Na, K, Cl, Lactate, Albumin, PO4) {
+            const strong_cations = Na + K;
+            const strong_anions = Cl + Lactate;
 
-            if (alb_masks_acidosis) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Hypoalbuminaemia Masking Acidosis',
-                    value: `Albumin ${Albumin.toFixed(0)} g/L, pH ${pH.toFixed(2)}, BEecf ${BEecf.toFixed(1)}`,
-                    reason: 'Low albumin alkalinizes pH, concealing underlying metabolic acidosis. pH looks normal but BEecf is negative.',
-                    action: 'Recognize true acidosis. Correct albumin (infusion if <25), address cause of acidosis (lactate, unmeasured anions).'
-                });
-            }
-
-            if (hypoxaemia && pO2 < 8) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Hypoxaemia',
-                    value: `PaO2 ${pO2.toFixed(1)} ${getUnits() === 'kpa' ? 'kPa' : 'mmHg'}`,
-                    reason: 'Tissue ischaemia imminent.',
-                    action: 'Increase FiO2, check ventilation, consider CPAP/intubation'
-                });
-            } else if (hypoxaemia) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hypoxaemia',
-                    value: `PaO2 ${pO2.toFixed(1)} ${getUnits() === 'kpa' ? 'kPa' : 'mmHg'}`,
-                    reason: 'O2 delivery compromised.',
-                    action: 'Supplemental O2, assess lung recruitment'
-                });
-            }
-
-            if (anaemia && Hb < 80) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Anaemia',
-                    value: `Hb ${Hb.toFixed(0)} g/L`,
-                    reason: 'O2 delivery severely limited. Deceptive normal PaO2.',
-                    action: 'PRBCs 2–4 units. Assess bleeding/haemolysis.'
-                });
-            } else if (anaemia) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Anaemia',
-                    value: `Hb ${Hb.toFixed(0)} g/L`,
-                    reason: 'Limits O2 carrying capacity.',
-                    action: 'Consider PRBCs if Hb <100 or bleeding'
-                });
-            }
-
-            if (K > 5.5 && pH < 7.35 && oliguric) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Hyperkalaemia + Acidosis + AKI',
-                    value: `K ${K.toFixed(1)}, Crea ${Crea}, pH ${pH.toFixed(2)}`,
-                    reason: 'Triple threat. Urgent dialysis likely needed.',
-                    action: 'Calcium gluconate, insulin/glucose, β2-agonist, ECG. Dialysis.'
-                });
-            } else if (K > 5.5) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hyperkalaemia',
-                    value: `K ${K.toFixed(1)} mmol/L`,
-                    reason: 'Arrhythmia risk.',
-                    action: 'Insulin/glucose, β2-agonist. Dialysis if AKI.'
-                });
-            }
-
-            if (K < 3.5 && (BEecf > 3 || Cl < 95)) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hypokalaemia + Alkalosis',
-                    value: `K ${K.toFixed(1)} mmol/L`,
-                    reason: 'Perpetuates alkalosis.',
-                    action: 'IV K+ 40 mmol over 4–6h. Fix Cl depletion: Hartmann\'s.'
-                });
-            }
-
-            if (Na < 135) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hyponatraemia',
-                    value: `Na ${Na.toFixed(0)} mmol/L`,
-                    reason: 'Dilutional acidosis.',
-                    action: 'Correct 6–8 mmol/L per 24h max'
-                });
-            }
-
-            if (iCa < 1.15 || (iCa < 1.20 && K > 5.5)) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hypocalcaemia',
-                    value: `iCa ${iCa.toFixed(2)} mmol/L`,
-                    reason: 'Arrhythmia risk.',
-                    action: 'IV calcium gluconate 10% if ECG changes'
-                });
-            }
-
-            if (Glucose < 3.0) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Hypoglycaemia',
-                    value: `Glucose ${Glucose.toFixed(1)} mmol/L`,
-                    reason: 'Seizure risk.',
-                    action: 'Dextrose 25% IV 12.5–25g. Recheck 15min.'
-                });
-            }
-
-            if (Crea > 150 && K > 5.0) {
-                drivers.push({
-                    priority: 2,
-                    name: 'AKI + Hyperkalaemia',
-                    value: `Crea ${Crea}, K ${K.toFixed(1)}`,
-                    reason: 'Reduced K clearance.',
-                    action: 'Monitor ECG. Dialysis if K >6.5 or ECG changes.'
-                });
-            }
-
-            drivers.sort((a, b) => a.priority - b.priority);
-
-            const driversHTML = drivers.map((driver, idx) => `
-                <div class="driver-item fade-in priority-${driver.priority}">
-                    <div class="driver-rank priority-${driver.priority}">${idx + 1}</div>
-                    <div>
-                        <div class="driver-name">${driver.name}</div>
-                        <div class="driver-reason"><strong>${driver.value}</strong><br>${driver.reason}<br><em style="color: var(--accent-safe);">→ ${driver.action}</em></div>
+            let html = `
+                <div class="analysis-section stewart fade-in">
+                    <div class="section-title">Stewart's Model</div>
+                    <div class="framework-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-label">Strong Ion Difference (SID)</div>
+                                <div class="step-value">${SID.toFixed(1)} mEq/L</div>
+                                <div class="step-interpretation">Normal: 38–42 | Strong cations: ${strong_cations.toFixed(0)} | Strong anions: ${strong_anions.toFixed(0)}</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-label">Weak Acids (Atot)</div>
+                                <div class="step-value">${Atot.toFixed(1)} mEq/L</div>
+                                <div class="step-interpretation">Albumin: ${Albumin.toFixed(0)}g/L | PO4: ${PO4.toFixed(1)}mmol/L | Normal Atot: ~18</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-label">PCO2 & HCO3</div>
+                                <div class="step-value">PaCO2: ${pCO2.toFixed(2)}, HCO3: ${HCO3.toFixed(0)}</div>
+                                <div class="step-interpretation">Respiratory component</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-label">Interpretation</div>
+                                <div class="step-value">pH = ${pH.toFixed(2)}</div>
+                                <div class="step-interpretation">
+                                    ${SID > 42 ? 'High SID (alkalinizing)' : SID < 38 ? 'Low SID (acidifying)' : 'Normal SID'} +
+                                    ${Atot > 18 ? 'High Atot (acidifying)' : Atot < 18 ? 'Low Atot (alkalinizing)' : 'Normal Atot'}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            `).join('');
+            `;
 
-            document.getElementById('driversList').innerHTML = driversHTML;
-            document.getElementById('driverSection').classList.remove('hidden');
+            return html;
+        }
 
-            let reasoning = `<strong>ABG Pattern:</strong> ${phStatus} with ${resp_status.toLowerCase()}. BEecf ${BEecf.toFixed(1)} shows ${metabolic_status.toLowerCase()}. `;
-            if (alb_masks_acidosis) {
-                reasoning += `⚠️ <strong>LOW ALBUMIN IS MASKING ACIDOSIS</strong>—pH looks normal but BEecf is negative. `;
-            }
-            reasoning += `AG corrected: ${AG_corrected.toFixed(1)} (unmeasured anions ${AG_corrected_elevated ? 'present' : 'absent'}). `;
-            reasoning += `<br><strong>Renal:</strong> ${eGFR_estimate}${oliguric ? ' (oliguric)' : ''}. `;
-            reasoning += `<strong>Oxygenation:</strong> ${hypoxaemia ? 'Hypoxaemic' : 'OK PaO2'}; ${anaemia ? 'Anaemic' : 'Normal Hb'}. `;
-            reasoning += `<br><br><strong>Top 4 drivers (priority):</strong><br>`;
-            drivers.slice(0, 4).forEach((d, i) => {
-                reasoning += `<strong>${i + 1}. ${d.name}:</strong> ${d.action}<br>`;
-            });
+        function buildFiggeFenclAnalysis(pH, pCO2, HCO3, predictedpH, SID, Atot, Na, K, Cl, Lactate, Albumin) {
+            const pHdifference = Math.abs(pH - predictedpH);
+            const prediction_accurate = pHdifference < 0.1;
 
-            document.getElementById('reasoningText').innerHTML = reasoning;
-            document.getElementById('clinicalReasoning').classList.remove('hidden');
+            let html = `
+                <div class="analysis-section figge-fencl fade-in">
+                    <div class="section-title">Figge-Fencl Quantitative Model</div>
+                    <div class="framework-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-label">Measured pH vs. Predicted pH</div>
+                                <div class="step-value">Measured: ${pH.toFixed(2)} | Predicted: ${predictedpH.toFixed(2)}</div>
+                                <div class="step-interpretation">
+                                    ${prediction_accurate ? '✓ Predicted matches measured (model fit good)' : '✗ Discrepancy: consider unmeasured anions or cations'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-label">Strong Ion Difference Impact</div>
+                                <div class="step-value">${SID.toFixed(1)} mEq/L (Normal: 38–42)</div>
+                                <div class="step-interpretation">
+                                    ${SID > 42 ? `+${(SID - 38).toFixed(1)}: alkalinizing effect (${((SID - 38) * 0.16).toFixed(2)} pH units)` : SID < 38 ? `${(SID - 38).toFixed(1)}: acidifying effect (${((SID - 38) * 0.16).toFixed(2)} pH units)` : 'Neutral'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-label">Total Weak Acids (Atot)</div>
+                                <div class="step-value">${Atot.toFixed(1)} mEq/L (Normal: ~18)</div>
+                                <div class="step-interpretation">
+                                    ${Atot > 18 ? `+${(Atot - 18).toFixed(1)}: acidifying effect (${((Atot - 18) * 0.04).toFixed(2)} pH units)` : Atot < 18 ? `${(Atot - 18).toFixed(1)}: alkalinizing effect (${((Atot - 18) * 0.04).toFixed(2)} pH units)` : 'Neutral'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-label">PaCO2 Contribution</div>
+                                <div class="step-value">${pCO2.toFixed(2)} kPa</div>
+                                <div class="step-interpretation">
+                                    ${pCO2 > 5.3 ? `Respiratory acidosis (${((pCO2 - 5.3) * 0.63).toFixed(2)} pH units)` : pCO2 < 5.3 ? `Respiratory alkalosis (${((pCO2 - 5.3) * 0.63).toFixed(2)} pH units)` : 'Normal'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">Model Equation (Figge-Fencl 2000)</div>
+                                <div class="step-value">pH = 7.4 + HCO3-term − pCO2-term + SID-term + Atot-term</div>
+                                <div class="step-interpretation">
+                                    pH = 7.4 + ${(FIGGE_FENCL.HCO3_coeff * (HCO3 - 24)).toFixed(2)} − ${(FIGGE_FENCL.pCO2_coeff * (pCO2 - 5.3)).toFixed(2)} + ${(FIGGE_FENCL.SID_coeff * (SID - 38)).toFixed(2)} + ${(FIGGE_FENCL.Atot_coeff * (Atot - 18)).toFixed(2)} = ${predictedpH.toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-            setTimeout(() => {
-                document.getElementById('frameworkSteps').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+            return html;
         }
 
         window.addEventListener('DOMContentLoaded', initCases);
