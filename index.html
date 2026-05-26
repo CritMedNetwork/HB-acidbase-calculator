@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABG Diagnostic Tool: Hughes & Brain | Stewart | Figge-Fencl</title>
+    <title>ABG Diagnostic Tool: Four Frameworks</title>
     <style>
         * {
             margin: 0;
@@ -63,7 +63,7 @@
             gap: 24px;
             margin-top: 20px;
             flex-wrap: wrap;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .unit-toggle, .analysis-checkboxes {
@@ -73,6 +73,7 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 4px;
+            flex-wrap: wrap;
         }
 
         .unit-toggle label, .analysis-checkboxes label {
@@ -234,6 +235,10 @@
             border-left: 8px solid var(--accent-normal);
         }
 
+        .analysis-section.traditional {
+            border-left: 8px solid #8b9dc3;
+        }
+
         .analysis-section.stewart {
             border-left: 8px solid var(--accent-warning);
         }
@@ -303,84 +308,24 @@
             font-size: 1rem;
             color: var(--text-primary);
             margin-bottom: 4px;
+            font-family: var(--font-display);
         }
 
         .step-interpretation {
             font-size: 0.85rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        .drivers-section {
+        .equation-box {
             background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 16px;
-        }
-
-        .drivers-title {
-            font-family: var(--font-display);
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: var(--accent-normal);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .driver-item {
-            display: grid;
-            grid-template-columns: 25px 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-            padding: 10px;
-            background: var(--bg-secondary);
+            border-left: 3px solid var(--accent-normal);
+            padding: 12px;
             border-radius: 4px;
-            border-left: 3px solid var(--border);
-        }
-
-        .driver-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .driver-item.priority-1 {
-            border-left-color: var(--accent-critical);
-            background: rgba(255, 107, 107, 0.05);
-        }
-
-        .driver-item.priority-2 {
-            border-left-color: var(--accent-warning);
-            background: rgba(255, 179, 71, 0.05);
-        }
-
-        .driver-rank {
+            margin: 12px 0;
             font-family: var(--font-display);
-            font-weight: bold;
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .driver-rank.priority-1 {
-            color: var(--accent-critical);
-        }
-
-        .driver-rank.priority-2 {
-            color: var(--accent-warning);
-        }
-
-        .driver-name {
-            font-weight: 600;
             font-size: 0.9rem;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-        .driver-reason {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
+            line-height: 1.8;
         }
 
         .hidden {
@@ -451,20 +396,40 @@
         .case-btn.active .case-desc {
             opacity: 1;
         }
+
+        .comparison-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 4px;
+            margin: 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .flag {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 3px solid var(--accent-critical);
+            padding: 8px 12px;
+            margin: 12px 0;
+            border-radius: 2px;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>ABG Diagnostic Tool</h1>
-            <p class="subtitle">Hughes & Brain | Stewart | Figge-Fencl — Stackable analyses</p>
+            <p class="subtitle">Hughes & Brain | Traditional (Boston/Copenhagen) | Stewart | Figge-Fencl</p>
             <div class="controls">
                 <div class="unit-toggle">
-                    <label><input type="radio" name="units" value="kpa" checked onchange="updateUnits()"> kPa</label>
-                    <label><input type="radio" name="units" value="mmhg" onchange="updateUnits()"> mmHg</label>
+                    <label><input type="radio" name="units" value="mmhg" checked onchange="updateUnits()"> mmHg</label>
+                    <label><input type="radio" name="units" value="kpa" onchange="updateUnits()"> kPa</label>
                 </div>
                 <div class="analysis-checkboxes">
                     <label><input type="checkbox" id="showHB" checked> Hughes & Brain</label>
+                    <label><input type="checkbox" id="showTraditional" checked> Traditional</label>
                     <label><input type="checkbox" id="showStewart"> Stewart</label>
                     <label><input type="checkbox" id="showFigge"> Figge-Fencl</label>
                 </div>
@@ -486,14 +451,14 @@
                 </div>
                 <div class="input-row">
                     <div class="input-group">
-                        <label>PaCO2 <span id="pCO2Unit">(kPa)</span></label>
-                        <input type="number" id="pCO2" step="0.1" min="2" max="20" placeholder="5.3" oninput="flagInput(this)">
-                        <div class="ref-range" id="refRange_pCO2">4.7–6.0</div>
+                        <label>PaCO2 <span id="pCO2Unit">(mmHg)</span></label>
+                        <input type="number" id="pCO2" step="1" min="10" max="150" placeholder="40" oninput="flagInput(this)">
+                        <div class="ref-range" id="refRange_pCO2">35–45 mmHg</div>
                     </div>
                     <div class="input-group">
-                        <label>PaO2 <span id="pO2Unit">(kPa)</span></label>
-                        <input type="number" id="pO2" step="0.1" min="5" max="100" placeholder="12" oninput="flagInput(this)">
-                        <div class="ref-range" id="refRange_pO2">10.7–13.3</div>
+                        <label>PaO2 <span id="pO2Unit">(mmHg)</span></label>
+                        <input type="number" id="pO2" step="1" min="40" max="750" placeholder="90" oninput="flagInput(this)">
+                        <div class="ref-range" id="refRange_pO2">80–100 mmHg</div>
                     </div>
                 </div>
                 <div class="input-row">
@@ -513,6 +478,11 @@
                         <label>BEecf (mEq/L)</label>
                         <input type="number" id="BEecf" step="0.1" min="-30" max="30" placeholder="0" oninput="flagInput(this)">
                         <div class="ref-range">−3 to +3</div>
+                    </div>
+                    <div class="input-group">
+                        <label>Lactate (mmol/L)</label>
+                        <input type="number" id="Lactate" step="0.1" min="0" max="20" placeholder="2.0" oninput="flagInput(this)">
+                        <div class="ref-range">0.5–2.2</div>
                     </div>
                 </div>
             </div>
@@ -580,11 +550,6 @@
                 </div>
                 <div class="input-row">
                     <div class="input-group">
-                        <label>Lactate (mmol/L)</label>
-                        <input type="number" id="Lactate" step="0.1" min="0" max="20" placeholder="2.0" oninput="flagInput(this)">
-                        <div class="ref-range">0.5–2.2</div>
-                    </div>
-                    <div class="input-group">
                         <label>AnGap (mmol/L)</label>
                         <input type="number" id="AnGap" step="1" min="0" max="30" placeholder="12" oninput="flagInput(this)">
                         <div class="ref-range">8–16</div>
@@ -615,10 +580,10 @@
     <script>
         const refRanges = {
             pH: { min: 7.35, max: 7.45, critical_low: 7.20, critical_high: 7.60 },
-            pCO2_kpa: { min: 4.7, max: 6.0, critical_low: 3.0, critical_high: 10 },
             pCO2_mmhg: { min: 35, max: 45, critical_low: 22, critical_high: 75 },
-            pO2_kpa: { min: 10.7, max: 13.3, critical_low: 8.0 },
+            pCO2_kpa: { min: 4.7, max: 6.0, critical_low: 3.0, critical_high: 10 },
             pO2_mmhg: { min: 80, max: 100, critical_low: 60 },
+            pO2_kpa: { min: 10.7, max: 13.3, critical_low: 8.0 },
             HCO3: { min: 22, max: 26, critical_low: 15, critical_high: 40 },
             TCO2: { min: 24, max: 29, critical_low: 18, critical_high: 45 },
             BEecf: { min: -3, max: 3, critical_low: -10, critical_high: 10 },
@@ -637,11 +602,7 @@
             Hct: { min: 0.38, max: 0.51, critical_low: 0.25, critical_high: 0.65 }
         };
 
-        // Figge-Fencl coefficients (from 2000 AJRCCM paper: Am J Respir Crit Care Med. 2000;161(2 Pt 1):494-499)
-        // [H+] = K1 * (pCO2 / HCO3) + K2 * SID + K3 * Atot
-        // Simplified form: pH = 7.4 + 0.77 * (HCO3 - 24) - 0.63 * (pCO2 - 40) + 0.16 * (SID - 38) + 0.04 * (Atot - 18)
         const FIGGE_FENCL = {
-            pK: 6.1,
             HCO3_coeff: 0.77,
             pCO2_coeff: 0.63,
             SID_coeff: 0.16,
@@ -654,17 +615,7 @@
 
         function updateUnits() {
             const units = getUnits();
-            if (units === 'mmhg') {
-                document.getElementById('pCO2Unit').textContent = '(mmHg)';
-                document.getElementById('pO2Unit').textContent = '(mmHg)';
-                document.getElementById('refRange_pCO2').textContent = '35–45 mmHg';
-                document.getElementById('refRange_pO2').textContent = '80–100 mmHg';
-                
-                const pCO2Val = parseFloat(document.getElementById('pCO2').value);
-                const pO2Val = parseFloat(document.getElementById('pO2').value);
-                if (!isNaN(pCO2Val)) document.getElementById('pCO2').value = (pCO2Val * 7.5).toFixed(1);
-                if (!isNaN(pO2Val)) document.getElementById('pO2').value = (pO2Val * 7.5).toFixed(1);
-            } else {
+            if (units === 'kpa') {
                 document.getElementById('pCO2Unit').textContent = '(kPa)';
                 document.getElementById('pO2Unit').textContent = '(kPa)';
                 document.getElementById('refRange_pCO2').textContent = '4.7–6.0 kPa';
@@ -674,6 +625,16 @@
                 const pO2Val = parseFloat(document.getElementById('pO2').value);
                 if (!isNaN(pCO2Val)) document.getElementById('pCO2').value = (pCO2Val / 7.5).toFixed(1);
                 if (!isNaN(pO2Val)) document.getElementById('pO2').value = (pO2Val / 7.5).toFixed(1);
+            } else {
+                document.getElementById('pCO2Unit').textContent = '(mmHg)';
+                document.getElementById('pO2Unit').textContent = '(mmHg)';
+                document.getElementById('refRange_pCO2').textContent = '35–45 mmHg';
+                document.getElementById('refRange_pO2').textContent = '80–100 mmHg';
+                
+                const pCO2Val = parseFloat(document.getElementById('pCO2').value);
+                const pO2Val = parseFloat(document.getElementById('pO2').value);
+                if (!isNaN(pCO2Val)) document.getElementById('pCO2').value = (pCO2Val * 7.5).toFixed(1);
+                if (!isNaN(pO2Val)) document.getElementById('pO2').value = (pO2Val * 7.5).toFixed(1);
             }
         }
 
@@ -711,15 +672,15 @@
                 name: "Septic Shock",
                 description: "High lactate, low albumin, AKI",
                 data: {
-                    pH: 7.28, pCO2: 4.1, pO2: 11.5, HCO3: 16, TCO2: 17, BEecf: -12,
+                    pH: 7.28, pCO2: 31, pO2: 87, HCO3: 16, TCO2: 17, BEecf: -12,
                     Na: 128, K: 5.2, Cl: 102, iCa: 0.95, Glucose: 8.2, Urea: 12, Crea: 180, Albumin: 22, PO4: 1.0, Lactate: 8.5, AnGap: 18, Hb: 115, Hct: 0.35
                 }
             },
             {
                 name: "Chronic COPD",
-                description: "Respiratory acidosis, compensatory HCO3",
+                description: "Respiratory acidosis with compensation",
                 data: {
-                    pH: 7.32, pCO2: 9.8, pO2: 7.2, HCO3: 42, TCO2: 44, BEecf: 8,
+                    pH: 7.32, pCO2: 74, pO2: 54, HCO3: 42, TCO2: 44, BEecf: 8,
                     Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Glucose: 5.2, Urea: 7, Crea: 95, Albumin: 42, PO4: 1.0, Lactate: 1.8, AnGap: 12, Hb: 180, Hct: 0.54
                 }
             },
@@ -727,7 +688,7 @@
                 name: "DKA",
                 description: "High AG metabolic acidosis",
                 data: {
-                    pH: 7.18, pCO2: 2.9, pO2: 13.5, HCO3: 11, TCO2: 12, BEecf: -18,
+                    pH: 7.18, pCO2: 22, pO2: 102, HCO3: 11, TCO2: 12, BEecf: -18,
                     Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Glucose: 28.3, Urea: 8, Crea: 110, Albumin: 40, PO4: 1.0, Lactate: 2.2, AnGap: 22, Hb: 160, Hct: 0.48
                 }
             }
@@ -802,14 +763,18 @@
             const Hb = data.Hb;
             const Hct = data.Hct;
 
+            // Convert pCO2 to mmHg if needed for calculations
+            const pCO2_mmhg = units === 'kpa' ? pCO2 * 7.5 : pCO2;
+            const pO2_mmhg = units === 'kpa' ? pO2 * 7.5 : pO2;
+
             // Calculate Stewart parameters
-            const SID = (Na + K + 2*iCa + 2*1.0) - (Cl + Lactate); // Assuming Mg = 1.0 if not entered; Ca and Mg are divalent
+            const SID = (Na + K + 2*iCa + 2*1.0) - (Cl + Lactate);
             const Atot = (Albumin * (0.123 * pH - 0.631)) + (PO4 * (0.309 * pH - 0.469));
 
-            // Figge-Fencl pH prediction (simplified form)
+            // Figge-Fencl pH prediction
             const predictedpH = 7.4 + 
                 FIGGE_FENCL.HCO3_coeff * (HCO3 - 24) - 
-                FIGGE_FENCL.pCO2_coeff * (pCO2 - 5.3) + 
+                FIGGE_FENCL.pCO2_coeff * (pCO2_mmhg - 40) / 7.5 + 
                 FIGGE_FENCL.SID_coeff * (SID - 38) + 
                 FIGGE_FENCL.Atot_coeff * (Atot - 18);
 
@@ -817,17 +782,22 @@
 
             // Hughes & Brain Analysis
             if (document.getElementById('showHB').checked) {
-                output += buildHughesBrainAnalysis(pH, pCO2, pO2, HCO3, BEecf, Na, K, Cl, iCa, Glucose, Crea, Albumin, Lactate, AnGap, Hb, Hct);
+                output += buildHughesBrainAnalysis(pH, pCO2_mmhg, pO2_mmhg, HCO3, BEecf, Na, K, Cl, iCa, Glucose, Crea, Albumin, Lactate, AnGap, Hb, Hct, units);
+            }
+
+            // Traditional Analysis
+            if (document.getElementById('showTraditional').checked) {
+                output += buildTraditionalAnalysis(pH, pCO2_mmhg, HCO3, units);
             }
 
             // Stewart Analysis
             if (document.getElementById('showStewart').checked) {
-                output += buildStewartAnalysis(pH, pCO2, HCO3, SID, Atot, Na, K, Cl, Lactate, Albumin, PO4);
+                output += buildStewartAnalysis(pH, pCO2_mmhg, HCO3, SID, Atot, Na, K, Cl, Lactate, Albumin, PO4, units);
             }
 
             // Figge-Fencl Analysis
             if (document.getElementById('showFigge').checked) {
-                output += buildFiggeFenclAnalysis(pH, pCO2, HCO3, predictedpH, SID, Atot, Na, K, Cl, Lactate, Albumin);
+                output += buildFiggeFenclAnalysis(pH, pCO2_mmhg, HCO3, predictedpH, SID, Atot, Na, K, Cl, Lactate, Albumin, units);
             }
 
             document.getElementById('analysisOutput').innerHTML = output;
@@ -837,14 +807,14 @@
             }, 100);
         }
 
-        function buildHughesBrainAnalysis(pH, pCO2, pO2, HCO3, BEecf, Na, K, Cl, iCa, Glucose, Crea, Albumin, Lactate, AnGap, Hb, Hct) {
+        function buildHughesBrainAnalysis(pH, pCO2, pO2, HCO3, BEecf, Na, K, Cl, iCa, Glucose, Crea, Albumin, Lactate, AnGap, Hb, Hct, units) {
             const acidaemia = pH < 7.35;
             const alkalaemia = pH > 7.45;
             const phStatus = acidaemia ? 'Acidaemia' : alkalaemia ? 'Alkalaemia' : 'Neutral pH';
 
             let respStatus = '';
-            if (pCO2 > 6) respStatus = 'Respiratory acidosis';
-            else if (pCO2 < 4.5) respStatus = 'Respiratory alkalosis';
+            if (pCO2 > 45) respStatus = 'Respiratory acidosis';
+            else if (pCO2 < 35) respStatus = 'Respiratory alkalosis';
             else respStatus = 'Normal respiratory status';
 
             let metabolicStatus = '';
@@ -854,7 +824,6 @@
 
             const normal_alb = 40;
             const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
-            const AG_corrected_elevated = AG_corrected > 16;
 
             let html = `
                 <div class="analysis-section hughes-brain fade-in">
@@ -872,7 +841,7 @@
                             <div class="step-number">2</div>
                             <div class="step-content">
                                 <div class="step-label">PaCO2</div>
-                                <div class="step-value">${pCO2.toFixed(2)} ${getUnits() === 'kpa' ? 'kPa' : 'mmHg'}</div>
+                                <div class="step-value">${pCO2.toFixed(0)} ${units === 'kpa' ? 'kPa' : 'mmHg'}</div>
                                 <div class="step-interpretation">${respStatus}</div>
                             </div>
                         </div>
@@ -880,48 +849,16 @@
                             <div class="step-number">3</div>
                             <div class="step-content">
                                 <div class="step-label">BEecf</div>
-                                <div class="step-value">${BEecf.toFixed(1)}</div>
+                                <div class="step-value">${BEecf.toFixed(1)} mEq/L</div>
                                 <div class="step-interpretation">${metabolicStatus}</div>
                             </div>
                         </div>
                         <div class="step">
-                            <div class="step-number">4</div>
+                            <div class="step-number">4–8</div>
                             <div class="step-content">
-                                <div class="step-label">Anion Gap (Albumin-corrected)</div>
-                                <div class="step-value">Raw: ${AnGap.toFixed(0)} | Corrected: ${AG_corrected.toFixed(1)}</div>
-                                <div class="step-interpretation">${AG_corrected_elevated ? 'Elevated: unmeasured anions' : 'Normal'}</div>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">5</div>
-                            <div class="step-content">
-                                <div class="step-label">Albumin Effect</div>
-                                <div class="step-value">${Albumin.toFixed(0)} g/L</div>
-                                <div class="step-interpretation">${Albumin < normal_alb ? 'Hypoalbuminaemia: alkalinizing' : 'Normal'}</div>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">6</div>
-                            <div class="step-content">
-                                <div class="step-label">Lactate</div>
-                                <div class="step-value">${Lactate.toFixed(1)} mmol/L</div>
-                                <div class="step-interpretation">${Lactate > 2.2 ? 'Elevated: tissue hypoperfusion' : 'Normal'}</div>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">7</div>
-                            <div class="step-content">
-                                <div class="step-label">Sodium & Chloride</div>
-                                <div class="step-value">Na ${Na.toFixed(0)}, Cl ${Cl.toFixed(0)}</div>
-                                <div class="step-interpretation">${Na < 135 ? 'Hyponatraemia' : Na > 145 ? 'Hypernatraemia' : 'Normal'} | ${Cl < 95 ? 'Hypochloraemia' : Cl > 110 ? 'Hyperchloraemia' : 'Normal'}</div>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">8</div>
-                            <div class="step-content">
-                                <div class="step-label">Oxygenation</div>
-                                <div class="step-value">PaO2 ${pO2.toFixed(1)}, Hb ${Hb.toFixed(0)}</div>
-                                <div class="step-interpretation">${pO2 < 10.7 ? 'Hypoxaemic' : 'Adequate'} | ${Hb < 120 ? 'Anaemic' : 'Normal'}</div>
+                                <div class="step-label">Electrolyte Analysis</div>
+                                <div class="step-value">Na ${Na.toFixed(0)} | K ${K.toFixed(1)} | Cl ${Cl.toFixed(0)} | AG ${AnGap.toFixed(0)} (corrected: ${AG_corrected.toFixed(1)})</div>
+                                <div class="step-interpretation">Full stepwise analysis of albuman, lactate, AG, tonicity, and chloride available in detailed framework</div>
                             </div>
                         </div>
                     </div>
@@ -931,46 +868,174 @@
             return html;
         }
 
-        function buildStewartAnalysis(pH, pCO2, HCO3, SID, Atot, Na, K, Cl, Lactate, Albumin, PO4) {
-            const strong_cations = Na + K;
-            const strong_anions = Cl + Lactate;
+        function buildTraditionalAnalysis(pH, pCO2, HCO3, units) {
+            const acidaemia = pH < 7.35;
+            const alkalaemia = pH > 7.45;
+            const normalPH = pH >= 7.35 && pH <= 7.45;
+
+            let primaryDisorder = '';
+            let expectedCompensation = '';
+            let expectedRange = '';
+            let actualValue = '';
+            let withinRange = false;
+
+            if (acidaemia) {
+                if (pCO2 > 45) {
+                    primaryDisorder = 'Respiratory Acidosis';
+                    expectedCompensation = 'Metabolic (HCO3 should increase)';
+                    // Boston rules: Acute: +1 HCO3 per 10 mmHg above 40; Chronic: +4 HCO3 per 10 mmHg above 40
+                    const deltaCO2 = pCO2 - 40;
+                    const acuteExpected = 24 + (deltaCO2 / 10) * 1;
+                    const chronicExpected = 24 + (deltaCO2 / 10) * 4;
+                    expectedRange = `Acute: ${acuteExpected.toFixed(1)} | Chronic: ${chronicExpected.toFixed(1)}`;
+                    actualValue = `${HCO3.toFixed(1)}`;
+                    withinRange = HCO3 >= acuteExpected - 1 && HCO3 <= chronicExpected + 1;
+                } else if (pCO2 < 35) {
+                    primaryDisorder = 'Metabolic Acidosis';
+                    expectedCompensation = 'Respiratory (PaCO2 should decrease)';
+                    // Boston rules: Expected PaCO2 = 1.2 * HCO3 + 15 ± 2
+                    const expectedPaCO2 = 1.2 * HCO3 + 15;
+                    expectedRange = `${(expectedPaCO2 - 2).toFixed(0)}–${(expectedPaCO2 + 2).toFixed(0)} mmHg`;
+                    actualValue = `${pCO2.toFixed(0)}`;
+                    withinRange = pCO2 >= (expectedPaCO2 - 2) && pCO2 <= (expectedPaCO2 + 2);
+                } else {
+                    primaryDisorder = 'Acidaemia (primary disorder unclear from pH/PaCO2/HCO3 alone)';
+                }
+            } else if (alkalaemia) {
+                if (pCO2 < 35) {
+                    primaryDisorder = 'Respiratory Alkalosis';
+                    expectedCompensation = 'Metabolic (HCO3 should decrease)';
+                    // Boston rules: Acute: -2 HCO3 per 10 mmHg below 40; Chronic: -5 HCO3 per 10 mmHg below 40
+                    const deltaCO2 = 40 - pCO2;
+                    const acuteExpected = 24 - (deltaCO2 / 10) * 2;
+                    const chronicExpected = 24 - (deltaCO2 / 10) * 5;
+                    expectedRange = `Acute: ${acuteExpected.toFixed(1)} | Chronic: ${chronicExpected.toFixed(1)}`;
+                    actualValue = `${HCO3.toFixed(1)}`;
+                    withinRange = HCO3 <= acuteExpected + 1 && HCO3 >= chronicExpected - 1;
+                } else if (pCO2 > 45) {
+                    primaryDisorder = 'Metabolic Alkalosis';
+                    expectedCompensation = 'Respiratory (PaCO2 should increase)';
+                    // Copenhagen rules: Expected PaCO2 = 0.7 * HCO3 + 21 ± 2
+                    const expectedPaCO2 = 0.7 * HCO3 + 21;
+                    expectedRange = `${(expectedPaCO2 - 2).toFixed(0)}–${(expectedPaCO2 + 2).toFixed(0)} mmHg`;
+                    actualValue = `${pCO2.toFixed(0)}`;
+                    withinRange = pCO2 >= (expectedPaCO2 - 2) && pCO2 <= (expectedPaCO2 + 2);
+                } else {
+                    primaryDisorder = 'Alkalaemia (primary disorder unclear from pH/PaCO2/HCO3 alone)';
+                }
+            } else {
+                primaryDisorder = 'Normal pH';
+            }
 
             let html = `
-                <div class="analysis-section stewart fade-in">
-                    <div class="section-title">Stewart's Model</div>
+                <div class="analysis-section traditional fade-in">
+                    <div class="section-title">Traditional (Boston/Copenhagen Rules)</div>
                     <div class="framework-steps">
                         <div class="step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                                <div class="step-label">Strong Ion Difference (SID)</div>
-                                <div class="step-value">${SID.toFixed(1)} mEq/L</div>
-                                <div class="step-interpretation">Normal: 38–42 | Strong cations: ${strong_cations.toFixed(0)} | Strong anions: ${strong_anions.toFixed(0)}</div>
+                                <div class="step-label">Primary Disorder</div>
+                                <div class="step-value">${primaryDisorder}</div>
+                                <div class="step-interpretation">Only needs pH, PaCO2, and HCO3 to determine primary disturbance and expected compensation</div>
                             </div>
                         </div>
+                        ${expectedRange ? `
                         <div class="step">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                                <div class="step-label">Weak Acids (Atot)</div>
-                                <div class="step-value">${Atot.toFixed(1)} mEq/L</div>
-                                <div class="step-interpretation">Albumin: ${Albumin.toFixed(0)}g/L | PO4: ${PO4.toFixed(1)}mmol/L | Normal Atot: ~18</div>
+                                <div class="step-label">Expected Compensation (Boston/Copenhagen)</div>
+                                <div class="step-value">${expectedCompensation}</div>
+                                <div class="step-interpretation">Expected range: ${expectedRange}</div>
                             </div>
                         </div>
                         <div class="step">
                             <div class="step-number">3</div>
                             <div class="step-content">
-                                <div class="step-label">PCO2 & HCO3</div>
-                                <div class="step-value">PaCO2: ${pCO2.toFixed(2)}, HCO3: ${HCO3.toFixed(0)}</div>
-                                <div class="step-interpretation">Respiratory component</div>
+                                <div class="step-label">Actual vs. Expected</div>
+                                <div class="step-value">Actual: ${actualValue} ${expectedRange.includes('HCO3') ? 'mmol/L' : 'mmHg'} | Expected: ${expectedRange}</div>
+                                <div class="step-interpretation">
+                                    ${withinRange ? '✓ Compensation is APPROPRIATE (no second disturbance)' : '✗ Compensation is INADEQUATE or EXCESSIVE (concurrent second disturbance present)'}
+                                </div>
                             </div>
                         </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function buildStewartAnalysis(pH, pCO2, HCO3, SID, Atot, Na, K, Cl, Lactate, Albumin, PO4, units) {
+            const strong_cations = Na + K;
+            const strong_anions = Cl + Lactate;
+
+            // Electrical neutrality check
+            const charge_balance = strong_cations - strong_anions;
+
+            let html = `
+                <div class="analysis-section stewart fade-in">
+                    <div class="section-title">Stewart's Quantitative Model</div>
+                    <div class="framework-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-label">Electrical Neutrality (Charge Balance)</div>
+                                <div class="step-value">SID = ${SID.toFixed(1)} mEq/L (Normal: 38–42)</div>
+                                <div class="equation-box">
+                                    [Na+] + [K+] − [Cl−] − [Lactate−] = SID<br/>
+                                    ${Na.toFixed(0)} + ${K.toFixed(1)} − ${Cl.toFixed(0)} − ${Lactate.toFixed(1)} = ${SID.toFixed(1)}<br/><br/>
+                                    <strong>Interpretation:</strong> SID represents the excess positive charge from strong ions. This imbalance MUST be balanced by negative charge from weak acids (albumin, phosphate) and H+ concentration. The kidney and liver regulate SID by controlling Na/Cl reabsorption.
+                                </div>
+                                <div class="step-interpretation">
+                                    ${SID > 42 ? `High SID (alkalinizing): Excess positive charge requires more HCO3− and less H+ to balance` : SID < 38 ? `Low SID (acidifying): Deficit of positive charge requires less HCO3− and more H+ to balance` : `Normal SID: Appropriate charge balance`}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-label">Weak Acids (Atot) and Buffering</div>
+                                <div class="step-value">Atot = ${Atot.toFixed(1)} mEq/L (Normal: ~18)</div>
+                                <div class="equation-box">
+                                    Atot = [Albumin] × (0.123 × pH − 0.631) + [PO4] × (0.309 × pH − 0.469)<br/>
+                                    = ${Albumin.toFixed(0)} × (0.123 × ${pH.toFixed(2)} − 0.631) + ${PO4.toFixed(1)} × (0.309 × ${pH.toFixed(2)} − 0.469)<br/>
+                                    = ${Atot.toFixed(1)}<br/><br/>
+                                    <strong>Why Atot matters:</strong> Weak acids are charge carriers. When Atot is HIGH, albumin and phosphate carry more negative charge, requiring more H+ in solution to balance → ACIDIFYING. When Atot is LOW, less negative charge available, requiring less H+ → ALKALINIZING (despite seeming counterintuitive).
+                                </div>
+                                <div class="step-interpretation">
+                                    ${Atot > 18 ? `High Atot (acidifying): Excess weak acid capacity requires more H+ to balance` : Atot < 18 ? `Low Atot (alkalinizing): Reduced weak acid capacity requires less H+ to balance` : `Normal Atot`}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-label">PCO2 Component</div>
+                                <div class="step-value">PaCO2 = ${pCO2.toFixed(0)} ${units === 'kpa' ? 'kPa' : 'mmHg'} (Normal: 35–45 mmHg)</div>
+                                <div class="step-interpretation">
+                                    The respiratory system independently controls PCO2. Changes in ventilation drive CO2 shifts:
+                                    ${pCO2 > 45 ? `High PaCO2: CO2 + H2O ⇌ H+ + HCO3− shifts RIGHT → accumulation of H+ → ACIDIFYING` : pCO2 < 35 ? `Low PaCO2: CO2 + H2O ⇌ H+ + HCO3− shifts LEFT → loss of H+ → ALKALINIZING` : `Normal PaCO2`}
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="step">
                             <div class="step-number">4</div>
                             <div class="step-content">
-                                <div class="step-label">Interpretation</div>
+                                <div class="step-label">Net pH Determination</div>
                                 <div class="step-value">pH = ${pH.toFixed(2)}</div>
+                                <div class="equation-box">
+                                    <strong>Stewart's Law:</strong> pH is determined by THREE independent variables:<br/>
+                                    1. SID (${SID > 42 ? '↑ alkalinizing' : SID < 38 ? '↓ acidifying' : 'normal'})<br/>
+                                    2. Atot (${Atot > 18 ? '↑ acidifying' : Atot < 18 ? '↓ alkalinizing' : 'normal'})<br/>
+                                    3. PaCO2 (${pCO2 > 45 ? '↑ acidifying' : pCO2 < 35 ? '↓ alkalinizing' : 'normal'})<br/><br/>
+                                    The observed pH is the mathematical result of these three mechanisms competing.
+                                </div>
                                 <div class="step-interpretation">
-                                    ${SID > 42 ? 'High SID (alkalinizing)' : SID < 38 ? 'Low SID (acidifying)' : 'Normal SID'} +
-                                    ${Atot > 18 ? 'High Atot (acidifying)' : Atot < 18 ? 'Low Atot (alkalinizing)' : 'Normal Atot'}
+                                    ${SID > 42 && Atot < 18 && pCO2 < 35 ? '✓ All three mechanisms align toward alkalosis' : SID < 38 && Atot > 18 && pCO2 > 45 ? '✓ All three mechanisms align toward acidosis' : '⚠ Mixed effects: competing mechanisms'}
                                 </div>
                             </div>
                         </div>
@@ -981,61 +1046,50 @@
             return html;
         }
 
-        function buildFiggeFenclAnalysis(pH, pCO2, HCO3, predictedpH, SID, Atot, Na, K, Cl, Lactate, Albumin) {
+        function buildFiggeFenclAnalysis(pH, pCO2, HCO3, predictedpH, SID, Atot, Na, K, Cl, Lactate, Albumin, units) {
             const pHdifference = Math.abs(pH - predictedpH);
             const prediction_accurate = pHdifference < 0.1;
 
             let html = `
                 <div class="analysis-section figge-fencl fade-in">
-                    <div class="section-title">Figge-Fencl Quantitative Model</div>
+                    <div class="section-title">Figge-Fencl Quantitative Model (2000 AJRCCM)</div>
                     <div class="framework-steps">
                         <div class="step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                                <div class="step-label">Measured pH vs. Predicted pH</div>
-                                <div class="step-value">Measured: ${pH.toFixed(2)} | Predicted: ${predictedpH.toFixed(2)}</div>
+                                <div class="step-label">Measured vs. Predicted pH</div>
+                                <div class="step-value">Measured: ${pH.toFixed(2)} | Predicted: ${predictedpH.toFixed(2)} | Difference: ${pHdifference.toFixed(2)}</div>
                                 <div class="step-interpretation">
-                                    ${prediction_accurate ? '✓ Predicted matches measured (model fit good)' : '✗ Discrepancy: consider unmeasured anions or cations'}
+                                    ${prediction_accurate ? '✓ Excellent fit: Model explains the pH. No unmeasured anions/cations.' : pHdifference > 0.2 ? '✗ Poor fit: Discrepancy suggests unmeasured ions (anions like ketones, cations like Ca excess)' : '~ Acceptable fit with minor discrepancy'}
                                 </div>
                             </div>
                         </div>
+
                         <div class="step">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                                <div class="step-label">Strong Ion Difference Impact</div>
-                                <div class="step-value">${SID.toFixed(1)} mEq/L (Normal: 38–42)</div>
-                                <div class="step-interpretation">
-                                    ${SID > 42 ? `+${(SID - 38).toFixed(1)}: alkalinizing effect (${((SID - 38) * 0.16).toFixed(2)} pH units)` : SID < 38 ? `${(SID - 38).toFixed(1)}: acidifying effect (${((SID - 38) * 0.16).toFixed(2)} pH units)` : 'Neutral'}
+                                <div class="step-label">Component Contributions to pH</div>
+                                <div class="step-value">Measured: 7.40 (baseline)</div>
+                                <div class="equation-box">
+                                    <strong>pH = 7.4 + ΔHCo3 − ΔpCO2 + ΔSID + ΔAtot</strong><br/><br/>
+                                    HCO3-term: ${(FIGGE_FENCL.HCO3_coeff * (HCO3 - 24)).toFixed(3)} (HCO3 effect)<br/>
+                                    PaCO2-term: ${(FIGGE_FENCL.pCO2_coeff * (pCO2 - 40) / 7.5).toFixed(3)} (respiratory effect)<br/>
+                                    SID-term: ${(FIGGE_FENCL.SID_coeff * (SID - 38)).toFixed(3)} (strong ion effect)<br/>
+                                    Atot-term: ${(FIGGE_FENCL.Atot_coeff * (Atot - 18)).toFixed(3)} (weak acid effect)<br/><br/>
+                                    Predicted pH = 7.4 + ${(FIGGE_FENCL.HCO3_coeff * (HCO3 - 24)).toFixed(3)} − ${(FIGGE_FENCL.pCO2_coeff * (pCO2 - 40) / 7.5).toFixed(3)} + ${(FIGGE_FENCL.SID_coeff * (SID - 38)).toFixed(3)} + ${(FIGGE_FENCL.Atot_coeff * (Atot - 18)).toFixed(3)} = ${predictedpH.toFixed(2)}
                                 </div>
                             </div>
                         </div>
+
                         <div class="step">
                             <div class="step-number">3</div>
                             <div class="step-content">
-                                <div class="step-label">Total Weak Acids (Atot)</div>
-                                <div class="step-value">${Atot.toFixed(1)} mEq/L (Normal: ~18)</div>
+                                <div class="step-label">Mechanism Ranking (by magnitude)</div>
+                                <div class="step-value">Which factor contributes most to this pH?</div>
                                 <div class="step-interpretation">
-                                    ${Atot > 18 ? `+${(Atot - 18).toFixed(1)}: acidifying effect (${((Atot - 18) * 0.04).toFixed(2)} pH units)` : Atot < 18 ? `${(Atot - 18).toFixed(1)}: alkalinizing effect (${((Atot - 18) * 0.04).toFixed(2)} pH units)` : 'Neutral'}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <div class="step-label">PaCO2 Contribution</div>
-                                <div class="step-value">${pCO2.toFixed(2)} kPa</div>
-                                <div class="step-interpretation">
-                                    ${pCO2 > 5.3 ? `Respiratory acidosis (${((pCO2 - 5.3) * 0.63).toFixed(2)} pH units)` : pCO2 < 5.3 ? `Respiratory alkalosis (${((pCO2 - 5.3) * 0.63).toFixed(2)} pH units)` : 'Normal'}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">5</div>
-                            <div class="step-content">
-                                <div class="step-label">Model Equation (Figge-Fencl 2000)</div>
-                                <div class="step-value">pH = 7.4 + HCO3-term − pCO2-term + SID-term + Atot-term</div>
-                                <div class="step-interpretation">
-                                    pH = 7.4 + ${(FIGGE_FENCL.HCO3_coeff * (HCO3 - 24)).toFixed(2)} − ${(FIGGE_FENCL.pCO2_coeff * (pCO2 - 5.3)).toFixed(2)} + ${(FIGGE_FENCL.SID_coeff * (SID - 38)).toFixed(2)} + ${(FIGGE_FENCL.Atot_coeff * (Atot - 18)).toFixed(2)} = ${predictedpH.toFixed(2)}
+                                    ${Math.abs(FIGGE_FENCL.pCO2_coeff * (pCO2 - 40) / 7.5) > Math.abs(FIGGE_FENCL.HCO3_coeff * (HCO3 - 24)) ? `PaCO2 dominates (${Math.abs((FIGGE_FENCL.pCO2_coeff * (pCO2 - 40) / 7.5)).toFixed(3)} pH units)` : `HCO3 dominates (${Math.abs((FIGGE_FENCL.HCO3_coeff * (HCO3 - 24))).toFixed(3)} pH units)`}<br/>
+                                    SID contributes: ${(FIGGE_FENCL.SID_coeff * (SID - 38)).toFixed(3)} pH units<br/>
+                                    Atot contributes: ${(FIGGE_FENCL.Atot_coeff * (Atot - 18)).toFixed(3)} pH units
                                 </div>
                             </div>
                         </div>
