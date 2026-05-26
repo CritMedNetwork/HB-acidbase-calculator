@@ -824,41 +824,110 @@
 
             const normal_alb = 40;
             const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
+            const AG_elevated = AG_corrected > 16;
+
+            const alb_low = Albumin < 35;
+            const alb_alkalinizing = Albumin < normal_alb;
+            const alb_masks_acidosis = alb_alkalinizing && BEecf < -2 && pH > 7.35;
+
+            const lactate_elevated = Lactate > 2.2;
+
+            const hypoxaemia = pO2 < 80;
+            const anaemia = Hb < 120;
+            const severe_anaemia = Hb < 80;
 
             let html = `
                 <div class="analysis-section hughes-brain fade-in">
-                    <div class="section-title">Hughes & Brain Framework</div>
+                    <div class="section-title">Hughes & Brain Framework (8 Steps)</div>
                     <div class="framework-steps">
                         <div class="step">
                             <div class="step-number">1</div>
                             <div class="step-content">
                                 <div class="step-label">pH Status</div>
                                 <div class="step-value">${pH.toFixed(2)}</div>
-                                <div class="step-interpretation">${phStatus}</div>
+                                <div class="step-interpretation">${phStatus} (normal: 7.35–7.45)</div>
                             </div>
                         </div>
+
                         <div class="step">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                                <div class="step-label">PaCO2</div>
-                                <div class="step-value">${pCO2.toFixed(0)} ${units === 'kpa' ? 'kPa' : 'mmHg'}</div>
-                                <div class="step-interpretation">${respStatus}</div>
+                                <div class="step-label">PaCO2 (Respiratory Status)</div>
+                                <div class="step-value">${pCO2.toFixed(0)} mmHg</div>
+                                <div class="step-interpretation">${respStatus} (normal: 35–45 mmHg)</div>
                             </div>
                         </div>
+
                         <div class="step">
                             <div class="step-number">3</div>
                             <div class="step-content">
-                                <div class="step-label">BEecf</div>
+                                <div class="step-label">BEecf (Metabolic Status)</div>
                                 <div class="step-value">${BEecf.toFixed(1)} mEq/L</div>
-                                <div class="step-interpretation">${metabolicStatus}</div>
+                                <div class="step-interpretation">${metabolicStatus} (normal: −3 to +3)</div>
                             </div>
                         </div>
+
                         <div class="step">
-                            <div class="step-number">4–8</div>
+                            <div class="step-number">4</div>
                             <div class="step-content">
-                                <div class="step-label">Electrolyte Analysis</div>
-                                <div class="step-value">Na ${Na.toFixed(0)} | K ${K.toFixed(1)} | Cl ${Cl.toFixed(0)} | AG ${AnGap.toFixed(0)} (corrected: ${AG_corrected.toFixed(1)})</div>
-                                <div class="step-interpretation">Full stepwise analysis of albuman, lactate, AG, tonicity, and chloride available in detailed framework</div>
+                                <div class="step-label">Anion Gap (Raw vs. Albumin-Corrected)</div>
+                                <div class="step-value">Raw AG: ${AnGap.toFixed(0)} | Corrected: ${AG_corrected.toFixed(1)} mmol/L</div>
+                                <div class="equation-box">
+                                    AG_corrected = AG_measured + ((40 − Albumin) / 4)<br/>
+                                    = ${AnGap.toFixed(0)} + ((40 − ${Albumin.toFixed(0)}) / 4) = ${AG_corrected.toFixed(1)}<br/>
+                                    Normal: 8–16 mmol/L
+                                </div>
+                                <div class="step-interpretation">
+                                    ${AG_elevated ? '<strong>ELEVATED:</strong> Unmeasured anions present (HAGMA)' : '<strong>NORMAL:</strong> No AG disturbance'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">Albumin Effect (Weak Acid)</div>
+                                <div class="step-value">${Albumin.toFixed(0)} g/L (normal: 35–50)</div>
+                                <div class="step-interpretation">
+                                    ${alb_low ? '<strong>HYPOALBUMINAEMIA:</strong> Reduces negative charge → alkalinizing effect' : 'Normal albumin'}<br/>
+                                    ${alb_masks_acidosis ? '<strong>⚠️ MASKING ACIDOSIS:</strong> Low albumin alkalinizes pH, but BEecf is negative (true acidosis present)' : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <div class="step-label">Lactate (Tissue Perfusion Marker)</div>
+                                <div class="step-value">${Lactate.toFixed(1)} mmol/L (normal: 0.5–2.2)</div>
+                                <div class="step-interpretation">
+                                    ${lactate_elevated ? '<strong>ELEVATED:</strong> Tissue hypoperfusion or anaerobic metabolism (sepsis, shock, liver disease)' : 'Normal lactate'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">7</div>
+                            <div class="step-content">
+                                <div class="step-label">Sodium + Chloride (Tonicity & Balance)</div>
+                                <div class="step-value">Na ${Na.toFixed(0)} mmol/L | Cl ${Cl.toFixed(0)} mmol/L</div>
+                                <div class="step-interpretation">
+                                    ${Na < 135 ? '<strong>Hyponatraemia:</strong> Dilutional (contributes to metabolic acidosis)' : Na > 145 ? '<strong>Hypernatraemia:</strong> Concentration' : 'Normal Na'}<br/>
+                                    ${Cl < 95 ? '<strong>Hypochloraemia:</strong> Often with metabolic alkalosis (chloride-depletion alkalosis)' : Cl > 110 ? '<strong>Hyperchloraemia:</strong> Associated with hyperchloraemic acidosis (normal AG)' : 'Normal Cl'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">8</div>
+                            <div class="step-content">
+                                <div class="step-label">Oxygenation & Oxygen Delivery</div>
+                                <div class="step-value">PaO2 ${pO2.toFixed(0)} mmHg | Hb ${Hb.toFixed(0)} g/L | Hct ${(Hct*100).toFixed(0)}%</div>
+                                <div class="step-interpretation">
+                                    ${hypoxaemia ? '<strong>HYPOXAEMIA:</strong>' : '<strong>Adequate PaO2:</strong>'} ${pO2.toFixed(0)} mmHg (normal: 80–100)<br/>
+                                    ${severe_anaemia ? '<strong>SEVERE ANAEMIA:</strong> O2 carrying capacity critically reduced. Normal PaO2 is DECEPTIVE—actual O2 delivery is severely compromised.' : anaemia ? '<strong>Anaemia:</strong> Reduces O2 carrying capacity' : 'Normal Hb'}<br/>
+                                    O2 delivery ∝ PaO2 × Hb: Both matter equally
+                                </div>
                             </div>
                         </div>
                     </div>
