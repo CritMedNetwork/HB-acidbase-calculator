@@ -857,9 +857,9 @@
                     value: `K ${K.toFixed(1)}, pH ${pH.toFixed(2)}, Crea ${Crea}`,
                     reasoning: 'CRITICAL: High K + acidosis + AKI = arrhythmia risk. Acidosis prevents K entry into cells.',
                     strategy: `<strong>Immediate actions:</strong><br/>
-• Calcium gluconate 10%: 10 mL IV over 2–5 min (stabilizes cardiac membrane)<br/>
-• Insulin 10 units + D50 25g IV (shifts K into cells, effect in 15–30 min)<br/>
-• Albuterol 10–20 mg nebulized (β2 activates K influx, effect in 30 min)<br/>
+• Calcium gluconate 10%: 10 mL IV over 2–5 min (stabilises cardiac membrane)<br/>
+• Insulin 10 units + 50 mL 50% Dextrose IV (shifts K into cells, effect in 15–30 min)<br/>
+• Salbutamol 10–20 mg nebulised (β2 activates K influx, effect in 30 min)<br/>
 • Dialysis (RRT) if K >6.5 with ECG changes (removes ~20–30 mEq/h)<br/>
 <strong>Target K:</strong> <5.2 mmol/L`
                 });
@@ -869,7 +869,7 @@
                     name: 'Hyperkalaemia',
                     value: `K ${K.toFixed(1)} mmol/L`,
                     reasoning: 'Elevated K increases arrhythmia risk.',
-                    strategy: `<strong>K-lowering:</strong> Insulin 10 units + D50 25g IV, Albuterol 10–20 mg neb<br/><strong>Target:</strong> <5.2 mmol/L`
+                    strategy: `<strong>K-lowering:</strong> Insulin 10 units + 50 mL 50% Dextrose IV, Salbutamol 10–20 mg nebulised<br/><strong>Target:</strong> <5.2 mmol/L`
                 });
             }
 
@@ -902,7 +902,7 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     name: 'Severe Hypoxaemia',
                     value: `PaO2 ${pO2.toFixed(0)} mmHg`,
                     reasoning: 'Critical: tissue ischaemia imminent.',
-                    strategy: `<strong>Immediate:</strong> FiO2 1.0, optimize ventilation, assess lung recruitment<br/>
+                    strategy: `<strong>Immediate:</strong> FiO2 1.0, optimise ventilation, assess lung recruitment<br/>
 <strong>Target:</strong> PaO2 ≥80–100 mmHg`
                 });
             } else if (pO2 < 80) {
@@ -911,7 +911,7 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     name: 'Hypoxaemia',
                     value: `PaO2 ${pO2.toFixed(0)} mmHg`,
                     reasoning: 'O2 delivery compromised.',
-                    strategy: `<strong>Actions:</strong> Increase FiO2, optimize ventilation<br/>
+                    strategy: `<strong>Actions:</strong> Increase FiO2, optimise ventilation<br/>
 <strong>Target:</strong> PaO2 ≥80 mmHg`
                 });
             }
@@ -922,8 +922,10 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     name: 'Severe Anaemia',
                     value: `Hb ${Hb.toFixed(0)} g/L`,
                     reasoning: 'O2 delivery = PaO2 × Hb. Critical reduction.',
-                    strategy: `<strong>Transfusion:</strong> ${Math.ceil((100 - Hb) / 10)} units PRBC immediately<br/>
-<strong>Target:</strong> Hb ≥100 g/L`
+                    strategy: `<strong>Transfusion:</strong> Target Hb 70–90 g/L. Transfuse to relieve symptoms, not normalise.<br/>
+Each unit PRBC ↑ Hb by ~10 g/L<br/>
+<strong>Acute Coronary Syndrome:</strong> Target 80–100 g/L<br/>
+<strong>Neurocritical Care/TBI:</strong> Target >90 g/L`
                 });
             } else if (Hb < 120) {
                 drivers.push({
@@ -931,8 +933,8 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     name: 'Anaemia',
                     value: `Hb ${Hb.toFixed(0)} g/L`,
                     reasoning: 'Reduces O2 carrying capacity.',
-                    strategy: `<strong>Transfuse if:</strong> Hb <100 in critical illness<br/>
-<strong>Target:</strong> Hb ≥100–120 g/L`
+                    strategy: `<strong>Transfuse if:</strong> Hb <70 g/L (general), <80 g/L (ACS), <90 g/L (neurocritical)<br/>
+<strong>Target range:</strong> 70–90 g/L`
                 });
             }
 
@@ -944,7 +946,7 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     reasoning: 'Lactate >4 = severe tissue hypoperfusion.',
                     strategy: `<strong>Actions:</strong><br/>
 • STOP epinephrine (switch to noradrenaline)<br/>
-• Optimize perfusion: fluids, vasopressors<br/>
+• Optimise perfusion: fluids, vasopressors<br/>
 • Balanced fluids (NOT 0.9% saline)<br/>
 • Dialysis if on CRRT: increase Qeff to ≥20 mL/kg/h<br/>
 <strong>Target:</strong> Lactate <2 mmol/L`
@@ -955,7 +957,7 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     name: 'Elevated Lactate',
                     value: `Lactate ${Lactate.toFixed(1)} mmol/L`,
                     reasoning: 'Indicates tissue hypoperfusion.',
-                    strategy: `<strong>Actions:</strong> Optimize perfusion, balanced fluids<br/>
+                    strategy: `<strong>Actions:</strong> Optimise perfusion, balanced fluids<br/>
 <strong>Target:</strong> Lactate <2.2 mmol/L`
                 });
             }
@@ -966,8 +968,11 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     name: 'Severe Hyponatraemia',
                     value: `Na ${Na.toFixed(0)} mmol/L`,
                     reasoning: 'Severe hyponatraemia (<130) = seizure risk.',
-                    strategy: `<strong>If symptomatic:</strong> 3% NaCl ${(((140 - Na) * adv) / 513).toFixed(0)} mL IV<br/>
-Infuse at 0.5–1 mEq/L/h (max 10–12 mEq/L/day)<br/>
+                    strategy: `<strong>If symptomatic (seizures, altered mental status):</strong><br/>
+3% NaCl options:<br/>
+• <strong>250 mL 3% bag:</strong> ${Math.ceil((140 - Na) * adv / 513 / 250)} bags IV<br/>
+• <strong>23.4% ampoule (10 mL):</strong> ${Math.ceil((140 - Na) * adv / 2340 / 10)} ampoules diluted in 50 mL normal saline<br/>
+Infuse at 0.5–1 mEq/L/h (max 10–12 mEq/L/day to avoid central pontine myelinolysis)<br/>
 <strong>Target:</strong> ↑ Na by 4–6 mEq/L in first 6h if symptomatic`
                 });
             } else if (Na < 135) {
@@ -976,7 +981,7 @@ Infuse at 0.5–1 mEq/L/h (max 10–12 mEq/L/day)<br/>
                     name: 'Hyponatraemia',
                     value: `Na ${Na.toFixed(0)} mmol/L`,
                     reasoning: 'Contributes to dilutional acidosis.',
-                    strategy: `<strong>If euvolemic:</strong> Fluid restriction 1–1.5 L/day<br/>
+                    strategy: `<strong>If euvolaemic:</strong> Fluid restriction 1–1.5 L/day<br/>
 <strong>Target:</strong> Na 135–140 mmol/L (correct slowly, <8 mEq/L/day)`
                 });
             }
@@ -987,7 +992,7 @@ Infuse at 0.5–1 mEq/L/h (max 10–12 mEq/L/day)<br/>
                     name: 'Severe Hypoglycaemia',
                     value: `Glucose ${Glucose.toFixed(1)} mmol/L`,
                     reasoning: 'Seizure/cerebral damage risk.',
-                    strategy: `<strong>Immediate:</strong> Dextrose 25% IV: 12.5–25g (1–2 amps)<br/>
+                    strategy: `<strong>Immediate:</strong> 50 mL 50% Dextrose IV<br/>
 Recheck in 15 min, repeat if needed<br/>
 <strong>Target:</strong> Glucose ≥5 mmol/L`
                 });
@@ -1111,8 +1116,8 @@ Recheck in 15 min, repeat if needed<br/>
                         ${Cl > 110 ? `
                         <strong style="color: var(--accent-critical);">HYPERCHLORAEMIA DETECTED</strong><br/>
                         Cl excess = ${(Cl - 105).toFixed(0)} mEq/L<br/>
-                        <strong>Recommendation:</strong> STOP 0.9% saline. Switch ALL fluids to balanced crystalloid (Hartmann's, PlasmaLyte, Sterofundin).<br/>
-                        This will prevent further SID reduction and allow Cl to normalize passively.
+                        <strong>Recommendation:</strong> STOP 0.9% saline. Switch ALL fluids to balanced crystalloid (Hartmann's, PlasmaLyte).<br/>
+                        This will prevent further SID reduction and allow Cl to normalise passively.
                         ` : 'Cl normal—continue current fluid strategy'}
                         <br/><br/>
 
@@ -1120,8 +1125,9 @@ Recheck in 15 min, repeat if needed<br/>
                         Current Albumin: ${Albumin.toFixed(0)} g/L<br/>
                         ${Albumin < 35 ? `
                         Albumin deficit = ${(40 - Albumin).toFixed(0)} g<br/>
-                        <strong>25% Albumin:</strong> ${(((40 - Albumin) / 25) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-                        Infuse over 30–60 min. Repeat Albumin check in 4–6h.
+                        <strong>20% Albumin:</strong> ${(((40 - Albumin) / 20) * 100).toFixed(0)} mL IV over 30–60 min<br/>
+                        OR <strong>5% Albumin:</strong> ${(((40 - Albumin) / 5) * 100).toFixed(0)} mL IV over 30–60 min<br/>
+                        Repeat Albumin check in 4–6h.
                         ` : 'Albumin normal—no correction needed'}
                         <br/><br/>
 
@@ -1129,9 +1135,9 @@ Recheck in 15 min, repeat if needed<br/>
                         Current Lactate: ${Lactate.toFixed(1)} mmol/L<br/>
                         ${Lactate > 2.2 ? `
                         <strong style="color: var(--accent-critical);">TARGET LACTATE: <2.0 mmol/L</strong><br/>
-                        • STOP adrenaline/epinephrine (switch to noradrenaline)<br/>
-                        • STOP albuterol/salbutamol<br/>
-                        • Optimize perfusion: increase MAP, optimize fluid balance<br/>
+                        • STOP adrenaline (switch to noradrenaline)<br/>
+                        • STOP salbutamol<br/>
+                        • Optimise perfusion: increase MAP, optimise fluid balance<br/>
                         • Balanced fluids (NOT saline)<br/>
                         • If CRRT: ensure Qeff ≥20 mL/kg/h<br/>
                         Recheck lactate in 2–4 hours.
@@ -1160,6 +1166,8 @@ Recheck in 15 min, repeat if needed<br/>
             const pH = data.pH;
             const pCO2 = data.pCO2;
             const HCO3 = data.HCO3;
+            const AnGap = data.AnGap;
+            const Albumin = data.Albumin;
             const acidaemia = pH < 7.35;
             const alkalaemia = pH > 7.45;
 
@@ -1171,6 +1179,53 @@ Recheck in 15 min, repeat if needed<br/>
 
             const expectedPaCO2_met_acid = 1.2 * HCO3 + 15;
             const expectedPaCO2_met_alk = 0.7 * HCO3 + 21;
+
+            // AG analysis
+            const normal_alb = 40;
+            const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
+            const AG_elevated = AG_corrected > 16;
+            const deltaAG = AnGap - 12; // Expected AG is 12
+            const deltaHCO3 = 24 - HCO3; // Expected HCO3 is 24
+            const deltaRatio = deltaAG / deltaHCO3;
+
+            let AGanalysis = '';
+            if (AG_elevated && acidaemia && pCO2 < 35) {
+                AGanalysis = `
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(255, 107, 107, 0.1); border-radius: 4px;">
+                        <strong style="color: var(--accent-critical);">HIGH ANION GAP METABOLIC ACIDOSIS (HAGMA)</strong><br/>
+                        AG raw: ${AnGap.toFixed(0)} | AG corrected: ${AG_corrected.toFixed(1)}<br/>
+                        Delta AG: ${deltaAG.toFixed(1)} | Delta HCO3: ${deltaHCO3.toFixed(1)}<br/>
+                        Delta Ratio (ΔAG/ΔHCO3): ${deltaRatio.toFixed(2)}<br/>
+                        ${deltaRatio > 2 ? '→ Concurrent METABOLIC ALKALOSIS (ratio >2)' : deltaRatio < 1 ? '→ Concurrent NON-AG METABOLIC ACIDOSIS (ratio <1)' : '→ Pure HAGMA (ratio ~1)'}<br/><br/>
+                        <strong>HAGMA Differential (GOLDMARK):</strong><br/>
+                        • <strong>G</strong>lycols (ethylene glycol, propylene glycol)<br/>
+                        • <strong>O</strong>xoproline (from paracetamol, chronic TPN)<br/>
+                        • <strong>L</strong>-lactate (hypoperfusion, sepsis)<br/>
+                        • <strong>D</strong>-lactate (short bowel syndrome, bacterial overgrowth)<br/>
+                        • <strong>M</strong>ethanol<br/>
+                        • <strong>A</strong>spirin (salicylate toxicity)<br/>
+                        • <strong>R</strong>enal failure (uraemia)<br/>
+                        • <strong>K</strong>etoacidosis (DKA, alcoholic, starvation)<br/>
+                    </div>
+                `;
+            } else if (!AG_elevated && acidaemia && pCO2 < 35) {
+                AGanalysis = `
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(94, 234, 212, 0.1); border-radius: 4px;">
+                        <strong style="color: var(--accent-safe);">NORMAL ANION GAP METABOLIC ACIDOSIS (NAGMA/Hyperchloraemic)</strong><br/>
+                        AG: ${AnGap.toFixed(0)} (normal) | HCO3: ${HCO3.toFixed(1)} (low)<br/>
+                        This is a NAGMA—look for chloride excess or bicarbonate loss.<br/><br/>
+                        <strong>NAGMA Differential (USEDCARS):</strong><br/>
+                        • <strong>U</strong>reterosigmoidostomy (bowel conduit)<br/>
+                        • <strong>S</strong>aline administration (hyperchloraemic from 0.9% saline)<br/>
+                        • <strong>E</strong>ndocrine: Addison's disease, hypoaldosteronism<br/>
+                        • <strong>D</strong>iarrhoea (bicarbonate loss)<br/>
+                        • <strong>C</strong>arbonic anhydrase inhibitors (acetazolamide)<br/>
+                        • <strong>A</strong>mmonium chloride (iatrogenic)<br/>
+                        • <strong>R</strong>enal tubular acidosis (RTA types 1, 2, 4)<br/>
+                        • <strong>S</strong>pironolactone (type 4 RTA—hyperkalaemic)<br/>
+                    </div>
+                `;
+            }
 
             return `
                 <div class="analysis-section" style="border-left-color: #8b9dc3;">
@@ -1211,9 +1266,11 @@ Recheck in 15 min, repeat if needed<br/>
                         ` : ''}
                     </div>
 
-                    <div style="padding: 16px; background: rgba(139, 157, 195, 0.1); border-left: 3px solid #8b9dc3; border-radius: 4px; font-size: 0.9rem;">
+                    ${AGanalysis}
+
+                    <div style="padding: 16px; background: rgba(139, 157, 195, 0.1); border-left: 3px solid #8b9dc3; border-radius: 4px; font-size: 0.9rem; margin-top: 20px;">
                         <strong style="color: #8b9dc3;">Pattern Recognition → Diagnose Process → Treat Underlying Cause</strong><br/>
-                        Framework: Good for bedside rapid assessment. Boston/Copenhagen rules guide expected respiratory compensation to identify concurrent disturbances.
+                        Framework: Good for bedside rapid assessment. Boston/Copenhagen rules guide expected respiratory compensation to identify concurrent disturbances. AG analysis identifies metabolic acidosis type.
                     </div>
                 </div>
             `;
