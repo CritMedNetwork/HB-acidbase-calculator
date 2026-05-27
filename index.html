@@ -894,7 +894,8 @@
                     reasoning: 'Severe albumin loss (<30) = major oncotic loss + reduced buffering.',
                     strategy: `<strong>Albumin infusion:</strong><br/>
 Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
-25% Albumin: ${(((40 - Albumin) / 25) * 100).toFixed(0)} mL IV over 30–60 min<br/>
+<strong>20% Albumin:</strong> ${(((40 - Albumin) / 20) * 100).toFixed(0)} mL IV over 30–60 min<br/>
+OR <strong>5% Albumin:</strong> ${(((40 - Albumin) / 5) * 100).toFixed(0)} mL IV over 30–60 min<br/>
 <strong>Target:</strong> Albumin >35 g/L`
                 });
             } else if (Albumin < 35) {
@@ -904,7 +905,8 @@ Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
                     value: `Albumin ${Albumin.toFixed(0)} g/L`,
                     reasoning: 'Low albumin reduces buffering capacity.',
                     strategy: `<strong>Albumin infusion:</strong><br/>
-25% Albumin: ${(((40 - Albumin) / 25) * 100).toFixed(0)} mL IV over 30–60 min<br/>
+<strong>20% Albumin:</strong> ${(((40 - Albumin) / 20) * 100).toFixed(0)} mL IV over 30–60 min<br/>
+OR <strong>5% Albumin:</strong> ${(((40 - Albumin) / 5) * 100).toFixed(0)} mL IV over 30–60 min<br/>
 <strong>Target:</strong> Albumin ≥35 g/L`
                 });
             }
