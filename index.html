@@ -3,1966 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master ABG Tool: Hughes & Brain | Stewart | Traditional</title>
+    <title>iSTAT ABG Master Analyzer</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f28;
-            --bg-tertiary: #24293a;
-            --border: #3a4252;
-            --text-primary: #e8eaed;
-            --text-secondary: #b0b3ba;
-            --accent-normal: #4a9eff;
-            --accent-warning: #ffb347;
-            --accent-critical: #ff6b6b;
-            --accent-safe: #5eead4;
-            --font-display: 'Courier Prime', 'JetBrains Mono', monospace;
-            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            margin-bottom: 8px;
-            color: var(--accent-normal);
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .controls {
-            display: flex;
-            gap: 24px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .unit-toggle {
-            display: inline-flex;
-            gap: 12px;
-            padding: 10px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-        }
-
-        .unit-toggle label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 1200px) {
-            .main-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .card-title {
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            color: var(--accent-normal);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .input-group {
-            margin-bottom: 14px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 10px 12px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text-primary);
-            font-family: var(--font-display);
-            font-size: 0.95rem;
-        }
-
-        input[type="number"].normal {
-            border-color: var(--accent-safe);
-            background: rgba(94, 234, 212, 0.05);
-        }
-
-        input[type="number"].abnormal {
-            border-color: var(--accent-warning);
-            background: rgba(255, 179, 71, 0.05);
-        }
-
-        input[type="number"].critical {
-            border-color: var(--accent-critical);
-            background: rgba(255, 107, 107, 0.05);
-        }
-
-        .ref-range {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            font-family: var(--font-display);
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        button.analyze {
-            background: var(--accent-normal);
-            color: var(--bg-primary);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.95rem;
-            width: 100%;
-            font-family: var(--font-body);
-        }
-
-        button.analyze:hover {
-            background: #3a8ae0;
-        }
-
-        .case-selector {
-            margin-bottom: 30px;
-        }
-
-        .case-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .case-btn {
-            padding: 12px 16px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-            text-align: left;
-        }
-
-        .case-btn:hover {
-            border-color: var(--accent-normal);
-            background: rgba(74, 158, 255, 0.05);
-        }
-
-        .case-btn.active {
-            background: var(--accent-normal);
-            border-color: var(--accent-normal);
-            color: var(--bg-primary);
-            font-weight: 600;
-        }
-
-        .case-name {
-            font-weight: 600;
-            margin-bottom: 2px;
-            font-size: 0.9rem;
-        }
-
-        .case-desc {
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-weight: 600;
-            font-family: var(--font-display);
-            font-size: 0.95rem;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .tab-btn.active {
-            color: var(--accent-normal);
-            border-bottom-color: var(--accent-normal);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .analysis-section {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-left: 8px solid var(--accent-normal);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .constraint-box {
-            background: var(--bg-tertiary);
-            border-left: 3px solid var(--accent-critical);
-            padding: 16px;
-            border-radius: 4px;
-            margin: 16px 0;
-            font-size: 0.9rem;
-            line-height: 1.7;
-        }
-
-        .intervention-box {
-            background: rgba(94, 234, 212, 0.1);
-            border-left: 3px solid var(--accent-safe);
-            padding: 16px;
-            border-radius: 4px;
-            margin: 16px 0;
-            font-size: 0.9rem;
-            line-height: 1.7;
-        }
-
-        .drivers-list {
-            display: grid;
-            gap: 16px;
-            margin: 20px 0;
-        }
-
-        .driver-card {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--border);
-            border-radius: 6px;
-            padding: 16px;
-        }
-
-        .driver-card.priority-1 {
-            border-left-color: var(--accent-critical);
-            background: rgba(255, 107, 107, 0.05);
-        }
-
-        .driver-card.priority-2 {
-            border-left-color: var(--accent-warning);
-            background: rgba(255, 179, 71, 0.05);
-        }
-
-        .driver-card.priority-3 {
-            border-left-color: var(--accent-normal);
-        }
-
-        .driver-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .driver-rank {
-            font-family: var(--font-display);
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            min-width: 30px;
-        }
-
-        .driver-rank.priority-1 {
-            color: var(--accent-critical);
-        }
-
-        .driver-rank.priority-2 {
-            color: var(--accent-warning);
-        }
-
-        .driver-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-
-        .driver-value {
-            font-family: var(--font-display);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .driver-reasoning {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border-radius: 3px;
-        }
-
-        .correction-strategy {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-primary);
-            padding: 12px;
-            background: rgba(94, 234, 212, 0.1);
-            border-left: 2px solid var(--accent-safe);
-            border-radius: 3px;
-            margin-top: 12px;
-        }
-
-        .correction-strategy strong {
-            color: var(--accent-safe);
-        }
-
-        button.expand-driver {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            margin-top: 12px;
-        }
-
-        button.expand-driver:hover {
-            border-color: var(--accent-normal);
-            background: rgba(74, 158, 255, 0.05);
-        }
-
-        .slider-correction {
-            margin-top: 16px;
-            padding: 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-        }
-
-        .slider-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .slider-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .slider-item label {
-            margin: 0;
-            font-size: 0.8rem;
-        }
-
-        .slider-item input[type="range"] {
-            cursor: pointer;
-        }
-
-        .slider-value {
-            font-family: var(--font-display);
-            font-size: 0.9rem;
-            color: var(--accent-normal);
-            font-weight: 600;
-        }
+            --bg-primary: #0d1117;
+            --bg-secondary: #1c2128;
+            --bg-tertiary: #262c36;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --accent-normal: #58a6ff;
+            --accent-warning: #d29922;
+            --accent-critical: #f85149;
+            --accent-safe: #3fb950;
+            --font-display: 'Monaco', 'Courier New', monospace;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; border-bottom: 2px solid var(--border); }
+        .header h1 { font-size: 1.8rem; margin-bottom: 8px; color: var(--accent-normal); }
+        .header p { color: var(--text-secondary); font-size: 0.9rem; }
+        .case-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; padding: 20px; background: var(--bg-secondary); border-radius: 8px; }
+        .case-btn { padding: 12px 16px; background: var(--bg-tertiary); color: var(--text-primary); border: 2px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; text-align: left; }
+        .case-btn:hover { border-color: var(--accent-normal); background: var(--bg-primary); }
+        .case-btn.active { border-color: var(--accent-normal); background: rgba(88, 166, 255, 0.1); }
+        .case-name { font-weight: 600; margin-bottom: 4px; }
+        .case-desc { font-size: 0.8rem; color: var(--text-secondary); }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; padding: 20px; background: var(--bg-secondary); border-radius: 8px; }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+        .input-group input { padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 4px; font-family: var(--font-display); }
+        .input-group input:focus { outline: none; border-color: var(--accent-normal); box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.1); }
+        .button-group { display: flex; gap: 12px; margin-bottom: 24px; }
+        .btn-analyze { flex: 1; padding: 12px 24px; background: var(--accent-normal); color: var(--bg-primary); border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
+        .btn-analyze:hover { background: #4184e4; }
+        .tabs { display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+        .tab-btn { padding: 12px 20px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.95rem; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--accent-normal); border-bottom-color: var(--accent-normal); }
+        .tab-content { display: none; padding: 20px; background: var(--bg-secondary); border-radius: 8px; }
+        .tab-content.active { display: block; }
+        .analysis-section { padding: 16px; background: var(--bg-tertiary); border-left: 4px solid var(--accent-normal); border-radius: 6px; margin-bottom: 20px; }
+        .section-title { font-weight: 600; font-size: 1rem; margin-bottom: 16px; color: var(--accent-normal); font-family: var(--font-display); }
+        .flowchart-box { padding: 12px; margin: 8px 0; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 6px; text-align: center; font-weight: 500; }
+        .flowchart-arrow { text-align: center; color: var(--text-secondary); margin: 4px 0; font-size: 1.2rem; }
+        .slider-group { margin: 20px 0; padding: 16px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border); }
+        .slider-label { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; font-weight: 500; }
+        .slider-label-value { color: var(--accent-normal); font-family: var(--font-display); }
+        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; -webkit-appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-normal); cursor: pointer; transition: background 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { background: #4184e4; }
+        input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-normal); cursor: pointer; border: none; transition: background 0.2s; }
+        input[type="range"]::-moz-range-thumb:hover { background: #4184e4; }
+        .perturbation-summary { padding: 16px; background: rgba(94, 234, 212, 0.05); border-left: 3px solid var(--accent-safe); border-radius: 4px; margin-top: 20px; font-size: 0.9rem; line-height: 1.7; }
+        .disclaimer { padding: 12px; background: rgba(210, 153, 34, 0.1); border-left: 3px solid var(--accent-warning); margin-bottom: 20px; border-radius: 4px; font-size: 0.85rem; color: var(--text-secondary); }
+        .step-box { padding: 12px; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); margin: 12px 0; border-radius: 4px; font-size: 0.9rem; line-height: 1.7; }
     </style>
 </head>
 <body>
-    <div style="background: rgba(255, 179, 71, 0.15); border: 1px solid var(--accent-warning); border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
-        <strong style="color: var(--accent-warning);">⚠️ DISCLAIMER:</strong> This is a teaching tool to gain experience and understanding of these three approaches to the analysis of acid-base abnormalities and should not be used as any substitute for clinical advice. Always refer to relevant clinical guidelines and consult with senior clinicians when making clinical decisions.
+<div class="container">
+    <div class="disclaimer">
+        <strong>⚠️ DISCLAIMER:</strong> Educational tool only. Always correlate with clinical context and verify calculations using current institutional protocols.
     </div>
 
-    <div class="container">
-        <header>
-            <h1>Master ABG Diagnostic Tool</h1>
-            <p class="subtitle">Hughes & Brain | Stewart | Traditional — Complete mechanism-based analysis with constraint checking and clinical dosing (80kg patient)</p>
-            <div class="controls">
-                <div class="unit-toggle">
-                    <label><input type="radio" name="units" value="mmhg" checked onchange="updateUnits()"> mmHg</label>
-                    <label><input type="radio" name="units" value="kpa" onchange="updateUnits()"> kPa</label>
-                </div>
-            </div>
-        </header>
-
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-bottom: 30px; font-size: 0.85rem;">
-            <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 12px; color: var(--accent-normal); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Other CritMedNetwork Sites</div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                <a href="https://www.cicmwrecks.com" target="_blank" style="color: var(--accent-normal); text-decoration: none; font-weight: 600; transition: color 0.2s ease; padding: 8px 0;">ICU Primary Exam Resources</a>
-                <a href="https://bens-disorganisation.gitbook.io/anzca-rga-notes" target="_blank" style="color: var(--accent-normal); text-decoration: none; font-weight: 600; transition: color 0.2s ease; padding: 8px 0;">Rural Generalist Anaesthetics</a>
-                <a href="https://aspericu.wordpress.com/" target="_blank" style="color: var(--accent-normal); text-decoration: none; font-weight: 600; transition: color 0.2s ease; padding: 8px 0;">Critical Care EBM Learning</a>
-            </div>
-        </div>
-
-        <div class="case-selector">
-            <h2 style="font-family: var(--font-display); font-size: 1rem; margin-bottom: 12px; color: var(--text-primary);">SELECT A CASE</h2>
-            <div class="case-options" id="caseOptions"></div>
-        </div>
-
-        <div class="main-grid">
-            <div class="card">
-                <div class="card-title">Blood Gas</div>
-                <div class="input-group">
-                    <label>pH</label>
-                    <input type="number" id="pH" step="0.01" min="6.8" max="8.0" placeholder="7.40" oninput="flagInput(this)">
-                    <div class="ref-range">7.35–7.45</div>
-                </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>PaCO2 <span id="pCO2Unit">(mmHg)</span></label>
-                        <input type="number" id="pCO2" step="1" min="10" max="150" placeholder="40" oninput="flagInput(this)">
-                        <div class="ref-range" id="refRange_pCO2">35–45 mmHg</div>
-                    </div>
-                    <div class="input-group">
-                        <label>PaO2 <span id="pO2Unit">(mmHg)</span></label>
-                        <input type="number" id="pO2" step="1" min="40" max="750" placeholder="90" oninput="flagInput(this)">
-                        <div class="ref-range" id="refRange_pO2">80–100 mmHg</div>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>HCO3- (mmol/L)</label>
-                        <input type="number" id="HCO3" step="0.1" min="5" max="50" placeholder="24" oninput="flagInput(this)">
-                        <div class="ref-range">22–26</div>
-                    </div>
-                    <div class="input-group">
-                        <label>BEecf (mEq/L)</label>
-                        <input type="number" id="BEecf" step="0.1" min="-30" max="30" placeholder="0" oninput="flagInput(this)">
-                        <div class="ref-range">−3 to +3</div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>Lactate (mmol/L)</label>
-                    <input type="number" id="Lactate" step="0.1" min="0" max="20" placeholder="2.0" oninput="flagInput(this)">
-                    <div class="ref-range">0.5–2.2</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Electrolytes</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Na+ (mmol/L)</label>
-                        <input type="number" id="Na" step="1" min="100" max="160" placeholder="140" oninput="flagInput(this)">
-                        <div class="ref-range">135–145</div>
-                    </div>
-                    <div class="input-group">
-                        <label>K+ (mmol/L)</label>
-                        <input type="number" id="K" step="0.1" min="2" max="8" placeholder="4.0" oninput="flagInput(this)">
-                        <div class="ref-range">3.5–5.2</div>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Cl- (mmol/L)</label>
-                        <input type="number" id="Cl" step="1" min="80" max="120" placeholder="105" oninput="flagInput(this)">
-                        <div class="ref-range">95–110</div>
-                    </div>
-                    <div class="input-group">
-                        <label>iCa2+ (mmol/L)</label>
-                        <input type="number" id="iCa" step="0.01" min="0.8" max="1.5" placeholder="1.23" oninput="flagInput(this)">
-                        <div class="ref-range">1.15–1.32</div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>AnGap (mmol/L)</label>
-                    <input type="number" id="AnGap" step="1" min="0" max="30" placeholder="12" oninput="flagInput(this)">
-                    <div class="ref-range">8–16</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Chemistry</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Albumin (g/L)</label>
-                        <input type="number" id="Albumin" step="1" min="10" max="60" placeholder="40" oninput="flagInput(this)">
-                        <div class="ref-range">35–50</div>
-                    </div>
-                    <div class="input-group">
-                        <label>PO4 (mmol/L)</label>
-                        <input type="number" id="PO4" step="0.1" min="0.5" max="3" placeholder="1.0" oninput="flagInput(this)">
-                        <div class="ref-range">0.8–1.4</div>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Glucose (mmol/L)</label>
-                        <input type="number" id="Glucose" step="0.1" min="1" max="50" placeholder="5.5" oninput="flagInput(this)">
-                        <div class="ref-range">3.0–7.8</div>
-                    </div>
-                    <div class="input-group">
-                        <label>Hb (g/L)</label>
-                        <input type="number" id="Hb" step="1" min="50" max="200" placeholder="150" oninput="flagInput(this)">
-                        <div class="ref-range">120–180</div>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Crea (μmol/L)</label>
-                        <input type="number" id="Crea" step="1" min="20" max="500" placeholder="90" oninput="flagInput(this)">
-                        <div class="ref-range">60–120</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-bottom: 30px;">
-            <button class="analyze" onclick="analyzeCase()">Analyze Across All Frameworks</button>
-        </div>
-
-        <div id="analysisOutput"></div>
+    <div class="header">
+        <h1>iSTAT CG8+ ABG Master Analyzer</h1>
+        <p>Hughes & Brain | Stewart | Traditional Boston | Figge-Fencl</p>
     </div>
 
-    <script>
-        const refRanges = {
-            pH: { min: 7.35, max: 7.45, critical_low: 7.20, critical_high: 7.60 },
-            pCO2_mmhg: { min: 35, max: 45, critical_low: 22, critical_high: 75 },
-            pCO2_kpa: { min: 4.7, max: 6.0, critical_low: 3.0, critical_high: 10 },
-            pO2_mmhg: { min: 80, max: 100, critical_low: 60 },
-            pO2_kpa: { min: 10.7, max: 13.3, critical_low: 8.0 },
-            HCO3: { min: 22, max: 26, critical_low: 15, critical_high: 40 },
-            BEecf: { min: -3, max: 3, critical_low: -10, critical_high: 10 },
-            Na: { min: 135, max: 145, critical_low: 125, critical_high: 160 },
-            K: { min: 3.5, max: 5.2, critical_low: 2.8, critical_high: 6.5 },
-            Cl: { min: 95, max: 110, critical_low: 85, critical_high: 125 },
-            iCa: { min: 1.15, max: 1.32, critical_low: 0.75, critical_high: 1.50 },
-            AnGap: { min: 8, max: 16, critical_low: 5, critical_high: 20 },
-            Albumin: { min: 35, max: 50, critical_low: 25 },
-            PO4: { min: 0.8, max: 1.4 },
-            Lactate: { min: 0.5, max: 2.2, critical: 4.0 },
-            Glucose: { min: 3.0, max: 7.8, critical_low: 2.5, critical_high: 15 },
-            Hb: { min: 120, max: 180, critical_low: 80 },
-            Crea: { min: 60, max: 120, critical_high: 200 }
-        };
+    <div class="case-selector" id="caseOptions">
+        <h3 style="grid-column: 1/-1; margin-bottom: 12px; color: var(--text-secondary);">SELECT A TEST CASE</h3>
+    </div>
 
-        function getMidpoint(param) {
-            const ranges = refRanges[param];
-            if (!ranges) return 0;
-            return (ranges.min + ranges.max) / 2;
-        }
+    <div class="input-grid">
+        <div class="input-group"><label>pH</label><input type="number" id="pH" step="0.01" min="6" max="8" placeholder="7.35"></div>
+        <div class="input-group"><label>pCO2 (mmHg)</label><input type="number" id="pCO2" step="1" min="10" max="100" placeholder="40"></div>
+        <div class="input-group"><label>pO2 (mmHg)</label><input type="number" id="pO2" step="1" min="20" max="200" placeholder="90"></div>
+        <div class="input-group"><label>HCO3 (mmol/L)</label><input type="number" id="HCO3" step="0.1" min="1" max="60" placeholder="24"></div>
+        <div class="input-group"><label>Na (mmol/L)</label><input type="number" id="Na" step="1" min="110" max="160" placeholder="140"></div>
+        <div class="input-group"><label>K (mmol/L)</label><input type="number" id="K" step="0.1" min="2" max="8" placeholder="4.0"></div>
+        <div class="input-group"><label>Cl (mmol/L)</label><input type="number" id="Cl" step="1" min="80" max="120" placeholder="105"></div>
+        <div class="input-group"><label>iCa (mmol/L)</label><input type="number" id="iCa" step="0.01" min="0.5" max="2" placeholder="1.20"></div>
+        <div class="input-group"><label>Lactate (mmol/L)</label><input type="number" id="Lactate" step="0.1" min="0" max="20" placeholder="1.5"></div>
+        <div class="input-group"><label>Albumin (g/L)</label><input type="number" id="Albumin" step="1" min="20" max="60" placeholder="40"></div>
+        <div class="input-group"><label>PO4 (mmol/L)</label><input type="number" id="PO4" step="0.1" min="0.5" max="2.5" placeholder="1.0"></div>
+        <div class="input-group"><label>Glucose (mmol/L)</label><input type="number" id="Glucose" step="0.1" min="1" max="40" placeholder="5.0"></div>
+        <div class="input-group"><label>Hb (g/L)</label><input type="number" id="Hb" step="5" min="60" max="200" placeholder="140"></div>
+        <div class="input-group"><label>Creatinine (μmol/L)</label><input type="number" id="Crea" step="5" min="30" max="300" placeholder="90"></div>
+    </div>
 
-        function classifyValue(value, param) {
-            const units = document.querySelector('input[name="units"]:checked').value;
-            const key = param === 'pCO2' ? `pCO2_${units}` : param === 'pO2' ? `pO2_${units}` : param;
-            const ranges = refRanges[key];
-            
-            if (!ranges) return 'normal';
-            if (ranges.critical_high && value > ranges.critical_high) return 'critical';
-            if (ranges.critical_low && value < ranges.critical_low) return 'critical';
-            if (value < ranges.min || value > ranges.max) return 'abnormal';
-            return 'normal';
-        }
+    <div class="button-group">
+        <button class="btn-analyze" onclick="analyzeCase()">ANALYZE</button>
+    </div>
 
-        function flagInput(input) {
-            const val = parseFloat(input.value);
-            if (isNaN(val)) {
-                input.classList.remove('normal', 'abnormal', 'critical');
-                return;
-            }
-            const status = classifyValue(val, input.id);
-            input.classList.remove('normal', 'abnormal', 'critical');
-            input.classList.add(status);
-        }
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('hughes')">Hughes & Brain</button>
+        <button class="tab-btn" onclick="switchTab('stewart')">Stewart</button>
+        <button class="tab-btn" onclick="switchTab('traditional')">Traditional</button>
+        <button class="tab-btn" onclick="switchTab('figge')">Figge-Fencl</button>
+    </div>
 
-        function updateUnits() {
-            const units = document.querySelector('input[name="units"]:checked').value;
-            if (units === 'kpa') {
-                document.getElementById('pCO2Unit').textContent = '(kPa)';
-                document.getElementById('pO2Unit').textContent = '(kPa)';
-                document.getElementById('refRange_pCO2').textContent = '4.7–6.0 kPa';
-                document.getElementById('refRange_pO2').textContent = '10.7–13.3 kPa';
-                
-                const pCO2Val = parseFloat(document.getElementById('pCO2').value);
-                const pO2Val = parseFloat(document.getElementById('pO2').value);
-                if (!isNaN(pCO2Val)) document.getElementById('pCO2').value = (pCO2Val / 7.5).toFixed(1);
-                if (!isNaN(pO2Val)) document.getElementById('pO2').value = (pO2Val / 7.5).toFixed(1);
-            } else {
-                document.getElementById('pCO2Unit').textContent = '(mmHg)';
-                document.getElementById('pO2Unit').textContent = '(mmHg)';
-                document.getElementById('refRange_pCO2').textContent = '35–45 mmHg';
-                document.getElementById('refRange_pO2').textContent = '80–100 mmHg';
-                
-                const pCO2Val = parseFloat(document.getElementById('pCO2').value);
-                const pO2Val = parseFloat(document.getElementById('pO2').value);
-                if (!isNaN(pCO2Val)) document.getElementById('pCO2').value = (pCO2Val * 7.5).toFixed(1);
-                if (!isNaN(pO2Val)) document.getElementById('pO2').value = (pO2Val * 7.5).toFixed(1);
-            }
-        }
+    <div id="hughes" class="tab-content active"><div id="hughesOutput"></div></div>
+    <div id="stewart" class="tab-content"><div id="stewartOutput"></div></div>
+    <div id="traditional" class="tab-content"><div id="traditionalOutput"></div></div>
+    <div id="figge" class="tab-content"><div id="figgeOutput"></div></div>
+</div>
 
-        const cases = [
-            {
-                name: "Septic Shock",
-                description: "High lactate, low albumin, AKI, K+",
-                data: {
-                    pH: 7.28, pCO2: 31, pO2: 87, HCO3: 16, BEecf: -12,
-                    Na: 128, K: 5.8, Cl: 102, iCa: 0.92, AnGap: 18, Lactate: 8.5,
-                    Albumin: 22, PO4: 1.0, Glucose: 8.2, Hb: 115, Crea: 180
-                }
-            },
-            {
-                name: "Chronic COPD",
-                description: "Respiratory acidosis, compensatory HCO3",
-                data: {
-                    pH: 7.32, pCO2: 74, pO2: 54, HCO3: 42, BEecf: 8,
-                    Na: 138, K: 4.5, Cl: 98, iCa: 1.15, AnGap: 12, Lactate: 1.8,
-                    Albumin: 42, PO4: 1.0, Glucose: 5.2, Hb: 180, Crea: 95
-                }
-            },
-            {
-                name: "DKA",
-                description: "High AG acidosis, hyperglycaemia, K+",
-                data: {
-                    pH: 7.18, pCO2: 22, pO2: 102, HCO3: 11, BEecf: -18,
-                    Na: 132, K: 5.8, Cl: 108, iCa: 1.10, AnGap: 22, Lactate: 2.2,
-                    Albumin: 40, PO4: 1.0, Glucose: 28.3, Hb: 160, Crea: 110
-                }
-            }
-        ];
+<script>
+const cases = [
+    { name: "Septic Shock", description: "High lactate, low albumin, AKI, K+", data: { pH: 7.28, pCO2: 31, pO2: 87, HCO3: 16, Na: 128, K: 5.8, Cl: 102, iCa: 0.92, Lactate: 8.5, Albumin: 22, PO4: 1.0, Glucose: 8.2, Hb: 115, Crea: 180 } },
+    { name: "Chronic COPD", description: "Respiratory acidosis, compensatory HCO3", data: { pH: 7.32, pCO2: 74, pO2: 54, HCO3: 42, Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Lactate: 1.8, Albumin: 42, PO4: 1.0, Glucose: 5.2, Hb: 180, Crea: 95 } },
+    { name: "DKA", description: "High AG acidosis, hyperglycaemia, K+", data: { pH: 7.18, pCO2: 22, pO2: 102, HCO3: 11, Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Lactate: 2.2, Albumin: 40, PO4: 1.0, Glucose: 28.3, Hb: 160, Crea: 110 } },
+    { name: "Salicylate Overdose", description: "Mixed respiratory alkalosis + metabolic acidosis", data: { pH: 7.42, pCO2: 18, pO2: 110, HCO3: 12, Na: 140, K: 4.2, Cl: 105, iCa: 1.23, Lactate: 1.5, Albumin: 38, PO4: 1.0, Glucose: 7.8, Hb: 145, Crea: 92 } }
+];
 
-        function initCases() {
-            const container = document.getElementById('caseOptions');
-            cases.forEach((caseObj, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'case-btn';
-                btn.innerHTML = `<div class="case-name">${caseObj.name}</div><div class="case-desc">${caseObj.description}</div>`;
-                btn.onclick = () => loadCase(idx);
-                container.appendChild(btn);
-            });
-        }
+function initCases() {
+    const container = document.getElementById('caseOptions');
+    cases.forEach((caseObj, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'case-btn';
+        btn.innerHTML = `<div class="case-name">${caseObj.name}</div><div class="case-desc">${caseObj.description}</div>`;
+        btn.onclick = () => loadCase(idx);
+        container.appendChild(btn);
+    });
+}
 
-        function loadCase(idx) {
-            const case_data = cases[idx];
-            Object.keys(case_data.data).forEach(key => {
-                const el = document.getElementById(key);
-                if (el) {
-                    el.value = case_data.data[key];
-                    flagInput(el);
-                }
-            });
-            document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.case-btn')[idx].classList.add('active');
+function loadCase(idx) {
+    const caseData = cases[idx];
+    Object.keys(caseData.data).forEach(key => {
+        document.getElementById(key).value = caseData.data[key];
+    });
+    document.querySelectorAll('.case-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+    analyzeCase();
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+
+function analyzeCase() {
+    const data = {
+        pH: parseFloat(document.getElementById('pH').value) || 7.40,
+        pCO2: parseFloat(document.getElementById('pCO2').value) || 40,
+        pO2: parseFloat(document.getElementById('pO2').value) || 90,
+        HCO3: parseFloat(document.getElementById('HCO3').value) || 24,
+        Na: parseFloat(document.getElementById('Na').value) || 140,
+        K: parseFloat(document.getElementById('K').value) || 4.0,
+        Cl: parseFloat(document.getElementById('Cl').value) || 105,
+        iCa: parseFloat(document.getElementById('iCa').value) || 1.20,
+        Lactate: parseFloat(document.getElementById('Lactate').value) || 1.5,
+        Albumin: parseFloat(document.getElementById('Albumin').value) || 40,
+        PO4: parseFloat(document.getElementById('PO4').value) || 1.0,
+        Glucose: parseFloat(document.getElementById('Glucose').value) || 5.0,
+        Hb: parseFloat(document.getElementById('Hb').value) || 140,
+        Crea: parseFloat(document.getElementById('Crea').value) || 90
+    };
+
+    const BEecf = -0.93 * (24 - data.HCO3) - 16 * (7.40 - data.pH);
+    const AnGap = data.Na - (data.Cl + data.HCO3);
+    const AG_corrected = AnGap + ((40 - data.Albumin) / 4);
+    const acidaemia = data.pH < 7.35;
+    const SID = (data.Na + data.K + 2*data.iCa) - (data.Cl + data.Lactate);
+    const Atot = (data.Albumin/10) * (0.123 * data.pH - 0.631) + (data.PO4/10) * (0.309 * data.pH - 0.469);
+    const predicted_pH = 7.4 + 0.16*(SID-38) + 0.04*(Atot-18) - 0.084*((data.pCO2-40)/7.5);
+
+    document.getElementById('hughesOutput').innerHTML = buildHughesBrain(data, BEecf, AnGap, AG_corrected, acidaemia);
+    document.getElementById('stewartOutput').innerHTML = buildStewart(data, SID, Atot, predicted_pH);
+    document.getElementById('traditionalOutput').innerHTML = buildTraditional(data, AnGap, AG_corrected, BEecf, acidaemia);
+    document.getElementById('figgeOutput').innerHTML = buildFigge(data, predicted_pH);
+    setupSliders();
+}
+
+function setupSliders() {
+    ['k-slider', 'albumin-slider', 'lactate-slider', 'hb-slider'].forEach(id => {
+        const slider = document.getElementById(id);
+        if (slider) slider.addEventListener('input', (e) => {
+            const param = e.target.getAttribute('data-param');
+            document.getElementById(param).value = parseFloat(e.target.value);
             analyzeCase();
+        });
+    });
+    ['na-slider', 'cl-slider', 'albumin-slider-stew', 'po4-slider', 'pco2-slider'].forEach(id => {
+        const slider = document.getElementById(id);
+        if (slider) slider.addEventListener('input', (e) => {
+            const param = e.target.getAttribute('data-param');
+            document.getElementById(param).value = parseFloat(e.target.value);
+            analyzeCase();
+        });
+    });
+}
+
+function buildHughesBrain(data, BEecf, AnGap, AG_corrected, acidaemia) {
+    let h = '<div class="analysis-section"><div class="section-title">Hughes & Brain: 8-Step Flowchart & Drivers</div>';
+    h += '<div style="margin-bottom: 30px;"><strong style="color: var(--accent-normal); display: block; margin-bottom: 12px;">FLOWCHART: pH → Respiratory → Metabolic → AG → Lactate → Electrolytes → Clinical</strong>';
+    h += '<div class="flowchart-box"><strong>Step 1: pH Status</strong><br/>pH = ' + data.pH.toFixed(2) + '<br/>' + (acidaemia ? '🔴 ACIDAEMIA' : data.pH > 7.45 ? '🔵 ALKALAEMIA' : '🟢 NORMAL') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>Step 2: Respiratory (pCO2)</strong><br/>pCO2 = ' + data.pCO2.toFixed(0) + ' mmHg<br/>' + (data.pCO2 > 45 ? '↑ Hypoventilation' : data.pCO2 < 35 ? '↓ Hyperventilation' : '✓ Normal (35-45)') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>Step 3: Metabolic (BEecf)</strong><br/>BEecf = ' + BEecf.toFixed(1) + ' mEq/L<br/>' + (BEecf < -3 ? '🔴 Negative (Metabolic Acidosis)' : BEecf > 3 ? '🔵 Positive (Metabolic Alkalosis)' : '🟢 Normal (-3 to +3)') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>Steps 4–5: Anion Gap</strong><br/>Raw AG = ' + AnGap.toFixed(0) + ' | Corrected = ' + AG_corrected.toFixed(1) + '<br/>' + (AG_corrected > 16 ? '🔴 HIGH (HAGMA)' : '🟢 NORMAL') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>Step 6: Lactate</strong><br/>Lactate = ' + data.Lactate.toFixed(1) + ' mmol/L<br/>' + (data.Lactate > 4 ? '🔴 SEVERE' : data.Lactate > 2.2 ? '🟡 ELEVATED' : '🟢 NORMAL') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>Step 7: Electrolytes</strong><br/>Na ' + data.Na.toFixed(0) + ' | K ' + data.K.toFixed(1) + ' | Cl ' + data.Cl.toFixed(0) + ' | Albumin ' + data.Albumin.toFixed(0) + ' g/L</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>Step 8: Clinical Context</strong><br/>Crea ' + data.Crea + ' | Glucose ' + data.Glucose.toFixed(1) + ' | Hb ' + data.Hb + ' g/L</div></div>';
+    
+    h += '<div style="margin-top: 30px; padding: 12px; background: var(--bg-tertiary); border-radius: 6px;"><strong style="color: var(--accent-normal); display: block; margin-bottom: 12px;">KEY DRIVERS: Adjust sliders to see impact</strong>';
+    h += '<div class="slider-group"><div class="slider-label"><span>K (Potassium)</span><span class="slider-label-value">' + data.K.toFixed(1) + ' mmol/L</span></div><input type="range" id="k-slider" min="2" max="8" step="0.1" value="' + data.K + '" data-param="K"><div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Normal: 3.5–5.2 | Critical for cardiac effects</div></div>';
+    h += '<div class="slider-group"><div class="slider-label"><span>Albumin</span><span class="slider-label-value">' + data.Albumin.toFixed(0) + ' g/L</span></div><input type="range" id="albumin-slider" min="20" max="60" step="1" value="' + data.Albumin + '" data-param="Albumin"><div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Normal: 35–50 | Main unmeasured anion</div></div>';
+    h += '<div class="slider-group"><div class="slider-label"><span>Lactate</span><span class="slider-label-value">' + data.Lactate.toFixed(1) + ' mmol/L</span></div><input type="range" id="lactate-slider" min="0.5" max="20" step="0.1" value="' + data.Lactate + '" data-param="Lactate"><div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Normal: 0.5–2.2 | Tissue perfusion marker</div></div>';
+    h += '<div class="slider-group"><div class="slider-label"><span>Haemoglobin</span><span class="slider-label-value">' + data.Hb.toFixed(0) + ' g/L</span></div><input type="range" id="hb-slider" min="60" max="200" step="5" value="' + data.Hb + '" data-param="Hb"><div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Normal: 120–180 | Oxygen capacity</div></div>';
+    h += '<div class="perturbation-summary"><strong>DRIVER SUMMARY:</strong><br/>';
+    let summary = '';
+    if (data.K > 5.5) summary += '🔴 <strong>Hyperkalaemia</strong> (K ' + data.K.toFixed(1) + ') – Cardiac risk<br/>';
+    else if (data.K < 3.5) summary += '🔴 <strong>Hypokalaemia</strong> (K ' + data.K.toFixed(1) + ') – Arrhythmia risk<br/>';
+    if (data.Albumin < 35) summary += '🟡 <strong>Hypoalbuminaemia</strong> (' + data.Albumin.toFixed(0) + ' g/L) – Unmeasured anions<br/>';
+    if (data.Lactate > 4) summary += '🔴 <strong>Severe hyperlactataemia</strong> (' + data.Lactate.toFixed(1) + ') – Tissue hypoxia<br/>';
+    else if (data.Lactate > 2.2) summary += '🟡 <strong>Elevated lactate</strong> (' + data.Lactate.toFixed(1) + ')<br/>';
+    if (data.Hb < 100) summary += '🔴 <strong>Severe anaemia</strong> (' + data.Hb + ' g/L)<br/>';
+    h += (summary || '✓ No critical drivers') + '</div></div></div>';
+    return h;
+}
+
+function buildStewart(data, SID, Atot, predicted_pH) {
+    let h = '<div class="analysis-section"><div class="section-title">Stewart: SID → Atot → pCO2 → Predicted pH Flowchart</div>';
+    h += '<div style="margin-bottom: 30px;"><strong style="color: var(--accent-normal); display: block; margin-bottom: 12px;">FLOWCHART: Three Independent pH Variables</strong>';
+    h += '<div class="flowchart-box"><strong>1. Strong Ion Difference (SID)</strong><br/>SID = (Na ' + data.Na.toFixed(0) + ' + K ' + data.K.toFixed(1) + ') − (Cl ' + data.Cl.toFixed(0) + ' + Lactate ' + data.Lactate.toFixed(1) + ')<br/><strong style="color: var(--accent-normal);">SID = ' + SID.toFixed(1) + ' mEq/L</strong><br/>' + (SID < 38 ? '🔴 LOW (Acidifying)' : SID > 42 ? '🔵 HIGH (Alkalinizing)' : '🟢 NORMAL (38-42)') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>2. Effective Charge of Albumin & PO4</strong><br/>Atot = ' + Atot.toFixed(1) + ' mEq/L<br/>' + (Atot < 18 ? '🔴 LOW (Acidifying)' : Atot > 18 ? '🔵 HIGH (Alkalinizing)' : '🟢 NORMAL (~18)') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>3. Partial Pressure of CO2</strong><br/>pCO2 = ' + data.pCO2.toFixed(0) + ' mmHg<br/>' + (data.pCO2 < 35 ? '↓ Low (Alkalinizing)' : data.pCO2 > 45 ? '↑ High (Acidifying)' : '✓ Normal (35-45)') + '</div>';
+    h += '<div class="flowchart-arrow">↓</div>';
+    h += '<div class="flowchart-box"><strong>PREDICTED pH (Stewart Equation)</strong><br/>pH = 7.4 + 0.16(SID−38) + 0.04(Atot−18) − 0.084(pCO2−40)/7.5<br/><strong style="color: var(--accent-normal); font-size: 1.1rem;">Predicted: ' + predicted_pH.toFixed(2) + '</strong><br/>Measured: ' + data.pH.toFixed(2) + '<br/>Δ = ' + (data.pH - predicted_pH).toFixed(3) + ' ' + (Math.abs(data.pH - predicted_pH) > 0.1 ? '⚠️ Unmeasured ions' : '✓') + '</div></div>';
+    
+    h += '<div style="margin-top: 30px; padding: 12px; background: var(--bg-tertiary); border-radius: 6px;"><strong style="color: var(--accent-normal); display: block; margin-bottom: 12px;">INTERACTIVE: Adjust electrolytes to see SID & pH change</strong>';
+    h += '<div style="padding: 12px; margin-bottom: 16px; background: var(--bg-secondary); border-radius: 4px; border-left: 3px solid var(--accent-warning);"><strong>SID Modifiers (↓ = More Acidic)</strong>';
+    h += '<div class="slider-group"><div class="slider-label"><span>Na (Sodium)</span><span class="slider-label-value">' + data.Na.toFixed(0) + ' mmol/L</span></div><input type="range" id="na-slider" min="110" max="160" step="1" value="' + data.Na + '" data-param="Na"></div>';
+    h += '<div class="slider-group"><div class="slider-label"><span>Cl (Chloride)</span><span class="slider-label-value">' + data.Cl.toFixed(0) + ' mmol/L</span></div><input type="range" id="cl-slider" min="80" max="120" step="1" value="' + data.Cl + '" data-param="Cl"></div></div>';
+    h += '<div style="padding: 12px; margin-bottom: 16px; background: var(--bg-secondary); border-radius: 4px; border-left: 3px solid var(--accent-warning);"><strong>Atot Modifiers (Albumin & Phosphate)</strong>';
+    h += '<div class="slider-group"><div class="slider-label"><span>Albumin</span><span class="slider-label-value">' + data.Albumin.toFixed(0) + ' g/L</span></div><input type="range" id="albumin-slider-stew" min="20" max="60" step="1" value="' + data.Albumin + '" data-param="Albumin"></div>';
+    h += '<div class="slider-group"><div class="slider-label"><span>PO4 (Phosphate)</span><span class="slider-label-value">' + data.PO4.toFixed(1) + ' mmol/L</span></div><input type="range" id="po4-slider" min="0.5" max="2.5" step="0.1" value="' + data.PO4 + '" data-param="PO4"></div></div>';
+    h += '<div style="padding: 12px; background: var(--bg-secondary); border-radius: 4px; border-left: 3px solid var(--accent-warning);"><strong>Respiratory Component</strong>';
+    h += '<div class="slider-group"><div class="slider-label"><span>pCO2</span><span class="slider-label-value">' + data.pCO2.toFixed(0) + ' mmHg</span></div><input type="range" id="pco2-slider" min="10" max="100" step="1" value="' + data.pCO2 + '" data-param="pCO2"></div></div>';
+    h += '</div></div>';
+    return h;
+}
+
+function buildTraditional(data, AnGap, AG_corrected, BEecf, acidaemia) {
+    let h = '<div class="analysis-section"><div class="section-title">Traditional Boston: Pattern Recognition & Mnemonics</div>';
+    
+    h += '<div class="step-box"><strong>STEP 1: pH Status</strong> → pH = ' + data.pH.toFixed(2) + ' ' + (acidaemia ? '🔴 ACIDAEMIA' : data.pH > 7.45 ? '🔵 ALKALAEMIA' : '🟢 NORMAL') + '</div>';
+    
+    h += '<div class="step-box"><strong>STEP 2: Respiratory Response (Winter\'s Formula for Acidaemia)</strong><br/>';
+    if (acidaemia) {
+        const expected = 1.5 * data.HCO3 + 8 + 2;
+        h += 'Expected pCO2 = 1.5 × HCO3 + 8 ± 2 = ' + expected.toFixed(0) + ' mmHg<br/>Measured = ' + data.pCO2.toFixed(0) + ' mmHg<br/>';
+        if (data.pCO2 < expected - 2) h += '🔵 Appropriate respiratory compensation';
+        else if (data.pCO2 > expected + 2) h += '🔴 Concurrent respiratory acidosis';
+        else h += '✓ Appropriate';
+    } else {
+        h += 'pCO2 = ' + data.pCO2.toFixed(0) + ' mmHg (Alkalaemia context)';
+    }
+    h += '</div>';
+    
+    h += '<div class="step-box"><strong>STEP 3: Anion Gap</strong><br/>AG = Na − (Cl + HCO3) = ' + AnGap.toFixed(0) + '<br/>Corrected AG = ' + AG_corrected.toFixed(1) + ' ' + (AG_corrected > 16 ? '🔴 HIGH (HAGMA)' : '🟢 NORMAL') + '</div>';
+    
+    h += '<div class="step-box"><strong>STEP 4: Delta Ratio (if HAGMA)</strong><br/>';
+    if (AG_corrected > 16) {
+        const delta = (AnGap - 12) / (24 - data.HCO3);
+        h += 'Δ AG / Δ HCO3 = ' + delta.toFixed(2) + '<br/>';
+        if (delta > 2) h += '🔵 Concurrent metabolic alkalosis (HCO3 too high)';
+        else if (delta < 1) h += '🔴 Concurrent NAGMA (HCO3 too low)';
+        else h += '✓ Pure HAGMA';
+    } else {
+        h += 'No HAGMA detected';
+    }
+    h += '</div>';
+    
+    h += '<div class="step-box"><strong>STEP 5: Differential Diagnosis & Mnemonics</strong><br/>';
+    if (acidaemia) {
+        if (AG_corrected > 16) {
+            h += '🔴 <strong>HIGH AG METABOLIC ACIDOSIS (HAGMA)</strong><br/><strong style="color: var(--accent-normal);">GOLDMARK – Toxins & Unmeasured Anions:</strong><br/>';
+            h += '• <strong>G</strong>lycols (ethylene, propylene)<br/>• <strong>O</strong>xoproline (paracetamol excess, chronic TPN)<br/>• <strong>L</strong>-lactate (tissue hypoxia, sepsis, shock)<br/>• <strong>D</strong>-lactate (short bowel, bacterial overgrowth)<br/>• <strong>M</strong>ethanol (toxic alcohol)<br/>• <strong>A</strong>spirin (salicylate toxicity)<br/>• <strong>R</strong>enal failure (uraemia—phosphate, sulphate, urate)<br/>• <strong>K</strong>etoacidosis (DKA, alcoholic, starvation)';
+        } else {
+            h += '🔴 <strong>NORMAL AG METABOLIC ACIDOSIS (NAGMA/Hyperchloraemic)</strong><br/><strong style="color: var(--accent-normal);">USEDCARS – Normal AG Acidosis Causes:</strong><br/>';
+            h += '• <strong>U</strong>reterosigmoidostomy (GI HCO3 loss)<br/>• <strong>S</strong>aline administration (0.9% NaCl excess)<br/>• <strong>E</strong>ndocrine (Addison\'s, primary hypoaldosteronism)<br/>• <strong>D</strong>iarrhoea (GI bicarbonate loss)<br/>• <strong>C</strong>arbonic anhydrase inhibitors (acetazolamide)<br/>• <strong>A</strong>mmonium chloride (iatrogenic)<br/>• <strong>R</strong>enal tubular acidosis (RTA 1, 2, 4)<br/>• <strong>S</strong>pironolactone (type 4 RTA—hyperkalaemic)';
         }
-
-        function checkPlausibility(pH, pCO2, HCO3, K, Crea, Lactate, Albumin, Na) {
-            const constraints = { violations: [], warnings: [], score: 100 };
-            const acidaemia = pH < 7.35;
-            const alkalaemia = pH > 7.45;
-
-            // Boston/Copenhagen violations
-            if (acidaemia && pCO2 > 45) {
-                const deltaCO2 = pCO2 - 40;
-                const acuteExpected = 24 + (deltaCO2 / 10) * 1;
-                const chronicExpected = 24 + (deltaCO2 / 10) * 4;
-                if (HCO3 < acuteExpected - 2) {
-                    constraints.violations.push(`Boston Rule: Respiratory acidosis (pCO2 ${pCO2}) should have HCO3 ${acuteExpected.toFixed(1)}–${chronicExpected.toFixed(1)}, but HCO3 is ${HCO3.toFixed(1)}. Concurrent metabolic ACIDOSIS?`);
-                    constraints.score -= 15;
-                }
-            } else if (acidaemia && pCO2 < 35) {
-                const expectedPaCO2 = 1.2 * HCO3 + 15;
-                if (Math.abs(pCO2 - expectedPaCO2) > 5) {
-                    constraints.violations.push(`Boston Rule: Metabolic acidosis (HCO3 ${HCO3}) should trigger PaCO2 ${expectedPaCO2.toFixed(0)}±2, but pCO2 is ${pCO2}. Respiratory compensation ${pCO2 < expectedPaCO2 - 2 ? 'EXCESSIVE' : 'INADEQUATE'}?`);
-                    constraints.score -= 15;
-                }
-            }
-
-            // K-pH-Crea consistency
-            if (K > 5.5 && pH > 7.30 && Crea > 150) {
-                constraints.warnings.push(`K-pH-Crea: K ${K.toFixed(1)} with pH ${pH.toFixed(2)} and Crea ${Crea} is unusual. High K typically lowers pH. Confirm K value.`);
-                constraints.score -= 10;
-            }
-
-            // Lactate-Albumin-Na profile
-            if (Lactate > 4 && Albumin > 35 && Na > 135) {
-                constraints.warnings.push(`Lactate-Albumin-Na: High lactate (${Lactate.toFixed(1)}) with normal albumin (${Albumin}) and Na (${Na}) is atypical for sepsis. Consider non-septic causes.`);
-                constraints.score -= 5;
-            }
-
-            return constraints;
-        }
-
-        function analyzeCase() {
-            const fields = {
-                pH: 'pH', pCO2: 'pCO2', pO2: 'pO2', HCO3: 'HCO3', BEecf: 'BEecf',
-                Na: 'Na', K: 'K', Cl: 'Cl', iCa: 'iCa',
-                AnGap: 'AnGap', Albumin: 'Albumin', PO4: 'PO4', Lactate: 'Lactate',
-                Glucose: 'Glucose', Hb: 'Hb', Crea: 'Crea'
-            };
-
-            const data = {};
-            const units = document.querySelector('input[name="units"]:checked').value;
-
-            Object.keys(fields).forEach(key => {
-                let val = parseFloat(document.getElementById(fields[key]).value);
-                if (isNaN(val)) {
-                    const paramKey = (key === 'pCO2' || key === 'pO2') ? `${key}_${units}` : key;
-                    val = getMidpoint(paramKey);
-                    document.getElementById(fields[key]).value = val.toFixed(key === 'pH' || key === 'iCa' || key === 'BEecf' ? 2 : 1);
-                }
-                data[key] = val;
-            });
-
-            const bw = 80;
-            const adv = bw * 0.6;
-            const SID = (data.Na + data.K + 2*data.iCa + 2*1.0) - (data.Cl + data.Lactate);
-            const Atot = (data.Albumin * (0.123 * data.pH - 0.631)) + (data.PO4 * (0.309 * data.pH - 0.469));
-            const constraints = checkPlausibility(data.pH, data.pCO2, data.HCO3, data.K, data.Crea, data.Lactate, data.Albumin, data.Na);
-
-            const hbContent = buildHughesBrainTab(data, constraints, adv);
-            const stewartContent = buildStewartTab(data, SID, Atot, adv);
-            const tradContent = buildTraditionalTab(data);
-            const figgeContent = buildFiggeTab(data, SID, Atot, adv);
-
-            const html = `
-                <div style="margin-bottom: 20px;">
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab(event, 'hb')">Hughes & Brain</button>
-                        <button class="tab-btn" onclick="switchTab(event, 'stewart')">Stewart</button>
-                        <button class="tab-btn" onclick="switchTab(event, 'trad')">Traditional</button>
-                        <button class="tab-btn" onclick="switchTab(event, 'figge')">Figge-Fencl</button>
-                    </div>
-
-                    <div id="hb" class="tab-content active">
-                        ${hbContent}
-                    </div>
-
-                    <div id="stewart" class="tab-content">
-                        ${stewartContent}
-                    </div>
-
-                    <div id="trad" class="tab-content">
-                        ${tradContent}
-                    </div>
-
-                    <div id="figge" class="tab-content">
-                        ${figgeContent}
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('analysisOutput').innerHTML = html;
-            setTimeout(() => {
-                document.getElementById('analysisOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-        }
-
-        function buildHughesBrainTab(data, constraints, adv) {
-            const pH = data.pH;
-            const pCO2 = data.pCO2;
-            const pO2 = data.pO2;
-            const HCO3 = data.HCO3;
-            const BEecf = data.BEecf;
-            const Na = data.Na;
-            const K = data.K;
-            const Cl = data.Cl;
-            const iCa = data.iCa;
-            const AnGap = data.AnGap;
-            const Albumin = data.Albumin;
-            const Lactate = data.Lactate;
-            const Glucose = data.Glucose;
-            const Hb = data.Hb;
-            const Crea = data.Crea;
-
-            const acidaemia = pH < 7.35;
-            const normal_alb = 40;
-            const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
-
-            // Identify drivers
-            const drivers = [];
-
-            if (K > 5.5 && acidaemia && Crea > 150) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Hyperkalaemia + Acidosis + AKI (Triple Threat)',
-                    value: `K ${K.toFixed(1)}, pH ${pH.toFixed(2)}, Crea ${Crea}`,
-                    reasoning: 'CRITICAL: High K + acidosis + AKI = arrhythmia risk. Acidosis prevents K entry into cells.',
-                    strategy: `<strong>Immediate actions:</strong><br/>
-• Calcium gluconate 10%: 10 mL IV over 2–5 min (stabilises cardiac membrane)<br/>
-• Insulin 10 units + 50 mL 50% Dextrose IV (shifts K into cells, effect in 15–30 min)<br/>
-• Salbutamol 10–20 mg nebulised (β2 activates K influx, effect in 30 min)<br/>
-• Dialysis (RRT) if K >6.5 with ECG changes (removes ~20–30 mEq/h)<br/>
-<strong>Target K:</strong> <5.2 mmol/L`
-                });
-            } else if (K > 5.5) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hyperkalaemia',
-                    value: `K ${K.toFixed(1)} mmol/L`,
-                    reasoning: 'Elevated K increases arrhythmia risk.',
-                    strategy: `<strong>K-lowering:</strong> Insulin 10 units + 50 mL 50% Dextrose IV, Salbutamol 10–20 mg nebulised<br/><strong>Target:</strong> <5.2 mmol/L`
-                });
-            }
-
-            if (Albumin < 30) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Hypoalbuminaemia',
-                    value: `Albumin ${Albumin.toFixed(0)} g/L`,
-                    reasoning: 'Severe albumin loss (<30) = major oncotic loss + reduced buffering.',
-                    strategy: `<strong>Albumin infusion:</strong><br/>
-Deficit = ${(40 - Albumin).toFixed(0)} g<br/>
-<strong>20% Albumin:</strong> ${(((40 - Albumin) / 20) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-OR <strong>5% Albumin:</strong> ${(((40 - Albumin) / 5) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-<strong>Target:</strong> Albumin >35 g/L`
-                });
-            } else if (Albumin < 35) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hypoalbuminaemia',
-                    value: `Albumin ${Albumin.toFixed(0)} g/L`,
-                    reasoning: 'Low albumin reduces buffering capacity.',
-                    strategy: `<strong>Albumin infusion:</strong><br/>
-<strong>20% Albumin:</strong> ${(((40 - Albumin) / 20) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-OR <strong>5% Albumin:</strong> ${(((40 - Albumin) / 5) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-<strong>Target:</strong> Albumin ≥35 g/L`
-                });
-            }
-
-            if (pO2 < 60) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Hypoxaemia',
-                    value: `PaO2 ${pO2.toFixed(0)} mmHg`,
-                    reasoning: 'Critical: tissue ischaemia imminent.',
-                    strategy: `<strong>Immediate:</strong> FiO2 1.0, optimise ventilation, assess lung recruitment<br/>
-<strong>Target:</strong> PaO2 ≥80–100 mmHg`
-                });
-            } else if (pO2 < 80) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hypoxaemia',
-                    value: `PaO2 ${pO2.toFixed(0)} mmHg`,
-                    reasoning: 'O2 delivery compromised.',
-                    strategy: `<strong>Actions:</strong> Increase FiO2, optimise ventilation<br/>
-<strong>Target:</strong> PaO2 ≥80 mmHg`
-                });
-            }
-
-            if (Hb < 80) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Anaemia',
-                    value: `Hb ${Hb.toFixed(0)} g/L`,
-                    reasoning: 'O2 delivery = PaO2 × Hb. Critical reduction.',
-                    strategy: `<strong>Transfusion:</strong> Target Hb 70–90 g/L. Transfuse to relieve symptoms, not normalise.<br/>
-Each unit PRBC ↑ Hb by ~10 g/L<br/>
-<strong>Acute Coronary Syndrome:</strong> Target 80–100 g/L<br/>
-<strong>Neurocritical Care/TBI:</strong> Target >90 g/L`
-                });
-            } else if (Hb < 120) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Anaemia',
-                    value: `Hb ${Hb.toFixed(0)} g/L`,
-                    reasoning: 'Reduces O2 carrying capacity.',
-                    strategy: `<strong>Transfuse if:</strong> Hb <70 g/L (general), <80 g/L (ACS), <90 g/L (neurocritical)<br/>
-<strong>Target range:</strong> 70–90 g/L`
-                });
-            }
-
-            if (Lactate > 4) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Hyperlactataemia',
-                    value: `Lactate ${Lactate.toFixed(1)} mmol/L`,
-                    reasoning: 'Lactate >4 = severe tissue hypoperfusion.',
-                    strategy: `<strong>Actions:</strong><br/>
-• STOP epinephrine (switch to noradrenaline)<br/>
-• Optimise perfusion: fluids, vasopressors<br/>
-• Balanced fluids (NOT 0.9% saline)<br/>
-• Dialysis if on CRRT: increase Qeff to ≥20 mL/kg/h<br/>
-<strong>Target:</strong> Lactate <2 mmol/L`
-                });
-            } else if (Lactate > 2.2) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Elevated Lactate',
-                    value: `Lactate ${Lactate.toFixed(1)} mmol/L`,
-                    reasoning: 'Indicates tissue hypoperfusion.',
-                    strategy: `<strong>Actions:</strong> Optimise perfusion, balanced fluids<br/>
-<strong>Target:</strong> Lactate <2.2 mmol/L`
-                });
-            }
-
-            if (Na < 130) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Severe Hyponatraemia',
-                    value: `Na ${Na.toFixed(0)} mmol/L`,
-                    reasoning: 'Severe hyponatraemia (<130) = seizure risk.',
-                    strategy: `<strong>If symptomatic (seizures, altered mental status):</strong><br/>
-3% NaCl options:<br/>
-• <strong>250 mL 3% bag:</strong> ${Math.ceil((140 - Na) * adv / 513 / 250)} bags IV<br/>
-• <strong>23.4% ampoule (10 mL):</strong> ${Math.ceil((140 - Na) * adv / 2340 / 10)} ampoules diluted in 50 mL normal saline<br/>
-Infuse at 0.5–1 mEq/L/h (max 10–12 mEq/L/day to avoid central pontine myelinolysis)<br/>
-<strong>Target:</strong> ↑ Na by 4–6 mEq/L in first 6h if symptomatic`
-                });
-            } else if (Na < 135) {
-                drivers.push({
-                    priority: 3,
-                    name: 'Hyponatraemia',
-                    value: `Na ${Na.toFixed(0)} mmol/L`,
-                    reasoning: 'Contributes to dilutional acidosis.',
-                    strategy: `<strong>If euvolaemic:</strong> Fluid restriction 1–1.5 L/day<br/>
-<strong>Target:</strong> Na 135–140 mmol/L (correct slowly, <8 mEq/L/day)`
-                });
-            }
-
-            if (Glucose < 3.0) {
-                drivers.push({
-                    priority: 1,
-                    name: 'Severe Hypoglycaemia',
-                    value: `Glucose ${Glucose.toFixed(1)} mmol/L`,
-                    reasoning: 'Seizure/cerebral damage risk.',
-                    strategy: `<strong>Immediate:</strong> 50 mL 50% Dextrose IV<br/>
-Recheck in 15 min, repeat if needed<br/>
-<strong>Target:</strong> Glucose ≥5 mmol/L`
-                });
-            } else if (Glucose < 4.0) {
-                drivers.push({
-                    priority: 2,
-                    name: 'Hypoglycaemia',
-                    value: `Glucose ${Glucose.toFixed(1)} mmol/L`,
-                    reasoning: 'Increases catecholamine stress.',
-                    strategy: `<strong>Actions:</strong> Reduce insulin or give dextrose bolus<br/>
-<strong>Target:</strong> Glucose 5–8 mmol/L`
-                });
-            }
-
-            drivers.sort((a, b) => a.priority - b.priority);
-
-            let constraintHtml = '';
-            if (constraints.violations.length > 0 || constraints.warnings.length > 0) {
-                constraintHtml = `
-                <div style="margin-bottom: 20px; padding: 16px; background: rgba(255, 107, 107, 0.1); border-left: 3px solid var(--accent-critical); border-radius: 4px;">
-                    <strong style="color: var(--accent-critical);">⚠️ PHYSIOLOGICAL PLAUSIBILITY CHECK</strong><br/>
-                    <strong>Consistency Score:</strong> ${constraints.score}/100 ${constraints.score < 70 ? '<span style="color: var(--accent-critical);">(REVIEW INPUTS)</span>' : constraints.score < 85 ? '<span style="color: var(--accent-warning);">(MINOR INCONSISTENCIES)</span>' : '<span style="color: var(--accent-safe);">(CONSISTENT)</span>'}<br/><br/>
-                    ${constraints.violations.map(v => `<div style="margin-bottom: 8px; padding: 8px; background: rgba(255, 107, 107, 0.2); border-radius: 2px; color: var(--accent-critical); font-weight: 600;">❌ ${v}</div>`).join('')}
-                    ${constraints.warnings.map(w => `<div style="margin-bottom: 8px; padding: 8px; background: rgba(255, 179, 71, 0.2); border-radius: 2px; color: var(--accent-warning);">⚠️ ${w}</div>`).join('')}
-                </div>
-                `;
-            } else {
-                constraintHtml = `
-                <div style="margin-bottom: 20px; padding: 16px; background: rgba(94, 234, 212, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px;">
-                    <strong style="color: var(--accent-safe);">✓ PHYSIOLOGICAL PLAUSIBILITY CHECK</strong><br/>
-                    Consistency Score: ${constraints.score}/100 (inputs are physiologically consistent)
-                </div>
-                `;
-            }
-
-            return `
-                <div class="analysis-section" style="border-left-color: var(--accent-normal);">
-                    <div class="section-title">Hughes & Brain: 8-Step Analysis & Driver Identification</div>
-                    
-                    <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.9rem; line-height: 1.7;">
-                        <strong>Step 1: pH Status</strong> → ${pH.toFixed(2)} ${acidaemia ? '(ACIDAEMIA)' : pH > 7.45 ? '(ALKALAEMIA)' : '(NORMAL)'}<br/>
-                        <strong>Step 2: Respiratory</strong> → PaCO2 ${pCO2.toFixed(0)} ${pCO2 > 45 ? '(HIGH)' : pCO2 < 35 ? '(LOW)' : '(NORMAL)'}<br/>
-                        <strong>Step 3: Metabolic</strong> → BEecf ${BEecf.toFixed(1)} ${BEecf < -3 ? '(NEGATIVE)' : BEecf > 3 ? '(POSITIVE)' : '(NORMAL)'}<br/>
-                        <strong>Step 4–5: AG Analysis</strong> → Raw ${AnGap.toFixed(0)}, Corrected ${AG_corrected.toFixed(1)} ${AG_corrected > 16 ? '(HIGH)' : '(NORMAL)'}<br/>
-                        <strong>Step 6: Lactate</strong> → ${Lactate.toFixed(1)} mmol/L ${Lactate > 2.2 ? '(ELEVATED)' : '(NORMAL)'}<br/>
-                        <strong>Step 7: Na & Cl</strong> → Na ${Na.toFixed(0)}, Cl ${Cl.toFixed(0)}<br/>
-                        <strong>Step 8: Oxygenation</strong> → PaO2 ${pO2.toFixed(0)}, Hb ${Hb.toFixed(0)} → O2 delivery ${(pO2 * Hb / 100).toFixed(0)}
-                    </div>
-
-                    ${constraintHtml}
-
-                    <div style="margin-bottom: 20px; padding: 12px; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.9rem;">
-                        <strong>Drivers Identified: ${drivers.length}</strong> | Priority-1: ${drivers.filter(d => d.priority === 1).length} | Priority-2: ${drivers.filter(d => d.priority === 2).length} | Priority-3: ${drivers.filter(d => d.priority === 3).length}
-                    </div>
-
-                    <div class="drivers-list">
-                        ${drivers.map((driver, idx) => `
-                            <div class="driver-card priority-${driver.priority}">
-                                <div class="driver-header">
-                                    <div class="driver-rank priority-${driver.priority}">${idx + 1}</div>
-                                    <div style="flex: 1;">
-                                        <div class="driver-name">${driver.name}</div>
-                                        <div class="driver-value">${driver.value}</div>
-                                    </div>
-                                </div>
-                                <div class="driver-reasoning">${driver.reasoning}</div>
-                                <div class="correction-strategy">${driver.strategy}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="slider-correction">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 16px; color: var(--accent-normal); font-weight: 600;">FIGURE 2: Simplified Bedside Approach Flowchart</div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Interactive flowchart showing the Hughes & Brain decision tree. Each step calculates if abnormal.</p>
-                        
-                        <div style="display: grid; gap: 12px; margin-bottom: 20px;">
-                            <div style="padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 4px; text-align: center; font-weight: 600;">History and Presentation</div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div style="padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 4px; text-align: center; font-weight: 600;">PaO₂: <span id="fc_pao2">${pO2.toFixed(0)}</span> mmHg</div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_ph" style="padding: 12px; background: ${pH < 7.35 ? 'rgba(255, 107, 107, 0.2)' : pH > 7.45 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${pH < 7.35 || pH > 7.45 ? 'var(--accent-critical)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">pH: <span id="fc_ph_val">${pH.toFixed(2)}</span> ${pH < 7.35 ? '❌ ACIDAEMIA' : pH > 7.45 ? '❌ ALKALAEMIA' : '✓'}</div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_paco2" style="padding: 12px; background: ${pCO2 > 45 || pCO2 < 35 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${pCO2 > 45 || pCO2 < 35 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">PaCO₂: <span id="fc_paco2_val">${pCO2.toFixed(0)}</span> mmHg <span id="fc_paco2_interp">${pCO2 > 45 ? '↑ Resp acidosis' : pCO2 < 35 ? '↓ Resp alkalosis' : '✓'}</span></div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_be" style="padding: 12px; background: ${BEecf < -3 || BEecf > 3 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${BEecf < -3 || BEecf > 3 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">BE: <span id="fc_be_val">${BEecf.toFixed(1)}</span> <span id="fc_be_interp">${BEecf < -3 ? '❌ Met acidosis' : BEecf > 3 ? '❌ Met alkalosis' : '✓'}</span></div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_albumin" style="padding: 12px; background: ${Albumin < 35 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${Albumin < 35 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">Albumin: <span id="fc_albumin_val">${Albumin.toFixed(0)}</span> g/L <span id="fc_albumin_interp">${Albumin < 35 ? '❌ ↓ Alkalosis effect' : '✓'}</span></div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_lactate" style="padding: 12px; background: ${Lactate > 2.2 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${Lactate > 2.2 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">Lactate: <span id="fc_lactate_val">${Lactate.toFixed(1)}</span> mmol/L <span id="fc_lactate_interp">${Lactate > 2.2 ? '❌ ↑ Acidosis' : '✓'}</span></div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_ag" style="padding: 12px; background: ${AG_corrected > 16 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${AG_corrected > 16 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">AG (corrected): <span id="fc_ag_val">${AG_corrected.toFixed(1)}</span> <span id="fc_ag_interp">${AG_corrected > 16 ? '❌ High AGMA' : '✓'}</span></div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_na" style="padding: 12px; background: ${Na < 135 || Na > 145 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${Na < 135 || Na > 145 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">Na (Tonicity): <span id="fc_na_val">${Na.toFixed(0)}</span> mmol/L <span id="fc_na_interp">${Na < 135 ? '❌ Dilutional acidosis' : Na > 145 ? '❌ Conc alkalosis' : '✓'}</span></div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            <div id="fc_cl" style="padding: 12px; background: ${Cl > 110 || Cl < 95 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${Cl > 110 || Cl < 95 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">Cl (corrected): <span id="fc_cl_val">${Cl.toFixed(0)}</span> mmol/L <span id="fc_cl_interp">${Cl > 110 ? '❌ Hyperchloraemic' : Cl < 95 ? '❌ Hypochloraemic' : '✓'}</span></div>
-                        </div>
-                    </div>
-
-                    <div style="padding: 16px; background: rgba(94, 234, 212, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px; margin-bottom: 20px;">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 12px; color: var(--accent-normal); font-weight: 600;">SUMMARY OF PERTURBATIONS (from flowchart analysis)</div>
-                        <div id="perturbationSummary" style="font-size: 0.9rem; line-height: 1.7; color: var(--text-primary);"></div>
-                    </div>
-
-                    <div class="slider-correction">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 16px; color: var(--accent-normal); font-weight: 600;">LIVE INTERVENTION SIMULATOR: Clinical Treatments</div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Simulate clinical interventions below. Watch the flowchart and perturbation summary update in real-time.</p>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Insulin + 50% Dextrose (units):</label>
-                                <input type="range" id="insulin_slider" min="0" max="20" step="1" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="insulin_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ K by ~1.5 per 10u, ↑ Glucose, improves metabolic state</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">20% Albumin (mL):</label>
-                                <input type="range" id="albumin_slider" min="0" max="500" step="50" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="albumin_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ Albumin by ~1 g/L per 50mL, improves buffering</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">3% NaCl (mL):</label>
-                                <input type="range" id="hypertonic_slider" min="0" max="500" step="50" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="hypertonic_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ Na, ↑ Cl, corrects hyponatraemia</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Balanced Fluids (L):</label>
-                                <input type="range" id="balanced_slider" min="0" max="10" step="1" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="balanced_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ Cl, ↑ Lactate clearance, ↑ Perfusion</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Switch to Noradrenaline (min):</label>
-                                <input type="range" id="noradrenaline_slider" min="0" max="120" step="10" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="noradrenaline_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ Lactate gradually (improves perfusion)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Increase MV (% increase):</label>
-                                <input type="range" id="mv_slider" min="0" max="50" step="5" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="mv_display">0%</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ PaCO2, ↑ pH (respiratory correction)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">8.4% NaHCO3 (mL):</label>
-                                <input type="range" id="nahco3_slider" min="0" max="200" step="10" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="nahco3_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ pH, ↑ HCO3, ↑ Na (use cautiously)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">PRBC Transfusion (units):</label>
-                                <input type="range" id="prbc_slider" min="0" max="6" step="1" value="0" oninput="updateInterventions()">
-                                <div class="slider-value" id="prbc_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ Hb by ~10 g/L per unit, ↑ O2 delivery</div>
-                            </div>
-                        </div>
-
-                        <div id="interventionResults" style="padding: 16px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.9rem; color: var(--text-secondary);"></div>
-                    </div>
-
-                    <script>
-                    window.interventionState = {
-                        basepH: ${pH},
-                        basepCO2: ${pCO2},
-                        baseBE: ${BEecf},
-                        baseNa: ${data.Na},
-                        baseCl: ${data.Cl},
-                        baseK: ${data.K},
-                        baseAlbumin: ${data.Albumin},
-                        baseLactate: ${data.Lactate},
-                        baseGlucose: ${data.Glucose},
-                        baseHb: ${data.Hb},
-                        baseAG: ${AnGap}
-                    };
-
-                    function updateInterventions() {
-                        const insulin = parseFloat(document.getElementById('insulin_slider').value);
-                        const albumin = parseFloat(document.getElementById('albumin_slider').value);
-                        const hypertonic = parseFloat(document.getElementById('hypertonic_slider').value);
-                        const balanced = parseFloat(document.getElementById('balanced_slider').value);
-                        const noradrenaline = parseFloat(document.getElementById('noradrenaline_slider').value);
-                        const mvIncrease = parseFloat(document.getElementById('mv_slider').value);
-                        const nahco3 = parseFloat(document.getElementById('nahco3_slider').value);
-                        const prbc = parseFloat(document.getElementById('prbc_slider').value);
-
-                        document.getElementById('insulin_display').textContent = insulin.toFixed(0);
-                        document.getElementById('albumin_display').textContent = albumin.toFixed(0);
-                        document.getElementById('hypertonic_display').textContent = hypertonic.toFixed(0);
-                        document.getElementById('balanced_display').textContent = balanced.toFixed(1);
-                        document.getElementById('noradrenaline_display').textContent = noradrenaline.toFixed(0);
-                        document.getElementById('mv_display').textContent = mvIncrease.toFixed(0) + '%';
-                        document.getElementById('nahco3_display').textContent = nahco3.toFixed(0);
-                        document.getElementById('prbc_display').textContent = prbc.toFixed(0);
-
-                        // Calculate new values based on interventions
-                        let newK = window.interventionState.baseK - (insulin / 10 * 1.5);
-                        let newNa = window.interventionState.baseNa + (hypertonic / 100 * 2); // Rough estimate
-                        let newCl = window.interventionState.baseCl + (hypertonic / 100 * 3.4) - (balanced / 10); // Balanced fluids lower Cl
-                        let newAlbumin = window.interventionState.baseAlbumin + (albumin / 50);
-                        let newLactate = window.interventionState.baseLactate * (1 - (noradrenaline / 120) * 0.5) * (1 - (balanced / 20) * 0.2); // Improved perfusion
-                        let newPaCO2 = window.interventionState.basepCO2 * (1 - mvIncrease / 100);
-                        let newBE = window.interventionState.baseBE + (nahco3 / 50) + (newAlbumin > window.interventionState.baseAlbumin ? (newAlbumin - window.interventionState.baseAlbumin) : 0);
-                        let newpH = 7.4 + (newBE / 25) - 0.084 * ((newPaCO2 - 40) / 7.5);
-                        let newHb = window.interventionState.baseHb + (prbc * 10);
-                        let newGlucose = window.interventionState.baseGlucose + (insulin / 10 * 2); // Dextrose effect
-
-                        // Update flowchart boxes
-                        document.getElementById('fc_ph_val').textContent = newpH.toFixed(2);
-                        document.getElementById('fc_paco2_val').textContent = newPaCO2.toFixed(0);
-                        document.getElementById('fc_paco2_interp').textContent = newPaCO2 > 45 ? '↑ Resp acidosis' : newPaCO2 < 35 ? '↓ Resp alkalosis' : '✓';
-                        document.getElementById('fc_be_val').textContent = newBE.toFixed(1);
-                        document.getElementById('fc_be_interp').textContent = newBE < -3 ? '❌ Met acidosis' : newBE > 3 ? '❌ Met alkalosis' : '✓';
-                        document.getElementById('fc_na_val').textContent = newNa.toFixed(0);
-                        document.getElementById('fc_na_interp').textContent = newNa < 135 ? '❌ Dilutional' : newNa > 145 ? '❌ Conc' : '✓';
-                        document.getElementById('fc_cl_val').textContent = newCl.toFixed(0);
-                        document.getElementById('fc_cl_interp').textContent = newCl > 110 ? '❌ Hyperchloraemic' : newCl < 95 ? '❌ Hypochloraemic' : '✓';
-                        document.getElementById('fc_albumin_val').textContent = newAlbumin.toFixed(0);
-                        document.getElementById('fc_albumin_interp').textContent = newAlbumin < 35 ? '❌ ↓ Alkalosis effect' : '✓';
-                        document.getElementById('fc_lactate_val').textContent = newLactate.toFixed(1);
-                        document.getElementById('fc_lactate_interp').textContent = newLactate > 2.2 ? '❌ ↑ Acidosis' : '✓';
-
-                        // Update pH box color
-                        const phBox = document.getElementById('fc_ph');
-                        if (newpH < 7.35) {
-                            phBox.style.background = 'rgba(255, 107, 107, 0.2)';
-                            phBox.style.borderColor = 'var(--accent-critical)';
-                        } else if (newpH > 7.45) {
-                            phBox.style.background = 'rgba(255, 179, 71, 0.2)';
-                            phBox.style.borderColor = 'var(--accent-warning)';
-                        } else {
-                            phBox.style.background = 'var(--bg-secondary)';
-                            phBox.style.borderColor = 'var(--border)';
-                        }
-
-                        // Generate perturbation summary
-                        let summary = '<strong>Current State (after interventions):</strong><br/><br/>';
-                        
-                        if (newpH < 7.35) summary += '❌ <strong>ACIDAEMIA</strong> (pH ' + newpH.toFixed(2) + ')<br/>';
-                        else if (newpH > 7.45) summary += '❌ <strong>ALKALAEMIA</strong> (pH ' + newpH.toFixed(2) + ')<br/>';
-                        else summary += '✓ <strong>pH normalised</strong> (' + newpH.toFixed(2) + ')<br/>';
-
-                        if (newBE < -3) summary += '❌ <strong>Metabolic acidosis</strong> (BE ' + newBE.toFixed(1) + ')<br/>';
-                        else if (newBE > 3) summary += '❌ <strong>Metabolic alkalosis</strong> (BE ' + newBE.toFixed(1) + ')<br/>';
-                        else summary += '✓ Metabolic component corrected<br/>';
-
-                        if (newPaCO2 > 45) summary += '⚠️ <strong>Respiratory acidosis</strong> (PaCO2 ' + newPaCO2.toFixed(0) + ')<br/>';
-                        else if (newPaCO2 < 35) summary += '⚠️ <strong>Respiratory alkalosis</strong> (PaCO2 ' + newPaCO2.toFixed(0) + ')<br/>';
-                        else summary += '✓ Respiratory component appropriate<br/>';
-
-                        summary += '<br/>';
-                        if (newNa < 135) summary += '⚠️ Hyponatraemia (' + newNa.toFixed(0) + ')<br/>';
-                        if (newCl > 110) summary += '⚠️ Hyperchloraemia (' + newCl.toFixed(0) + ')<br/>';
-                        if (newAlbumin < 35) summary += '⚠️ Hypoalbuminaemia (' + newAlbumin.toFixed(0) + ')<br/>';
-                        if (newLactate > 2.2) summary += '⚠️ Elevated lactate (' + newLactate.toFixed(1) + ')<br/>';
-                        if (newK > 5.5) summary += '❌ Hyperkalaemia (K ' + newK.toFixed(1) + ')<br/>';
-                        else summary += '✓ Electrolytes improving<br/>';
-
-                        summary += '<br/><strong>Changes from baseline:</strong><br/>';
-                        summary += 'pH: ' + window.interventionState.basepH.toFixed(2) + ' → ' + newpH.toFixed(2) + ' (Δ ' + (newpH - window.interventionState.basepH).toFixed(2) + ')<br/>';
-                        summary += 'BE: ' + window.interventionState.baseBE.toFixed(1) + ' → ' + newBE.toFixed(1) + ' (Δ ' + (newBE - window.interventionState.baseBE).toFixed(1) + ')<br/>';
-                        summary += 'K: ' + window.interventionState.baseK.toFixed(1) + ' → ' + newK.toFixed(1) + ' (Δ ' + (newK - window.interventionState.baseK).toFixed(1) + ')<br/>';
-                        summary += 'Lactate: ' + window.interventionState.baseLactate.toFixed(1) + ' → ' + newLactate.toFixed(1) + ' (Δ ' + (newLactate - window.interventionState.baseLactate).toFixed(1) + ')<br/>';
-
-                        document.getElementById('perturbationSummary').innerHTML = summary;
-                        document.getElementById('interventionResults').textContent = 'Intervention state: ' + (insulin + albumin + hypertonic + balanced + mvIncrease + nahco3 + prbc > 0 ? 'Active' : 'Baseline');
-                    }
-
-                    // Initial summary
-                    function generateInitialSummary() {
-                        let summary = '<strong>Initial Perturbations (Baseline):</strong><br/><br/>';
-                        
-                        if (pH < 7.35) summary += '❌ <strong>ACIDAEMIA</strong> (pH ' + pH.toFixed(2) + ')<br/>';
-                        else if (pH > 7.45) summary += '❌ <strong>ALKALAEMIA</strong> (pH ' + pH.toFixed(2) + ')<br/>';
-                        else summary += '✓ pH normal<br/>';
-
-                        if (BEecf < -3) summary += '❌ <strong>Metabolic acidosis</strong> (BE ' + BEecf.toFixed(1) + ')<br/>';
-                        else if (BEecf > 3) summary += '❌ <strong>Metabolic alkalosis</strong> (BE ' + BEecf.toFixed(1) + ')<br/>';
-                        else summary += '✓ Metabolic neutral<br/>';
-
-                        if (pCO2 > 45) summary += '⚠️ <strong>Respiratory acidosis</strong> (PaCO2 ' + pCO2.toFixed(0) + ')<br/>';
-                        else if (pCO2 < 35) summary += '⚠️ <strong>Respiratory alkalosis</strong> (PaCO2 ' + pCO2.toFixed(0) + ')<br/>';
-                        else summary += '✓ Respiratory neutral<br/>';
-
-                        summary += '<br/><strong>Electrolyte perturbations:</strong><br/>';
-                        if (Na < 135) summary += '❌ Hyponatraemia (' + Na.toFixed(0) + ')<br/>';
-                        if (Cl > 110) summary += '❌ Hyperchloraemia (' + Cl.toFixed(0) + ')<br/>';
-                        if (Albumin < 35) summary += '❌ Hypoalbuminaemia (' + Albumin.toFixed(0) + ')<br/>';
-                        if (Lactate > 2.2) summary += '❌ Elevated lactate (' + Lactate.toFixed(1) + ')<br/>';
-                        if (data.K > 5.5) summary += '❌ Hyperkalaemia (K ' + data.K.toFixed(1) + ')<br/>';
-                        if (data.Glucose < 3) summary += '❌ Hypoglycaemia (' + data.Glucose.toFixed(1) + ')<br/>';
-
-                        if (AG_corrected > 16) summary += '<br/>❌ <strong>High AG METABOLIC ACIDOSIS</strong> (' + AG_corrected.toFixed(1) + ')<br/>Suggests unmeasured anions (ketoacids, lactate, toxins)<br/>';
-
-                        document.getElementById('perturbationSummary').innerHTML = summary;
-                    }
-
-                    generateInitialSummary();
-                    </" + "script>
-            const pH = data.pH;
-            const pCO2 = data.pCO2;
-            const Na = data.Na;
-            const K = data.K;
-            const Cl = data.Cl;
-            const Lactate = data.Lactate;
-            const Albumin = data.Albumin;
-            const PO4 = data.PO4;
-
-            const SID_low = SID < 38;
-            const Atot_low = Atot < 18;
-            const normal_Na = 140;
-            const normal_Cl = 105;
-
-            return `
-                <div class="analysis-section" style="border-left-color: var(--accent-warning);">
-                    <div class="section-title">Stewart's Physicochemical Model</div>
-                    
-                    <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.9rem; line-height: 1.7;">
-                        <strong>Strong Ion Difference (SID):</strong><br/>
-                        SID = (Na ${Na.toFixed(0)} + K ${K.toFixed(1)} + 2×iCa + 2×Mg) − (Cl ${Cl.toFixed(0)} + Lactate ${Lactate.toFixed(1)}) = ${SID.toFixed(1)} mEq/L<br/>
-                        Normal: 38–42 mEq/L | Status: ${SID_low ? '<span style="color: var(--accent-critical);">LOW (acidifying)</span>' : SID > 42 ? '<span style="color: var(--accent-warning);">HIGH (alkalinizing)</span>' : 'NORMAL'}<br/><br/>
-                        
-                        <strong>Weak Acid Buffer (Atot):</strong><br/>
-                        Atot = ${Albumin.toFixed(0)}×(0.123×${pH.toFixed(2)} − 0.631) + ${PO4.toFixed(1)}×(0.309×${pH.toFixed(2)} − 0.469) = ${Atot.toFixed(1)} mEq/L<br/>
-                        Normal: ~18 mEq/L | Status: ${Atot_low ? '<span style="color: var(--accent-warning);">LOW (alkalinizing)</span>' : Atot > 18 ? '<span style="color: var(--accent-critical);">HIGH (acidifying)</span>' : 'NORMAL'}<br/><br/>
-                        
-                        <strong>PaCO2 Component:</strong><br/>
-                        PaCO2 ${pCO2.toFixed(0)} mmHg | Status: ${pCO2 > 45 ? '<span style="color: var(--accent-critical);">HIGH (acidifying)</span>' : pCO2 < 35 ? '<span style="color: var(--accent-warning);">LOW (alkalinizing)</span>' : 'NORMAL'}<br/>
-                    </div>
-
-                    <div class="intervention-box">
-                        <strong>CORRECTION STRATEGY (80kg Patient, ADV 48L)</strong><br/><br/>
-                        
-                        <strong>1. SODIUM / SID CORRECTION:</strong><br/>
-                        Current Na: ${Na.toFixed(0)} mmol/L | Target: 140 mmol/L<br/>
-                        ${Na !== normal_Na ? `
-                        Na deficit = (140 − ${Na.toFixed(0)}) × 48L = ${((140 - Na) * adv).toFixed(0)} mEq<br/>
-                        <strong>8.4% NaHCO3:</strong> ${(((140 - Na) * adv) / 1).toFixed(0)} mL IV over 4–6 hours<br/>
-                        ⚠️ Recheck Na in 4–6h; risk of hyperchloraemic acidosis if 0.9% saline used
-                        ` : 'Na normal—no correction needed'}
-                        <br/><br/>
-
-                        <strong>2. CHLORIDE / BALANCED FLUID STRATEGY:</strong><br/>
-                        Current Cl: ${Cl.toFixed(0)} mmol/L | Target: ~105 mmol/L<br/>
-                        ${Cl > 110 ? `
-                        <strong style="color: var(--accent-critical);">HYPERCHLORAEMIA DETECTED</strong><br/>
-                        Cl excess = ${(Cl - 105).toFixed(0)} mEq/L<br/>
-                        <strong>Recommendation:</strong> STOP 0.9% saline. Switch ALL fluids to balanced crystalloid (Hartmann's, PlasmaLyte).<br/>
-                        This will prevent further SID reduction and allow Cl to normalise passively.
-                        ` : 'Cl normal—continue current fluid strategy'}
-                        <br/><br/>
-
-                        <strong>3. ALBUMIN / ATOT CORRECTION:</strong><br/>
-                        Current Albumin: ${Albumin.toFixed(0)} g/L<br/>
-                        ${Albumin < 35 ? `
-                        Albumin deficit = ${(40 - Albumin).toFixed(0)} g<br/>
-                        <strong>20% Albumin:</strong> ${(((40 - Albumin) / 20) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-                        OR <strong>5% Albumin:</strong> ${(((40 - Albumin) / 5) * 100).toFixed(0)} mL IV over 30–60 min<br/>
-                        Repeat Albumin check in 4–6h.
-                        ` : 'Albumin normal—no correction needed'}
-                        <br/><br/>
-
-                        <strong>4. LACTATE CLEARANCE:</strong><br/>
-                        Current Lactate: ${Lactate.toFixed(1)} mmol/L<br/>
-                        ${Lactate > 2.2 ? `
-                        <strong style="color: var(--accent-critical);">TARGET LACTATE: <2.0 mmol/L</strong><br/>
-                        • STOP adrenaline (switch to noradrenaline)<br/>
-                        • STOP salbutamol<br/>
-                        • Optimise perfusion: increase MAP, optimise fluid balance<br/>
-                        • Balanced fluids (NOT saline)<br/>
-                        • If CRRT: ensure Qeff ≥20 mL/kg/h<br/>
-                        Recheck lactate in 2–4 hours.
-                        ` : 'Lactate normal—continue current management'}
-                        <br/><br/>
-
-                        <strong>5. VENTILATION / PCO2 ADJUSTMENT:</strong><br/>
-                        Current PaCO2: ${pCO2.toFixed(0)} mmHg<br/>
-                        ${pCO2 > 45 ? `
-                        <strong style="color: var(--accent-critical);">HYPERCAPNIA</strong><br/>
-                        Increase MV by ${((pCO2 - 40) * 10).toFixed(0)}%<br/>
-                        • ↑ RR by ${Math.ceil((pCO2 - 40) / 5)} breaths/min, OR<br/>
-                        • ↑ Vt by ${Math.ceil((pCO2 - 40) * 20)} mL
-                        ` : pCO2 < 35 ? `
-                        <strong style="color: var(--accent-warning);">HYPOCAPNIA</strong><br/>
-                        Decrease MV by ${((40 - pCO2) * 10).toFixed(0)}%<br/>
-                        • ↓ RR by ${Math.ceil((40 - pCO2) / 5)} breaths/min, OR<br/>
-                        • ↓ Vt by ${Math.ceil((40 - pCO2) * 20)} mL
-                        ` : 'PaCO2 normal—no ventilator adjustment needed'}
-                    </div>
-
-                    <div style="padding: 16px; background: rgba(255, 107, 107, 0.1); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem; margin-top: 20px;">
-                        <strong style="color: var(--accent-critical);">⚠️ FIGGE-FENCL REFINEMENT: Check for Unmeasured Anions</strong><br/>
-                        Stewart's model assumes all major ions are measured. But does the measured pH actually satisfy the equations?<br/>
-                        <strong>Always check the Figge-Fencl tab</strong> to verify electroneutrality and detect unmeasured anions (ketoacids in DKA, toxins, phosphate in renal failure, etc.).<br/>
-                        If measured pH doesn't match predicted pH, you've found unmeasured charges in the blood—and that's critical clinical information.
-                    </div>
-
-                    <div class="slider-correction">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 16px; color: var(--accent-normal); font-weight: 600;">STEWART FLOWCHART: Physicochemical Analysis</div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Interactive flowchart showing Stewart's approach: SID + Atot + PaCO2 → Predicted pH. Compare to measured pH to detect unmeasured ions.</p>
-                        
-                        <div style="display: grid; gap: 12px; margin-bottom: 20px;">
-                            <div style="padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 4px; text-align: center; font-weight: 600;">Measured Electrolytes & Gases</div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            
-                            <div id="fc_sid" style="padding: 12px; background: ${SID < 38 ? 'rgba(255, 107, 107, 0.2)' : SID > 42 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${Math.abs(SID - 40) > 2 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">
-                                SID: <span id="fc_sid_val">${SID.toFixed(1)}</span> mEq/L <span id="fc_sid_interp">${SID < 38 ? '↓ Acidifying' : SID > 42 ? '↑ Alkalinising' : '✓'}</span>
-                            </div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            
-                            <div id="fc_atot" style="padding: 12px; background: ${Atot < 16 ? 'rgba(255, 179, 71, 0.2)' : Atot > 20 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${Math.abs(Atot - 18) > 2 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">
-                                Atot: <span id="fc_atot_val">${Atot.toFixed(1)}</span> mEq/L <span id="fc_atot_interp">${Atot < 16 ? '↓ Alkalinising' : Atot > 20 ? '↑ Acidifying' : '✓'}</span>
-                            </div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            
-                            <div id="fc_pco2_stew" style="padding: 12px; background: ${pCO2 > 45 || pCO2 < 35 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)'}; border: 2px solid ${pCO2 > 45 || pCO2 < 35 ? 'var(--accent-warning)' : 'var(--border)'}; border-radius: 4px; text-align: center; font-weight: 600;">
-                                PaCO2: <span id="fc_pco2_stew_val">${pCO2.toFixed(0)}</span> mmHg <span id="fc_pco2_stew_interp">${pCO2 > 45 ? '↑ Acidifying' : pCO2 < 35 ? '↓ Alkalinising' : '✓'}</span>
-                            </div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            
-                            <div style="padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 4px; text-align: center; font-weight: 600;">
-                                <strong>Stewart Equation:</strong><br/>
-                                pH = 7.4 + 0.16(SID-38) + 0.04(Atot-18) - 0.084(pCO2-40)/7.5
-                            </div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            
-                            <div id="fc_predicted_ph" style="padding: 12px; background: 'var(--bg-secondary)'; border: 2px solid var(--border); border-radius: 4px; text-align: center; font-weight: 600;">
-                                <strong>Predicted pH:</strong> <span id="fc_predicted_ph_val">7.40</span>
-                            </div>
-                            <div style="text-align: center; color: var(--text-secondary);">↓</div>
-                            
-                            <div id="fc_measured_ph_stew" style="padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 4px; text-align: center; font-weight: 600;">
-                                <strong>Measured pH:</strong> <span id="fc_measured_ph_stew_val">${pH.toFixed(2)}</span><br/>
-                                <span id="fc_ph_match" style="font-size: 0.85rem; color: var(--text-secondary);"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="padding: 16px; background: rgba(94, 234, 212, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px; margin-bottom: 20px;">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 12px; color: var(--accent-normal); font-weight: 600;">SUMMARY OF PERTURBATIONS (Stewart's Perspective)</div>
-                        <div id="stewartPerturbationSummary" style="font-size: 0.9rem; line-height: 1.7; color: var(--text-primary);"></div>
-                    </div>
-
-                    <div class="slider-correction">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 16px; color: var(--accent-normal); font-weight: 600;">LIVE INTERVENTION SIMULATOR: How Interventions Affect SID, Atot, pH</div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Adjust interventions below. Watch how SID, Atot, and predicted pH change. This shows Stewart's mechanism.</p>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Insulin + 50% Dextrose (units):</label>
-                                <input type="range" id="stew_insulin_slider" min="0" max="20" step="1" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_insulin_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ K → ↓ SID (slight), improves metabolic state</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">20% Albumin (mL):</label>
-                                <input type="range" id="stew_albumin_slider" min="0" max="500" step="50" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_albumin_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ Albumin → ↑ Atot (improves buffering)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">3% NaCl (mL):</label>
-                                <input type="range" id="stew_hypertonic_slider" min="0" max="500" step="50" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_hypertonic_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ Na, ↑ Cl → ↑ SID (slightly, Cl effect dominates)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Balanced Fluids (L):</label>
-                                <input type="range" id="stew_balanced_slider" min="0" max="10" step="1" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_balanced_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ Cl → ↑ SID (restores normal strong ion difference)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Switch to Noradrenaline (min):</label>
-                                <input type="range" id="stew_noradrenaline_slider" min="0" max="120" step="10" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_noradrenaline_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ Lactate → ↓ SID (restores normal lactate burden)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">Increase MV (% increase):</label>
-                                <input type="range" id="stew_mv_slider" min="0" max="50" step="5" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_mv_display">0%</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↓ PaCO2 → ↑ pH (respiratory correction)</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">8.4% NaHCO3 (mL):</label>
-                                <input type="range" id="stew_nahco3_slider" min="0" max="200" step="10" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_nahco3_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ SID (HCO3- is part of strong ion balance), ↑ pH</div>
-                            </div>
-
-                            <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 4px;">
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem;">PRBC Transfusion (units):</label>
-                                <input type="range" id="stew_prbc_slider" min="0" max="6" step="1" value="0" oninput="updateStewartInterventions()">
-                                <div class="slider-value" id="stew_prbc_display">0</div>
-                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">↑ O2 delivery (indirect effect on metabolic acidosis)</div>
-                            </div>
-                        </div>
-
-                        <div id="stewartInterventionResults" style="padding: 16px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.9rem; color: var(--text-secondary);"></div>
-                    </div>
-
-                    <script>
-                    window.stewardInterventionState = {
-                        baseSID: ${SID},
-                        baseAtot: ${Atot},
-                        basepCO2: ${pCO2},
-                        basepH: ${pH},
-                        baseNa: ${data.Na},
-                        baseCl: ${data.Cl},
-                        baseK: ${data.K},
-                        baseAlbumin: ${data.Albumin},
-                        baseLactate: ${data.Lactate}
-                    };
-
-                    function calculatePredictedpH(SID, Atot, pCO2) {
-                        return 7.4 + 0.16*(SID - 38) + 0.04*(Atot - 18) - 0.084*((pCO2 - 40)/7.5);
-                    }
-
-                    function updateStewartInterventions() {
-                        const insulin = parseFloat(document.getElementById('stew_insulin_slider').value);
-                        const albumin = parseFloat(document.getElementById('stew_albumin_slider').value);
-                        const hypertonic = parseFloat(document.getElementById('stew_hypertonic_slider').value);
-                        const balanced = parseFloat(document.getElementById('stew_balanced_slider').value);
-                        const noradrenaline = parseFloat(document.getElementById('stew_noradrenaline_slider').value);
-                        const mvIncrease = parseFloat(document.getElementById('stew_mv_slider').value);
-                        const nahco3 = parseFloat(document.getElementById('stew_nahco3_slider').value);
-                        const prbc = parseFloat(document.getElementById('stew_prbc_slider').value);
-
-                        document.getElementById('stew_insulin_display').textContent = insulin.toFixed(0);
-                        document.getElementById('stew_albumin_display').textContent = albumin.toFixed(0);
-                        document.getElementById('stew_hypertonic_display').textContent = hypertonic.toFixed(0);
-                        document.getElementById('stew_balanced_display').textContent = balanced.toFixed(1);
-                        document.getElementById('stew_noradrenaline_display').textContent = noradrenaline.toFixed(0);
-                        document.getElementById('stew_mv_display').textContent = mvIncrease.toFixed(0) + '%';
-                        document.getElementById('stew_nahco3_display').textContent = nahco3.toFixed(0);
-                        document.getElementById('stew_prbc_display').textContent = prbc.toFixed(0);
-
-                        // Calculate how interventions affect SID, Atot, pCO2
-                        let newAlbumin = window.stewardInterventionState.baseAlbumin + (albumin / 50);
-                        let newAtot = (newAlbumin * (0.123 * window.stewardInterventionState.basepH - 0.631)) + (1.0 * (0.309 * window.stewardInterventionState.basepH - 0.469));
-                        
-                        let newNa = window.stewardInterventionState.baseNa + (hypertonic / 100 * 2);
-                        let newCl = window.stewardInterventionState.baseCl + (hypertonic / 100 * 3.4) - (balanced / 10) + (nahco3 / 100 * 0.5); // HCO3 effect small
-                        let newK = window.stewardInterventionState.baseK - (insulin / 10 * 1.5);
-                        let newLactate = window.stewardInterventionState.baseLactate * (1 - (noradrenaline / 120) * 0.5) * (1 - (balanced / 20) * 0.2);
-                        
-                        let newSID = (newNa + newK + 2*1.23 + 2*1.0) - (newCl + newLactate);
-                        let newpCO2 = window.stewardInterventionState.basepCO2 * (1 - mvIncrease / 100);
-                        let newpH = calculatePredictedpH(newSID, newAtot, newpCO2);
-
-                        // Update flowchart
-                        document.getElementById('fc_sid_val').textContent = newSID.toFixed(1);
-                        document.getElementById('fc_sid_interp').textContent = newSID < 38 ? '↓ Acidifying' : newSID > 42 ? '↑ Alkalinising' : '✓';
-                        document.getElementById('fc_sid').style.background = newSID < 38 ? 'rgba(255, 107, 107, 0.2)' : newSID > 42 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)';
-                        document.getElementById('fc_sid').style.borderColor = Math.abs(newSID - 40) > 2 ? 'var(--accent-warning)' : 'var(--border)';
-
-                        document.getElementById('fc_atot_val').textContent = newAtot.toFixed(1);
-                        document.getElementById('fc_atot_interp').textContent = newAtot < 16 ? '↓ Alkalinising' : newAtot > 20 ? '↑ Acidifying' : '✓';
-                        document.getElementById('fc_atot').style.background = newAtot < 16 ? 'rgba(255, 179, 71, 0.2)' : newAtot > 20 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)';
-                        document.getElementById('fc_atot').style.borderColor = Math.abs(newAtot - 18) > 2 ? 'var(--accent-warning)' : 'var(--border)';
-
-                        document.getElementById('fc_pco2_stew_val').textContent = newpCO2.toFixed(0);
-                        document.getElementById('fc_pco2_stew_interp').textContent = newpCO2 > 45 ? '↑ Acidifying' : newpCO2 < 35 ? '↓ Alkalinising' : '✓';
-                        document.getElementById('fc_pco2_stew').style.background = newpCO2 > 45 || newpCO2 < 35 ? 'rgba(255, 179, 71, 0.2)' : 'var(--bg-secondary)';
-                        document.getElementById('fc_pco2_stew').style.borderColor = newpCO2 > 45 || newpCO2 < 35 ? 'var(--accent-warning)' : 'var(--border)';
-
-                        document.getElementById('fc_predicted_ph_val').textContent = newpH.toFixed(2);
-                        
-                        // Check if predicted matches measured
-                        const phDiff = Math.abs(newpH - window.stewardInterventionState.basepH);
-                        if (phDiff < 0.05) {
-                            document.getElementById('fc_ph_match').innerHTML = '✓ Predicted matches measured (electroneutrality satisfied)';
-                        } else if (phDiff < 0.15) {
-                            document.getElementById('fc_ph_match').innerHTML = '⚠️ Minor discrepancy (Δ ' + phDiff.toFixed(2) + ')';
-                        } else {
-                            document.getElementById('fc_ph_match').innerHTML = '❌ Large discrepancy (Δ ' + phDiff.toFixed(2) + ') — unmeasured ions present';
-                        }
-
-                        // Generate perturbation summary
-                        let summary = '<strong>Stewart's View of Current State:</strong><br/><br/>';
-                        summary += '<strong>SID Component:</strong> ' + newSID.toFixed(1) + ' mEq/L (baseline: ' + window.stewardInterventionState.baseSID.toFixed(1) + ')<br/>';
-                        if (newSID < 38) summary += '❌ Low SID is acidifying<br/>';
-                        else if (newSID > 42) summary += '⚠️ High SID is alkalinising<br/>';
-                        else summary += '✓ SID contributing to normalisation<br/>';
-
-                        summary += '<br/><strong>Atot Component:</strong> ' + newAtot.toFixed(1) + ' mEq/L (baseline: ' + window.stewardInterventionState.baseAtot.toFixed(1) + ')<br/>';
-                        if (newAtot < 16) summary += '⚠️ Low Atot is alkalinising (reduced buffering)<br/>';
-                        else if (newAtot > 20) summary += '❌ High Atot is acidifying<br/>';
-                        else summary += '✓ Atot normal<br/>';
-
-                        summary += '<br/><strong>PaCO2 Component:</strong> ' + newpCO2.toFixed(0) + ' mmHg (baseline: ' + window.stewardInterventionState.basepCO2.toFixed(0) + ')<br/>';
-                        if (newpCO2 > 45) summary += '❌ High PaCO2 is acidifying<br/>';
-                        else if (newpCO2 < 35) summary += '⚠️ Low PaCO2 is alkalinising<br/>';
-                        else summary += '✓ PaCO2 appropriate<br/>';
-
-                        summary += '<br/><strong>Predicted pH:</strong> ' + newpH.toFixed(2) + ' (measured: ' + window.stewardInterventionState.basepH.toFixed(2) + ')<br/>';
-                        if (Math.abs(newpH - window.stewardInterventionState.basepH) > 0.15) {
-                            summary += '❌ Discrepancy indicates unmeasured ions (see Figge-Fencl tab)<br/>';
-                        }
-
-                        summary += '<br/><strong>Mechanism summary:</strong><br/>';
-                        if (balanced > 0) summary += '• Balanced fluids: ↓ Cl burden → ↑ SID → ↑ pH<br/>';
-                        if (albumin > 0) summary += '• Albumin: ↑ buffering capacity (Atot) → easier to correct pH<br/>';
-                        if (hypertonic > 0) summary += '• 3% NaCl: ↑ Na > ↑ Cl → slight SID increase<br/>';
-                        if (nahco3 > 0) summary += '• NaHCO3: ↑ SID → ↑ pH (direct effect on strong ions)<br/>';
-                        if (mvIncrease > 0) summary += '• ↑ MV: ↓ PaCO2 → ↑ pH (respiratory component)<br/>';
-                        if (noradrenaline > 0) summary += '• Noradrenaline: ↓ Lactate → ↓ SID burden → ↑ pH<br/>';
-
-                        document.getElementById('stewartPerturbationSummary').innerHTML = summary;
-                    }
-
-                    // Initial summary
-                    function generateStewartInitialSummary() {
-                        let summary = '<strong>Stewart's View of Initial State:</strong><br/><br/>';
-                        summary += '<strong>SID Component:</strong> ' + SID.toFixed(1) + ' mEq/L (normal: 38–42)<br/>';
-                        if (SID < 38) summary += '❌ Low SID is acidifying the blood<br/>';
-                        else if (SID > 42) summary += '⚠️ High SID is alkalinising<br/>';
-                        else summary += '✓ SID normal<br/>';
-
-                        summary += '<br/><strong>Atot Component:</strong> ' + Atot.toFixed(1) + ' mEq/L (normal: ~18)<br/>';
-                        if (Albumin < 35) summary += '❌ Low albumin reduces buffering capacity (↓ Atot effect)<br/>';
-                        else summary += '✓ Atot normal<br/>';
-
-                        summary += '<br/><strong>PaCO2 Component:</strong> ' + pCO2.toFixed(0) + ' mmHg (normal: 35–45)<br/>';
-                        if (pCO2 > 45) summary += '❌ High PaCO2 is acidifying<br/>';
-                        else if (pCO2 < 35) summary += '⚠️ Low PaCO2 is alkalinising (respiratory compensation?)<br/>';
-                        else summary += '✓ PaCO2 appropriate<br/>';
-
-                        summary += '<br/><strong>Predicted pH:</strong> 7.4 + 0.16(' + SID.toFixed(1) + '-38) + 0.04(' + Atot.toFixed(1) + '-18) - 0.084(' + pCO2.toFixed(0) + '-40)/7.5 = ' + calculatePredictedpH(SID, Atot, pCO2).toFixed(2) + '<br/>';
-                        const phDiff = Math.abs(pH - calculatePredictedpH(SID, Atot, pCO2));
-                        if (phDiff > 0.15) {
-                            summary += '❌ Predicted pH (' + calculatePredictedpH(SID, Atot, pCO2).toFixed(2) + ') ≠ Measured pH (' + pH.toFixed(2) + ')<br/>Discrepancy: ' + phDiff.toFixed(2) + ' → Unmeasured ions present!<br/>See Figge-Fencl tab to quantify.';
-                        } else if (phDiff < 0.05) {
-                            summary += '✓ Predicted pH matches measured pH (electroneutrality satisfied)';
-                        }
-
-                        document.getElementById('stewartPerturbationSummary').innerHTML = summary;
-                    }
-
-                    document.getElementById('fc_predicted_ph_val').textContent = calculatePredictedpH(SID, Atot, pCO2).toFixed(2);
-                    generateStewartInitialSummary();
-                    </" + "script>
-        }
-
-        function buildTraditionalTab(data) {
-            const pH = data.pH;
-            const pCO2 = data.pCO2;
-            const HCO3 = data.HCO3;
-            const AnGap = data.AnGap;
-            const Albumin = data.Albumin;
-            const acidaemia = pH < 7.35;
-            const alkalaemia = pH > 7.45;
-
-            let primaryDisorder = 'MIXED/COMPLEX';
-            if (acidaemia && pCO2 > 45) primaryDisorder = 'Respiratory Acidosis';
-            else if (acidaemia && pCO2 < 35) primaryDisorder = 'Metabolic Acidosis';
-            else if (alkalaemia && pCO2 < 35) primaryDisorder = 'Respiratory Alkalosis';
-            else if (alkalaemia && pCO2 > 45) primaryDisorder = 'Metabolic Alkalosis';
-
-            const expectedPaCO2_met_acid = 1.2 * HCO3 + 15;
-            const expectedPaCO2_met_alk = 0.7 * HCO3 + 21;
-
-            // AG analysis
-            const normal_alb = 40;
-            const AG_corrected = AnGap + ((normal_alb - Albumin) / 4);
-            const AG_elevated = AG_corrected > 16;
-            const deltaAG = AnGap - 12; // Expected AG is 12
-            const deltaHCO3 = 24 - HCO3; // Expected HCO3 is 24
-            const deltaRatio = deltaAG / deltaHCO3;
-
-            let AGanalysis = '';
-            if (AG_elevated && acidaemia && pCO2 < 35) {
-                AGanalysis = `
-                    <div style="margin-top: 16px; padding: 12px; background: rgba(255, 107, 107, 0.1); border-radius: 4px;">
-                        <strong style="color: var(--accent-critical);">HIGH ANION GAP METABOLIC ACIDOSIS (HAGMA)</strong><br/>
-                        AG raw: ${AnGap.toFixed(0)} | AG corrected: ${AG_corrected.toFixed(1)}<br/>
-                        Delta AG: ${deltaAG.toFixed(1)} | Delta HCO3: ${deltaHCO3.toFixed(1)}<br/>
-                        Delta Ratio (ΔAG/ΔHCO3): ${deltaRatio.toFixed(2)}<br/>
-                        ${deltaRatio > 2 ? '→ Concurrent METABOLIC ALKALOSIS (ratio >2)' : deltaRatio < 1 ? '→ Concurrent NON-AG METABOLIC ACIDOSIS (ratio <1)' : '→ Pure HAGMA (ratio ~1)'}<br/><br/>
-                        <strong>HAGMA Differential (GOLDMARK):</strong><br/>
-                        • <strong>G</strong>lycols (ethylene glycol, propylene glycol)<br/>
-                        • <strong>O</strong>xoproline (from paracetamol, chronic TPN)<br/>
-                        • <strong>L</strong>-lactate (hypoperfusion, sepsis)<br/>
-                        • <strong>D</strong>-lactate (short bowel syndrome, bacterial overgrowth)<br/>
-                        • <strong>M</strong>ethanol<br/>
-                        • <strong>A</strong>spirin (salicylate toxicity)<br/>
-                        • <strong>R</strong>enal failure (uraemia)<br/>
-                        • <strong>K</strong>etoacidosis (DKA, alcoholic, starvation)<br/>
-                    </div>
-                `;
-            } else if (!AG_elevated && acidaemia && pCO2 < 35) {
-                AGanalysis = `
-                    <div style="margin-top: 16px; padding: 12px; background: rgba(94, 234, 212, 0.1); border-radius: 4px;">
-                        <strong style="color: var(--accent-safe);">NORMAL ANION GAP METABOLIC ACIDOSIS (NAGMA/Hyperchloraemic)</strong><br/>
-                        AG: ${AnGap.toFixed(0)} (normal) | HCO3: ${HCO3.toFixed(1)} (low)<br/>
-                        This is a NAGMA—look for chloride excess or bicarbonate loss.<br/><br/>
-                        <strong>NAGMA Differential (USEDCARS):</strong><br/>
-                        • <strong>U</strong>reterosigmoidostomy (bowel conduit)<br/>
-                        • <strong>S</strong>aline administration (hyperchloraemic from 0.9% saline)<br/>
-                        • <strong>E</strong>ndocrine: Addison's disease, hypoaldosteronism<br/>
-                        • <strong>D</strong>iarrhoea (bicarbonate loss)<br/>
-                        • <strong>C</strong>arbonic anhydrase inhibitors (acetazolamide)<br/>
-                        • <strong>A</strong>mmonium chloride (iatrogenic)<br/>
-                        • <strong>R</strong>enal tubular acidosis (RTA types 1, 2, 4)<br/>
-                        • <strong>S</strong>pironolactone (type 4 RTA—hyperkalaemic)<br/>
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="analysis-section" style="border-left-color: #8b9dc3;">
-                    <div class="section-title">Traditional (Boston/Copenhagen): Pattern Recognition with Equations</div>
-                    
-                    <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.9rem; line-height: 1.8;">
-                        <strong style="color: var(--accent-normal);">STEP 1: Determine pH Status</strong><br/>
-                        <span style="font-family: var(--font-display); color: var(--text-secondary);">Measured pH = ${pH.toFixed(2)}</span><br/>
-                        ${acidaemia ? '✗ ACIDAEMIA (pH <7.35)' : alkalaemia ? '✗ ALKALAEMIA (pH >7.45)' : '✓ Normal (7.35–7.45)'}<br/>
-                        <strong>Primary Disorder:</strong> ${primaryDisorder}<br/><br/>
-
-                        <strong style="color: var(--accent-normal);">STEP 2: Assess Respiratory Component (PaCO2)</strong><br/>
-                        <span style="font-family: var(--font-display); color: var(--text-secondary);">Measured PaCO2 = ${pCO2.toFixed(0)} mmHg (Normal: 35–45)</span><br/>
-                        ${pCO2 > 45 && acidaemia ? '✗ HIGH PaCO2 with ACIDAEMIA → Respiratory acidosis (primary or inadequate compensation)' : pCO2 < 35 && acidaemia ? '✓ LOW PaCO2 with ACIDAEMIA → Appropriate respiratory compensation' : pCO2 > 45 && alkalaemia ? '✗ HIGH PaCO2 with ALKALAEMIA → Metabolic alkalosis with inadequate respiratory response' : pCO2 < 35 && alkalaemia ? '✓ LOW PaCO2 with ALKALAEMIA → Respiratory alkalosis' : '✓ Normal'}<br/><br/>
-
-                        <strong style="color: var(--accent-normal);">STEP 3: Calculate Expected Respiratory Compensation</strong><br/>
-                        <span style="font-family: var(--font-display); color: var(--text-secondary);">Using Boston Rule (acute vs chronic) or Copenhagen Rule</span><br/>
-                        ${acidaemia && pCO2 < 35 ? `
-                        <strong>Metabolic Acidosis Detected</strong><br/>
-                        <strong>Boston Rule:</strong> PaCO₂ = 1.2 × HCO₃ + 15 ± 2<br/>
-                        Expected PaCO₂ = 1.2 × ${HCO3.toFixed(1)} + 15 ± 2 = <span style="color: var(--accent-normal); font-weight: 600;">${expectedPaCO2_met_acid.toFixed(0)} ± 2 mmHg</span><br/>
-                        Measured PaCO₂ = ${pCO2.toFixed(0)} mmHg<br/>
-                        ${Math.abs(pCO2 - expectedPaCO2_met_acid) < 2 ? '✓ Respiratory compensation is APPROPRIATE' : Math.abs(pCO2 - expectedPaCO2_met_acid) > 5 ? '✗ Respiratory compensation is INADEQUATE (PaCO2 too high) — concurrent respiratory acidosis' : '⚠️ Borderline compensation'}
-                        ` : alkalaemia && pCO2 > 45 ? `
-                        <strong>Metabolic Alkalosis Detected</strong><br/>
-                        <strong>Copenhagen Rule:</strong> PaCO₂ = 0.7 × HCO₃ + 21 ± 2<br/>
-                        Expected PaCO₂ = 0.7 × ${HCO3.toFixed(1)} + 21 ± 2 = <span style="color: var(--accent-normal); font-weight: 600;">${expectedPaCO2_met_alk.toFixed(0)} ± 2 mmHg</span><br/>
-                        Measured PaCO₂ = ${pCO2.toFixed(0)} mmHg<br/>
-                        ${Math.abs(pCO2 - expectedPaCO2_met_alk) < 2 ? '✓ Respiratory compensation is APPROPRIATE' : Math.abs(pCO2 - expectedPaCO2_met_alk) > 5 ? '✗ Respiratory compensation is INADEQUATE (PaCO2 too low) — concurrent respiratory alkalosis' : '⚠️ Borderline compensation'}
-                        ` : acidaemia && pCO2 > 45 ? `
-                        <strong>Respiratory Acidosis Detected</strong><br/>
-                        <strong>Acute Respiratory Acidosis:</strong> HCO₃ ↑ by 1 per 10 mmHg ↑ PaCO₂<br/>
-                        Expected HCO₃ = 24 + (${(pCO2 - 40) / 10}.toFixed(1)} × 1) = <span style="color: var(--accent-normal); font-weight: 600;">${(24 + (pCO2 - 40) / 10).toFixed(1)} mmol/L</span><br/>
-                        <strong>Chronic Respiratory Acidosis:</strong> HCO₃ ↑ by 4 per 10 mmHg ↑ PaCO₂<br/>
-                        Expected HCO₃ = 24 + (${(pCO2 - 40) / 10}.toFixed(1)} × 4) = <span style="color: var(--accent-normal); font-weight: 600;">${(24 + (pCO2 - 40) / 10 * 4).toFixed(1)} mmol/L</span><br/>
-                        Measured HCO₃ = ${HCO3.toFixed(1)} mmol/L<br/>
-                        ${HCO3 < 24 ? '✗ HCO₃ too LOW → concurrent metabolic acidosis' : '✓ Appropriate metabolic compensation'}
-                        ` : alkalaemia && pCO2 < 35 ? `
-                        <strong>Respiratory Alkalosis Detected</strong><br/>
-                        <strong>Acute Respiratory Alkalosis:</strong> HCO₃ ↓ by 2 per 10 mmHg ↓ PaCO₂<br/>
-                        Expected HCO₃ = 24 − (${(40 - pCO2) / 10}.toFixed(1)} × 2) = <span style="color: var(--accent-normal); font-weight: 600;">${(24 - (40 - pCO2) / 10 * 2).toFixed(1)} mmol/L</span><br/>
-                        <strong>Chronic Respiratory Alkalosis:</strong> HCO₃ ↓ by 5 per 10 mmHg ↓ PaCO₂<br/>
-                        Expected HCO₃ = 24 − (${(40 - pCO2) / 10}.toFixed(1)} × 5) = <span style="color: var(--accent-normal); font-weight: 600;">${(24 - (40 - pCO2) / 10 * 5).toFixed(1)} mmol/L</span><br/>
-                        Measured HCO₃ = ${HCO3.toFixed(1)} mmol/L<br/>
-                        ${HCO3 > 24 ? '✗ HCO₃ too HIGH → concurrent metabolic alkalosis' : '✓ Appropriate metabolic compensation'}
-                        ` : '✓ No compensatory calculation needed'}
-                    </div>
-
-                    <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.9rem; line-height: 1.8;">
-                        <strong style="color: var(--accent-normal);">STEP 4: Anion Gap Analysis</strong><br/>
-                        <span style="font-family: var(--font-display); color: var(--text-secondary);">AG = Na − (Cl + HCO₃)</span><br/>
-                        AG = ${data.Na.toFixed(0)} − (${data.Cl.toFixed(0)} + ${HCO3.toFixed(1)}) = <span style="color: var(--accent-normal); font-weight: 600;">${AnGap.toFixed(0)} mmol/L</span><br/>
-                        Normal AG = 8–16 mmol/L<br/><br/>
-
-                        <strong style="color: var(--accent-normal);">STEP 5: Correct AG for Albumin</strong><br/>
-                        <span style="font-family: var(--font-display); color: var(--text-secondary);">AG_corrected = AG + (40 − Albumin) / 4</span><br/>
-                        AG_corrected = ${AnGap.toFixed(0)} + (40 − ${Albumin.toFixed(0)}) / 4 = <span style="color: var(--accent-normal); font-weight: 600;">${AG_corrected.toFixed(1)} mmol/L</span><br/>
-                        ${AG_corrected > 16 ? '✗ HIGH AG → Metabolic acidosis with elevated AG' : '✓ Normal AG'}<br/><br/>
-
-                        <strong style="color: var(--accent-normal);">STEP 6: Calculate Delta Ratio (if HAGMA)</strong><br/>
-                        <span style="font-family: var(--font-display); color: var(--text-secondary);">ΔAG/ΔHCO₃ = (AG − 12) / (24 − HCO₃)</span><br/>
-                        ΔAG/ΔHCO₃ = (${AnGap.toFixed(0)} − 12) / (24 − ${HCO3.toFixed(1)}) = ${deltaRatio.toFixed(2)}<br/>
-                        ${deltaRatio > 2 ? '✗ Ratio >2 → Concurrent METABOLIC ALKALOSIS (unmeasured alkalinising process)' : deltaRatio < 1 ? '✗ Ratio <1 → Concurrent NON-AG METABOLIC ACIDOSIS (unmeasured acidifying process)' : '✓ Ratio ~1 → Pure HAGMA'}
-                    </div>
-
-                    ${AGanalysis}
-
-                    <div style="padding: 16px; background: rgba(139, 157, 195, 0.1); border-left: 3px solid #8b9dc3; border-radius: 4px; font-size: 0.9rem; margin-top: 20px;">
-                        <strong style="color: #8b9dc3;">Pattern Recognition Framework</strong><br/>
-                        The Traditional approach uses bedside equations (Boston, Copenhagen, AG formulas) to:<br/>
-                        1. Identify the primary disorder (pH + PaCO2)<br/>
-                        2. Check if respiratory/metabolic compensation is appropriate<br/>
-                        3. Detect concurrent disturbances (via AG and delta ratio)<br/>
-                        4. Diagnose the underlying process via differential mnemonics<br/>
-                        This is pattern recognition at the bedside—quick, practical, and doesn't require memorising physicochemical mechanisms.
-                    </div>
-                </div>
-            `;
-        }
-
-        function buildFiggeTab(data, SID, Atot, adv) {
-            const pH = data.pH;
-            const pCO2 = data.pCO2;
-            const HCO3 = data.HCO3;
-            const Na = data.Na;
-            const K = data.K;
-            const Cl = data.Cl;
-            const Lactate = data.Lactate;
-            const Albumin = data.Albumin;
-            const PO4 = data.PO4;
-            const iCa = data.iCa;
-
-            // Predicted pH using Stewart's framework
-            // pH = 7.4 + 0.16*(SID - 38) + 0.04*(Atot - 18) - 0.084*((pCO2 - 40)/7.5)
-            const predictedpH_base = 7.4 + 0.16*(SID - 38) + 0.04*(Atot - 18) - 0.084*((pCO2 - 40)/7.5);
-            const pHdiscrepancy = pH - predictedpH_base;
-
-            // Unmeasured ion burden (simplified): roughly 6-7 pH units per 100 mEq/L unmeasured charge
-            // So if pH is 0.3 units lower than predicted, ~50 mEq/L unmeasured anions
-            const estimatedUnmeasuredBurden = Math.abs(pHdiscrepancy) * 150; // mEq/L estimate
-
-            const mismatchDetected = Math.abs(pHdiscrepancy) > 0.1;
-
-            let mismatchWarning = '';
-            if (mismatchDetected) {
-                mismatchWarning = `
-                    <div style="margin: 16px 0; padding: 16px; background: rgba(255, 107, 107, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px;">
-                        <strong style="color: var(--accent-critical);">⚠️ UNMEASURED IONS DETECTED</strong><br/>
-                        Measured pH (${pH.toFixed(2)}) does NOT match predicted pH (${predictedpH_base.toFixed(2)})<br/>
-                        <strong>Discrepancy: ${Math.abs(pHdiscrepancy).toFixed(2)} pH units</strong><br/>
-                        <strong>Estimated unmeasured ion burden: ~${estimatedUnmeasuredBurden.toFixed(0)} mEq/L</strong><br/><br/>
-                        ${pHdiscrepancy < 0 ? `
-                        <strong>Direction: pH is LOWER than predicted</strong> → Unmeasured ANIONS present (negative charges)<br/>
-                        Likely: ketoacids (DKA), lactate, phosphate, sulphate, toxins (salicylates, methanol, ethylene glycol)
-                        ` : `
-                        <strong>Direction: pH is HIGHER than predicted</strong> → Unmeasured CATIONS present (positive charges)<br/>
-                        Likely: hypermagnesaemia, hyperkalemia not fully captured, or albumin calculation error
-                        `}
-                    </div>
-                `;
-            } else {
-                mismatchWarning = `
-                    <div style="margin: 16px 0; padding: 16px; background: rgba(94, 234, 212, 0.15); border-left: 3px solid var(--accent-safe); border-radius: 4px;">
-                        <strong style="color: var(--accent-safe);">✓ ELECTRONEUTRALITY SATISFIED</strong><br/>
-                        Measured pH (${pH.toFixed(2)}) matches predicted pH (${predictedpH_base.toFixed(2)})<br/>
-                        No significant unmeasured ions. Stewart's model explains the pH well.
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="analysis-section" style="border-left-color: var(--accent-critical);">
-                    <div class="section-title">Figge-Fencl: Unmeasured Ion Detection & Quantification</div>
-                    
-                    <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.9rem; line-height: 1.7;">
-                        <strong>THE KEY PRINCIPLE:</strong><br/>
-                        Stewart's model predicts pH from measured SID, Atot, and pCO2.<br/>
-                        If measured pH ≠ predicted pH → unmeasured ions are hiding in the blood.<br/><br/>
-
-                        <strong>BASELINE CALCULATIONS:</strong><br/>
-                        Apparent SID: ${SID.toFixed(1)} mEq/L<br/>
-                        Atot: ${Atot.toFixed(1)} mEq/L<br/>
-                        PaCO2: ${pCO2.toFixed(0)} mmHg<br/><br/>
-
-                        <strong>pH Analysis:</strong><br/>
-                        Predicted pH: ${predictedpH_base.toFixed(2)}<br/>
-                        Measured pH: ${pH.toFixed(2)}<br/>
-                        Discrepancy: ${pHdiscrepancy.toFixed(2)} pH units<br/>
-                    </div>
-
-                    ${mismatchWarning}
-
-                    <div style="margin-top: 20px; padding: 16px; background: var(--bg-tertiary); border-radius: 4px;">
-                        <div style="font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 12px; color: var(--accent-normal); font-weight: 600;">INTERACTIVE: Adjust Unmeasured Ion Burden</div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Use the slider to add unmeasured anions (negative) or cations (positive). When predicted pH matches measured pH, you've found the unmeasured ion load.</p>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Unmeasured Ions (mEq/L):</label>
-                                <input type="range" id="unmeasuredSlider" min="-500" max="500" step="10" value="0" oninput="updateFiggeSlider()" style="width: 100%; cursor: pointer;">
-                                <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--accent-normal); margin-top: 6px; font-weight: 600;" id="sliderDisplay">0</div>
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Predicted pH with adjustment:</label>
-                                <div style="font-family: var(--font-display); font-size: 1.3rem; color: var(--text-primary); margin-top: 6px; font-weight: 600;" id="adjustedpHDisplay">${predictedpH_base.toFixed(2)}</div>
-                            </div>
-                        </div>
-                        <div id="sliderResults" style="padding: 12px; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem; color: var(--text-secondary);"></div>
-                    </div>
-
-                    <div style="padding: 16px; background: rgba(255, 107, 107, 0.1); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem; margin-top: 20px;">
-                        <strong style="color: var(--accent-critical);">CLINICAL APPLICATION:</strong><br/>
-                        Once you know the unmeasured ion burden and direction, <strong>search clinically</strong>:<br/>
-                        • <strong>Unmeasured ANIONS:</strong> Check lactate trend, urine ketones (DKA), serum osmolality (toxins?), phosphate (renal failure?)<br/>
-                        • <strong>Unmeasured CATIONS:</strong> Check Mg²⁺, review K⁺ calculation, assess albumin accuracy
-                    </div>
-                </div>
-
-                <script>
-                window.figgeState = {
-                    basepH: ${predictedpH_base},
-                    measuredpH: ${pH},
-                    SID: ${SID},
-                    Atot: ${Atot},
-                    pCO2: ${pCO2}
-                };
-
-                function updateFiggeSlider() {
-                    const slider = document.getElementById('unmeasuredSlider');
-                    const unmeasuredIons = parseFloat(slider.value);
-                    document.getElementById('sliderDisplay').textContent = unmeasuredIons.toFixed(0);
-
-                    // Adjust SID by unmeasured ion burden
-                    // If unmeasured anions: SID effectively lower (more negative charge on right side)
-                    // If unmeasured cations: SID effectively higher
-                    const adjustedSID = window.figgeState.SID - (unmeasuredIons / 100); // Rough conversion
-                    
-                    // Recalculate predicted pH
-                    const adjustedpH = 7.4 + 0.16*(adjustedSID - 38) + 0.04*(window.figgeState.Atot - 18) - 0.084*((window.figgeState.pCO2 - 40)/7.5);
-                    document.getElementById('adjustedpHDisplay').textContent = adjustedpH.toFixed(2);
-
-                    // Show match status
-                    const pHdiff = Math.abs(adjustedpH - window.figgeState.measuredpH);
-                    let status = '';
-                    if (pHdiff < 0.05) {
-                        status = `<strong style="color: var(--accent-safe);">✓ MATCH!</strong> Adjusted pH (${adjustedpH.toFixed(2)}) matches measured pH (${window.figgeState.measuredpH.toFixed(2)}). Unmeasured ions ≈ ${unmeasuredIons.toFixed(0)} mEq/L`;
-                    } else if (pHdiff < 0.15) {
-                        status = `⚠️ Close. Difference: ${pHdiff.toFixed(2)} pH units. Try adjusting slider.`;
-                    } else {
-                        status = `Still off by ${pHdiff.toFixed(2)} pH units. Keep adjusting...`;
-                    }
-                    document.getElementById('sliderResults').innerHTML = status;
-                }
-
-                // Initialize
-                updateFiggeSlider();
-                </" + "script>
-            `;
-        }
-
-        function switchTab(event, tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        window.addEventListener('DOMContentLoaded', initCases);
-    </" + "script>
+    } else if (data.pH > 7.45) {
+        h += '🔵 <strong>ALKALAEMIA</strong> – Assess HCO3 and respiratory drive';
+    }
+    h += '</div>';
+    
+    return h + '</div>';
+}
+
+function buildFigge(data, predicted_pH) {
+    let h = '<div class="analysis-section"><div class="section-title">Figge-Fencl: Unmeasured Ions Detection</div>';
+    h += '<div class="step-box"><strong>Predicted vs Measured pH Comparison</strong><br/>Predicted (Stewart): ' + predicted_pH.toFixed(2) + '<br/>Measured (iSTAT): ' + data.pH.toFixed(2) + '<br/>Difference (Δ): ' + (data.pH - predicted_pH).toFixed(3) + '<br/>';
+    if (Math.abs(data.pH - predicted_pH) > 0.1) {
+        h += '⚠️ <strong>SIGNIFICANT DIFFERENCE – Unmeasured anions or cations likely present</strong><br/>Consider: Unmeasured cations (Mg, Ca, K excess) or anions (proteins, PO4, SO4)';
+    } else {
+        h += '✓ Measured ions adequately explain the pH';
+    }
+    h += '</div></div>';
+    return h;
+}
+
+window.onload = initCases;
+</script>
 </body>
 </html>
