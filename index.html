@@ -1318,7 +1318,7 @@ Recheck in 15 min, repeat if needed<br/>
                     }
 
                     generateInitialSummary();
-                    </script>
+                    </" + "script>
             const pH = data.pH;
             const pCO2 = data.pCO2;
             const Na = data.Na;
@@ -1668,7 +1668,7 @@ Recheck in 15 min, repeat if needed<br/>
 
                     document.getElementById('fc_predicted_ph_val').textContent = calculatePredictedpH(SID, Atot, pCO2).toFixed(2);
                     generateStewartInitialSummary();
-                    </script>
+                    </" + "script>
         }
 
         function buildTraditionalTab(data) {
@@ -1951,7 +1951,7 @@ Recheck in 15 min, repeat if needed<br/>
 
                 // Initialize
                 updateFiggeSlider();
-                </script>
+                </" + "script>
             `;
         }
 
@@ -1963,6 +1963,6 @@ Recheck in 15 min, repeat if needed<br/>
         }
 
         window.addEventListener('DOMContentLoaded', initCases);
-    </script>
+    </" + "script>
 </body>
 </html>
