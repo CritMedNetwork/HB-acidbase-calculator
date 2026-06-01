@@ -67,7 +67,7 @@
 <body>
 <div class="container">
     <div class="disclaimer">
-        <strong>⚠️ DISCLAIMER:</strong> Educational tool only. Always correlate with clinical context and verify calculations using current institutional protocols. Estimated replacements are based on 80 kg male using standard formula.
+        <strong>⚠️ DISCLAIMER:</strong> Educational tool only. Always correlate with clinical context and verify calculations using current institutional protocols.
     </div>
 
     <div class="header">
@@ -84,6 +84,7 @@
         <div class="input-group"><label>pCO2 (mmHg)</label><input type="number" id="pCO2" step="1" min="10" max="100" placeholder="40"></div>
         <div class="input-group"><label>pO2 (mmHg)</label><input type="number" id="pO2" step="1" min="20" max="200" placeholder="90"></div>
         <div class="input-group"><label>HCO3 (mmol/L)</label><input type="number" id="HCO3" step="0.1" min="1" max="60" placeholder="24"></div>
+        <div class="input-group"><label>BE (from analyzer)</label><input type="number" id="BE" step="0.1" min="-30" max="30" placeholder="0"></div>
         <div class="input-group"><label>Na (mmol/L)</label><input type="number" id="Na" step="1" min="110" max="160" placeholder="140"></div>
         <div class="input-group"><label>K (mmol/L)</label><input type="number" id="K" step="0.1" min="2" max="8" placeholder="4.0"></div>
         <div class="input-group"><label>Cl (mmol/L)</label><input type="number" id="Cl" step="1" min="80" max="120" placeholder="105"></div>
@@ -94,6 +95,8 @@
         <div class="input-group"><label>Glucose (mmol/L)</label><input type="number" id="Glucose" step="0.1" min="1" max="40" placeholder="5.0"></div>
         <div class="input-group"><label>Hb (g/L)</label><input type="number" id="Hb" step="5" min="60" max="200" placeholder="140"></div>
         <div class="input-group"><label>Creatinine (μmol/L)</label><input type="number" id="Crea" step="5" min="30" max="300" placeholder="90"></div>
+        <div class="input-group"><label>Urea (mmol/L)</label><input type="number" id="Urea" step="0.5" min="1" max="50" placeholder="7"></div>
+        <div class="input-group"><label>Osmolality (mOsm/kg)</label><input type="number" id="Osmolality" step="1" min="250" max="350" placeholder="290"></div>
     </div>
 
     <div class="button-group">
@@ -115,10 +118,10 @@
 
 <script>
 const cases = [
-    { name: "Septic Shock", description: "High lactate, low albumin, AKI, K+", data: { pH: 7.28, pCO2: 31, pO2: 87, HCO3: 16, Na: 128, K: 5.8, Cl: 102, iCa: 0.92, Lactate: 8.5, Albumin: 22, PO4: 1.0, Glucose: 8.2, Hb: 115, Crea: 180 } },
-    { name: "Chronic COPD", description: "Respiratory acidosis, compensatory HCO3", data: { pH: 7.32, pCO2: 74, pO2: 54, HCO3: 42, Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Lactate: 1.8, Albumin: 42, PO4: 1.0, Glucose: 5.2, Hb: 180, Crea: 95 } },
-    { name: "DKA", description: "High AG acidosis, hyperglycaemia, K+", data: { pH: 7.18, pCO2: 22, pO2: 102, HCO3: 11, Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Lactate: 2.2, Albumin: 40, PO4: 1.0, Glucose: 28.3, Hb: 160, Crea: 110 } },
-    { name: "Salicylate Overdose", description: "Mixed respiratory alkalosis + metabolic acidosis", data: { pH: 7.42, pCO2: 18, pO2: 110, HCO3: 12, Na: 140, K: 4.2, Cl: 105, iCa: 1.23, Lactate: 1.5, Albumin: 38, PO4: 1.0, Glucose: 7.8, Hb: 145, Crea: 92 } }
+    { name: "Septic Shock", description: "High lactate, low albumin, AKI, K+", data: { pH: 7.28, pCO2: 31, pO2: 87, HCO3: 16, BE: -10, Na: 128, K: 5.8, Cl: 102, iCa: 0.92, Lactate: 8.5, Albumin: 22, PO4: 1.0, Glucose: 8.2, Hb: 115, Crea: 180, Urea: 12, Osmolality: 305 } },
+    { name: "Chronic COPD", description: "Respiratory acidosis, compensatory HCO3", data: { pH: 7.32, pCO2: 74, pO2: 54, HCO3: 42, BE: 12, Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Lactate: 1.8, Albumin: 42, PO4: 1.0, Glucose: 5.2, Hb: 180, Crea: 95, Urea: 6, Osmolality: 288 } },
+    { name: "DKA", description: "High AG acidosis, hyperglycaemia, K+", data: { pH: 7.18, pCO2: 22, pO2: 102, HCO3: 11, BE: -18, Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Lactate: 2.2, Albumin: 40, PO4: 1.0, Glucose: 28.3, Hb: 160, Crea: 110, Urea: 9, Osmolality: 312 } },
+    { name: "Salicylate Overdose", description: "Mixed respiratory alkalosis + metabolic acidosis", data: { pH: 7.42, pCO2: 18, pO2: 110, HCO3: 12, BE: -14, Na: 140, K: 4.2, Cl: 105, iCa: 1.23, Lactate: 1.5, Albumin: 38, PO4: 1.0, Glucose: 7.8, Hb: 145, Crea: 92, Urea: 5, Osmolality: 295 } }
 ];
 
 function initCases() {
@@ -154,6 +157,7 @@ function analyzeCase() {
         pCO2: parseFloat(document.getElementById('pCO2').value) || 40,
         pO2: parseFloat(document.getElementById('pO2').value) || 90,
         HCO3: parseFloat(document.getElementById('HCO3').value) || 24,
+        BE: parseFloat(document.getElementById('BE').value) || 0,
         Na: parseFloat(document.getElementById('Na').value) || 140,
         K: parseFloat(document.getElementById('K').value) || 4.0,
         Cl: parseFloat(document.getElementById('Cl').value) || 105,
@@ -163,7 +167,9 @@ function analyzeCase() {
         PO4: parseFloat(document.getElementById('PO4').value) || 1.0,
         Glucose: parseFloat(document.getElementById('Glucose').value) || 5.0,
         Hb: parseFloat(document.getElementById('Hb').value) || 140,
-        Crea: parseFloat(document.getElementById('Crea').value) || 90
+        Crea: parseFloat(document.getElementById('Crea').value) || 90,
+        Urea: parseFloat(document.getElementById('Urea').value) || 7,
+        Osmolality: parseFloat(document.getElementById('Osmolality').value) || 290
     };
 
     const BEecf = -0.93 * (24 - data.HCO3) - 16 * (7.40 - data.pH);
@@ -506,13 +512,27 @@ function buildTraditional(d, AG, AGc, BE, acid) {
         h += 'Δ AG / Δ HCO3 = ' + delta.toFixed(2) + ' → ' + (delta > 2 ? '🔵 Concurrent metabolic alkalosis' : delta < 1 ? '🔴 Concurrent NAGMA' : '✓ Pure HAGMA');
     }
     h += '</div>';
-    h += '<div class="step-box"><strong>STEP 5: Differential Diagnosis</strong><br/>';
+    h += '<div class="step-box"><strong>STEP 5: Differential & Mnemonics</strong><br/>';
     if (acid) {
         if (AGc > 16) {
             h += '🔴 <strong>HIGH AG METABOLIC ACIDOSIS (HAGMA)</strong><br/><strong style="color: var(--accent-normal);">GOLDMARK:</strong><br/>• <strong>G</strong>lycols • <strong>O</strong>xoproline • <strong>L</strong>-lactate • <strong>D</strong>-lactate • <strong>M</strong>ethanol • <strong>A</strong>spirin • <strong>R</strong>enal failure • <strong>K</strong>etoacidosis';
         } else {
             h += '🔴 <strong>NORMAL AG METABOLIC ACIDOSIS (NAGMA)</strong><br/><strong style="color: var(--accent-normal);">USEDCARS:</strong><br/>• <strong>U</strong>reterosigmoidostomy • <strong>S</strong>aline • <strong>E</strong>ndocrine (Addison\'s) • <strong>D</strong>iarrhoea • <strong>C</strong>CA inhibitors • <strong>A</strong>mmonium chloride • <strong>R</strong>TA • <strong>S</strong>pironolactone';
         }
+    }
+    h += '</div>';
+    
+    h += '<div class="step-box"><strong>OSMOLAR GAP (if measured osmolality available)</strong><br/>';
+    const calc_osm = (2 * d.Na) + d.Glucose + d.Urea;
+    const osm_gap = d.Osmolality - calc_osm;
+    h += 'Osmolar Gap = Measured (' + d.Osmolality.toFixed(0) + ') − Calculated (2×Na ' + (2*d.Na).toFixed(0) + ' + Glucose ' + d.Glucose.toFixed(1) + ' + Urea ' + d.Urea.toFixed(0) + ')<br/>';
+    h += 'Osmolar Gap = ' + osm_gap.toFixed(0) + ' mOsm/kg<br/>';
+    if (osm_gap > 10) {
+        h += '🔴 <strong>ELEVATED (>10):</strong> Unmeasured osmoles present (toxic alcohols: methanol, ethylene glycol, isopropanol)<br/>';
+    } else if (osm_gap > 5) {
+        h += '🟡 <strong>BORDERLINE (5-10):</strong> Consider unmeasured osmoles, but could be normal variation';
+    } else {
+        h += '🟢 <strong>NORMAL (<5):</strong> Accounted osmoles only';
     }
     h += '</div></div>';
     return h;
