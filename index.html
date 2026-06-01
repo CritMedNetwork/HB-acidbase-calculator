@@ -207,6 +207,7 @@ function setupSliders() {
 
 function buildHughesBrain(d, BE, AG, AGc, acid) {
     let h = '<div class="analysis-section"><div class="section-title">Hughes & Brain: 8-Step Analysis</div>';
+    const calc_osm = (2 * d.Na) + d.Glucose + d.Urea;
     h += '<div style="margin-bottom: 24px; display: grid; grid-template-columns: 180px 30px 1fr; gap: 12px; align-items: start;">';
     
     // Step 1
@@ -273,6 +274,58 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
     // DRIVER SUMMARY WITH CLINICAL CORRECTIONS
     h += '<div class="driver-summary"><strong style="color: var(--accent-critical); font-size: 1.1rem;">CRITICAL DRIVERS & CLINICAL CORRECTIONS (80 kg patient)</strong>';
     
+    // Context-specific warnings for each case
+    if (d.Glucose > 20 && d.pH < 7.25 && d.HCO3 < 15) {
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ LIKELY DKA – K MANAGEMENT WARNING:</strong> ' + (d.K > 5.5 ? 'K ' + d.K.toFixed(1) + ' appears HIGH but TOTAL-BODY K IS SEVERELY DEPLETED' : d.K < 3.5 ? 'K ' + d.K.toFixed(1) + ' is paradoxically LOW = severe depletion' : 'K ' + d.K.toFixed(1) + ' is normal but TOTAL-BODY K IS LIKELY DEPLETED') + '. Insulin + IV fluids will drive K INTO cells (+ pH correction). Start K replacement EARLY. Recheck K every 1-2 hours initially.</div>';
+    }
+    if (d.Lactate > 6 && d.pH < 7.30) {
+        let k_context_lactate = '';
+        if (d.K > 5.5) k_context_lactate = 'K ' + d.K.toFixed(1) + ' is HIGH, which is expected (H+ shifts in, K+ shifts out), but may mask underlying depletion.';
+        else if (d.K < 3.5) k_context_lactate = 'K ' + d.K.toFixed(1) + ' is LOW in acidemia = severe depletion.';
+        else k_context_lactate = 'K ' + d.K.toFixed(1) + ' is normal but may not reflect intracellular status.';
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE HYPERLACTATAEMIA & ACIDEMIA:</strong> ' + k_context_lactate + ' Tissue damage/rhabdo can release K artificially. As perfusion improves and acidosis corrects, K will shift unpredictably. Aggressive monitoring essential.</div>';
+    }
+    if (d.Cl > 110 && d.pH < 7.35) {
+        let k_chlor_msg = '';
+        if (d.K < 3.5) {
+            k_chlor_msg = '🟡 K ' + d.K.toFixed(1) + ' is paradoxically LOW in acidemia = massive depletion. Correct with KPO4 (not KCl). As pH corrects, K will FALL further.';
+        } else if (d.K > 5) {
+            k_chlor_msg = '🟡 K ' + d.K.toFixed(1) + ' is HIGH (expected in acidemia). As pH corrects, K will FALL. Monitor closely.';
+        } else {
+            k_chlor_msg = '🟡 K ' + d.K.toFixed(1) + ' is normal but likely depleted. Once pH corrects, K may drop.';
+        }
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ HYPERCHLOREMIC ACIDOSIS – STRONG ION ABNORMALITY:</strong><br/>Fix Cl/Na first (Hartmann\'s or NaHCO3). ' + k_chlor_msg + '</div>';
+    }
+    
+    // Additional pattern warnings
+    if (d.K > 6.5 && d.pH < 7.25) {
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE HYPERKALAEMIA IN SEVERE ACIDEMIA:</strong> This is additive cardiac toxicity. ECG changes expected. Treat both urgently—acidosis correction alone will drive K HIGHER initially before it drops. Calcium gluconate first, then aggressive K lowering (insulin, bicarb, dialysis).</div>';
+    }
+    
+    if (d.Na < 130 && d.K > 5.5 && d.Cl < 95) {
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ ADRENAL CRISIS PATTERN (Low Na + High K + Low Cl):</strong> Consider acute adrenal insufficiency. Treat with IV hydrocortisone 100 mg stat, then aggressive saline (0.9% NaCl). K will fall rapidly with treatment.</div>';
+    }
+    
+    if (d.pCO2 > 80 && d.pH < 7.20 && d.HCO3 > 40) {
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE RESPIRATORY ACIDOSIS:</strong> High pCO2 + high HCO3 = chronic compensation. Acute decompensation implies critical airway/ventilation problem. Consider intubation if not already mechanically ventilated.</div>';
+    }
+    
+    if (d.pH > 7.55 && d.K < 3.5) {
+        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE ALKALEMIA + HYPOKALAEMIA:</strong> This is the worst combination for arrhythmias. H+ has shifted into cells → K+ shifted OUT (depleting serum K further). Even "mild" hypokalemia becomes lethal in alkalemia. Urgent K replacement needed.</div>';
+    }
+    
+    if (Math.abs(d.pH - 7.40) < 0.05 && BE > 3) {
+        h += '<div style="padding: 12px; margin-bottom: 12px; background: rgba(94, 234, 212, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-safe);">✓ COMPENSATED – EXCELLENT RESPIRATORY RESPONSE:</strong> pH near-normal despite metabolic alkalosis, suggesting strong respiratory compensation (low pCO2). Patient is compensating well. Focus on addressing underlying cause (GI losses, diuretics, etc.).</div>';
+    }
+    
+    if (Math.abs(d.Osmolality - calc_osm) > 20) {
+        const osm_gap = d.Osmolality - calc_osm;
+        if (osm_gap > 0) {
+            h += '<div style="padding: 12px; margin-bottom: 12px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ LARGE OSMOLAR GAP (+' + osm_gap.toFixed(0) + '):</strong> Unmeasured osmoles present. Suspect toxic alcohol (methanol, ethylene glycol, isopropanol) especially if high anion gap + hypotension + neurological symptoms. Fomepizole if ethylene glycol suspected.</div>';
+        }
+    }
+    
+    
     if (d.K > 6) {
         h += '<div class="driver-item critical">🔴 <strong>SEVERE HYPERKALAEMIA (K ' + d.K.toFixed(1) + ') – IMMEDIATE ACTION REQUIRED</strong>';
         h += '<div class="correction">• <strong>Calcium:</strong> 10 mL calcium gluconate 10% IV over 2-5 min (cardiac protection)<br/>';
@@ -286,11 +339,27 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
         h += '• <strong>Sodium polystyrene:</strong> 15 g PO/PR (slower, use PRN)<br/>';
         h += '• <strong>Loop diuretic:</strong> Furosemide 40 mg IV if volume replete</div></div>';
     } else if (d.K < 3.5) {
-        h += '<div class="driver-item critical">🔴 <strong>Hypokalaemia (K ' + d.K.toFixed(1) + ') – ARRHYTHMIA RISK</strong>';
-        h += '<div class="correction">• <strong>KCl replacement IV:</strong> 10-20 mmol in 100 mL 0.9% NaCl over 30-60 min<br/>';
-        h += '• Can repeat if K <3.0 mmol/L or ECG changes<br/>';
-        h += '• Oral (if tolerated):<strong> 20 mmol slow-release daily<br/>';
-        h += '• Monitor: ECG, repeat K after 2-4 hours</div></div>';
+        let k_context = '';
+        if (acid) {
+            k_context = '🔴 <strong>PARADOXICALLY LOW IN ACIDEMIA</strong> – suggests massive total-body K deficit. As pH corrects, K will FALL further (H+ shifts out of cells → K+ shifts back in).';
+        } else if (d.pH > 7.45) {
+            k_context = '🔴 Expected in alkalemia (H+ shifts into cells → K+ shifts out). As pH corrects, K will RISE.';
+        }
+        h += '<div class="driver-item critical">🔴 <strong>Hypokalaemia (K ' + d.K.toFixed(1) + ') – ARRHYTHMIA RISK' + (k_context ? '<br/>' + k_context : '') + '</strong>';
+        h += '<div class="correction">';
+        if (acid && d.K < 3.5) {
+            h += '• <strong>Critical:</strong> K is paradoxically low in acidemia = severe depletion<br/>';
+            h += '• <strong>Avoid KCl if Cl is high</strong> (hyperchloraemic acidosis) – use KPO4 instead<br/>';
+            h += '• <strong>⚠️ WARNING:</strong> As pH corrects, serum K will DROP further (H+ shifts back out, K+ shifts back in)<br/>';
+            h += '• <strong>Replacement strategy:</strong> Consider KPO4 10-20 mmol IV before correcting acidosis<br/>';
+            h += '• Monitor: ECG continuously; repeat K frequently (K will fall as pH corrects)<br/>';
+        } else {
+            h += '• <strong>KCl replacement IV:</strong> 10-20 mmol in 100 mL 0.9% NaCl over 30-60 min<br/>';
+            h += '• Can repeat if K <3.0 mmol/L or ECG changes<br/>';
+            h += '• Oral (if tolerated): 20 mmol slow-release daily<br/>';
+            h += '• Monitor: ECG, repeat K after 2-4 hours<br/>';
+        }
+        h += '</div></div>';
     }
     
     if (d.Albumin < 30) {
