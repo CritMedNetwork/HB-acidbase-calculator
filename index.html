@@ -250,9 +250,15 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
     h += '<div class="vertical-connector">↓</div><div></div><div></div>';
     
     // Step 7
-    h += '<div class="step-box"><strong>Step 7<br/>Electrolytes</strong><br/>Na ' + d.Na.toFixed(0) + '<br/>K ' + d.K.toFixed(1) + '</div>';
+    h += '<div class="step-box"><strong>Step 7<br/>Electrolytes</strong><br/>Na ' + d.Na.toFixed(0) + ' | Cl ' + d.Cl.toFixed(0) + '<br/>K ' + d.K.toFixed(1) + '</div>';
     h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (d.Na < 135 || d.Na > 145 ? '⚠️ Na abnormal' : d.K > 5.5 || d.K < 3.5 ? '⚠️ K abnormal' : '✓ Normal') + '</div>';
+    let elec_status = '';
+    if (d.Na < 135 || d.Na > 145) elec_status += '⚠️ Na abnormal | ';
+    if (d.Cl > 110) elec_status += '🔴 Cl HIGH (hyperchloraemic) | ';
+    if (d.Cl < 95) elec_status += '⚠️ Cl low | ';
+    if (d.K > 5.5 || d.K < 3.5) elec_status += '⚠️ K abnormal';
+    if (!elec_status) elec_status = '✓ Normal';
+    h += '<div class="step-interpretation">' + elec_status + '</div>';
     
     // Vertical connector
     h += '<div class="vertical-connector">↓</div><div></div><div></div>';
@@ -327,10 +333,13 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
         h += '• Recheck ABG after each dose<br/>';
         h += '• Address underlying cause (lactate, DKA, renal failure)</div></div>';
     } else if (BE < -6) {
+        const bicarb_deficit_mild = Math.abs(BE) * 0.5 * 80;
+        const bicarb_mL_mild = Math.round(bicarb_deficit_mild / 1);
         h += '<div class="driver-item">🟡 <strong>Metabolic Acidosis (BEecf ' + BE.toFixed(1) + ')</strong>';
-        h += '<div class="correction">• Conservative approach if pH >7.20<br/>';
-        h += '• Address underlying cause preferentially<br/>';
-        h += '• Bicarbonate reserved for severe cases (pH <7.10)</div></div>';
+        h += '<div class="correction">• <strong>If pH <7.20:</strong> Sodium bicarbonate 8.4%: ' + Math.round(bicarb_mL_mild / 2) + '-' + bicarb_mL_mild + ' mL IV (half-correction approach)<br/>';
+        h += '(Estimate: ' + bicarb_deficit_mild.toFixed(0) + ' mEq needed total; cautious dosing to avoid overcorrection)<br/>';
+        h += '• <strong>If pH >7.20:</strong> Address underlying cause preferentially (lactate clearance, treat DKA, correct diarrhea)<br/>';
+        h += '• Recheck ABG after intervention</div></div>';
     }
     
     if (d.pCO2 < 30) {
@@ -364,6 +373,14 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
         h += '• <strong>If hypovolaemic:</strong> 0.9% NaCl IV<br/>';
         h += '• <strong>If euvolaemic (SIADH):</strong> Fluid restrict to 500-800 mL/day<br/>';
         h += '• Gentle correction: 8-10 mmol/L daily</div></div>';
+    }
+    
+    if (d.Cl > 110) {
+        h += '<div class="driver-item critical">🔴 <strong>Hyperchloraemia (Cl ' + d.Cl.toFixed(0) + ' mmol/L) – STRONG ION ABNORMALITY</strong>';
+        h += '<div class="correction">• <strong>Typical of:</strong> Diarrhoea, RTA, or 0.9% NaCl excess<br/>';
+        h += '• <strong>Management:</strong> Switch to balanced fluids (Hartmann\'s, Plasmalyte)<br/>';
+        h += '• Associated NAGMA (normal AG acidosis) – check USEDCARS causes<br/>';
+        h += '• Monitor: Cl trends, acid-base status after fluid change</div></div>';
     }
     
     h += '</div>';
@@ -540,10 +557,18 @@ function buildTraditional(d, AG, AGc, BE, acid) {
 }
 
 function buildFigge(d, pred_pH) {
-    let h = '<div class="analysis-section"><div class="section-title">Figge-Fencl: Unmeasured Ions</div>';
+    let h = '<div class="analysis-section"><div class="section-title">Figge-Fencl: Unmeasured Ions Detection & Management</div>';
     h += '<div class="step-box"><strong>Predicted vs Measured pH</strong><br/>Predicted: ' + pred_pH.toFixed(2) + ' | Measured: ' + d.pH.toFixed(2) + ' | Δ: ' + (d.pH - pred_pH).toFixed(3) + '<br/>';
-    if (Math.abs(d.pH - pred_pH) > 0.1) h += '⚠️ Unmeasured ions present – consider Ca, Mg, PO4, SO4';
-    else h += '✓ Measured ions explain pH';
+    if (Math.abs(d.pH - pred_pH) > 0.1) {
+        h += '⚠️ <strong>UNMEASURED IONS PRESENT</strong><br/>';
+        h += '<strong style="color: var(--accent-normal); display: block; margin-top: 8px;">Investigation & Management:</strong><br/>';
+        h += '• <strong>Measure:</strong> Serum calcium, magnesium, phosphate, sulfate<br/>';
+        h += '• <strong>Consider causes:</strong> Hypermagnesaemia (laxatives, renal failure), hypercalcaemia, high phosphate (renal failure), sulfate (renal failure)<br/>';
+        h += '• <strong>Management:</strong> Address underlying cause (reduce Mg supplementation, treat renal failure with dialysis, manage hyperparathyroidism)<br/>';
+        h += '• <strong>Note:</strong> Presence of unmeasured ions explains the pH discrepancy—focus on correcting SID and ventilation while investigating';
+    } else {
+        h += '✓ <strong>MEASURED IONS EXPLAIN pH</strong><br/>No significant unmeasured ion effect detected. Proceed with SID and ventilation management based on Hughes & Brain and Stewart analyses.';
+    }
     h += '</div></div>';
     return h;
 }
