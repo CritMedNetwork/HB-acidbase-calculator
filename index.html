@@ -353,7 +353,7 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
         h += '<div class="driver-item critical">🔴 <strong>Hypokalaemia (K ' + d.K.toFixed(1) + ') – ARRHYTHMIA RISK' + (k_context ? '<br/>' + k_context : '') + '</strong>';
         h += '<div class="correction">';
         if (acid && d.K < 3.5) {
-            h += '• <strong>Critical:</strong> K is paradoxically low in acidemia = severe depletion<br/>';
+            h += '• <strong>Critical:</strong> K is paradoxically low in this case given the acidemia = severe depletion<br/>';
             h += '• <strong>Avoid KCl if Cl is high</strong> (hyperchloraemic acidosis) – use KPO4 instead<br/>';
             h += '• <strong>⚠️ WARNING:</strong> As pH corrects, serum K will DROP further (H+ shifts back out, K+ shifts back in)<br/>';
             h += '• <strong>Replacement strategy:</strong> Consider KPO4 10-20 mmol IV before correcting acidosis<br/>';
