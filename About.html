@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About & Formulae - iSTAT ABG Master Analyzer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #1c2128;
+            --bg-tertiary: #262c36;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --accent-normal: #58a6ff;
+            --accent-warning: #d29922;
+            --accent-critical: #f85149;
+            --accent-safe: #3fb950;
+            --font-display: 'Monaco', 'Courier New', monospace;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 20px; line-height: 1.8; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; border-bottom: 2px solid var(--border); }
+        .header h1 { font-size: 1.8rem; margin-bottom: 8px; color: var(--accent-normal); }
+        .header p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px; }
+        .nav-links { display: flex; gap: 20px; justify-content: center; font-size: 0.95rem; margin-top: 16px; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding-bottom: 4px; transition: all 0.2s; }
+        .nav-links a:hover { color: var(--accent-normal); }
+        .nav-links a.active { color: var(--accent-normal); border-bottom: 3px solid var(--accent-normal); }
+        .section { margin-bottom: 40px; padding: 20px; background: var(--bg-secondary); border-radius: 8px; border-left: 4px solid var(--accent-normal); }
+        .section h2 { font-size: 1.3rem; margin-bottom: 16px; color: var(--accent-normal); }
+        .section h3 { font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; color: var(--accent-warning); }
+        .formula { padding: 12px; background: var(--bg-tertiary); border-left: 3px solid var(--accent-normal); border-radius: 4px; font-family: var(--font-display); font-size: 0.95rem; margin: 12px 0; }
+        .approach { padding: 16px; background: var(--bg-tertiary); border-radius: 6px; margin: 16px 0; }
+        .approach strong { color: var(--accent-normal); }
+        .disclaimer { padding: 12px; background: rgba(210, 153, 34, 0.1); border-left: 3px solid var(--accent-warning); margin-bottom: 20px; border-radius: 4px; font-size: 0.9rem; color: var(--text-secondary); }
+        ul, ol { margin-left: 24px; }
+        li { margin-bottom: 8px; }
+        code { background: var(--bg-tertiary); padding: 2px 6px; border-radius: 3px; font-family: var(--font-display); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>iSTAT CG8+ ABG Master Analyzer</h1>
+        <p>About This Tool & Formulae Reference</p>
+        <div class="nav-links">
+            <a href="index.html">Calculator</a>
+            <a href="about.html" class="active">About & Formulae</a>
+            <a href="theory.html">Acid-Base Theory</a>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        <strong>⚠️ DISCLAIMER:</strong> This tool is for educational purposes only. Always correlate with clinical context and verify calculations using current institutional protocols. Not a substitute for clinical judgment.
+    </div>
+
+    <div class="section">
+        <h2>Overview: Three Complementary Approaches</h2>
+        <p>This calculator implements three independent interpretive frameworks for acid-base disorders. Each uses different variables and equations but should converge on similar management recommendations:</p>
+        <ul>
+            <li><strong>Hughes & Brain:</strong> Bedside-friendly 8-step flowchart emphasizing clinical pattern recognition and actionable drivers</li>
+            <li><strong>Stewart:</strong> Physicochemical approach using strong ion difference (SID), weak acid effects (Atot), and respiratory component</li>
+            <li><strong>Traditional Boston:</strong> Anion gap method with Delta ratio and differential diagnosis mnemonics</li>
+            <li><strong>Figge-Fencl:</strong> Detects unmeasured ions by comparing predicted vs. measured pH</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Hughes & Brain Approach</h2>
+        <p><strong>Reference:</strong> Hughes R & Brain MJ. "A simplified bedside approach to acid-base: fluid physiology utilizing classical and physicochemical approaches." <em>Anaesthesia and Intensive Care Medicine</em> 14:10 (2013): 445–452.</p>
+        <h3>8-Step Flowchart</h3>
+        <ol>
+            <li><strong>pH Status:</strong> Acidaemia (<7.35) vs. Normal (7.35-7.45) vs. Alkalaemia (>7.45)</li>
+            <li><strong>pCO2 Assessment:</strong> Hypoventilation (>45) vs. Normal (35-45) vs. Hyperventilation (<35)</li>
+            <li><strong>BEecf (Base Excess in extracellular fluid):</strong> Metabolic component
+                <div class="formula">BEecf = −0.93 × (24 − HCO3) − 16 × (7.40 − pH)</div>
+                Normal: −3 to +3 mEq/L
+            </li>
+            <li><strong>Anion Gap (raw):</strong> <code>AG = Na − (Cl + HCO3)</code> Normal: 8–16</li>
+            <li><strong>Anion Gap (corrected for albumin):</strong>
+                <div class="formula">AG_corrected = AG + (40 − Albumin)/4</div>
+                Accounts for unmeasured negative charge from hypoalbuminaemia
+            </li>
+            <li><strong>Lactate:</strong> 0.5–2.2 mmol/L normal. High lactate suggests tissue hypoperfusion/hypoxia</li>
+            <li><strong>Electrolytes (Na, K, Cl):</strong> Check for hyperchloraemia (Cl >110), hyponatraemia, hyperkalaemia/hypokalaemia</li>
+            <li><strong>Ancillary (Creatinine, Glucose):</strong> Assess renal function, metabolic stress</li>
+        </ol>
+        <h3>Clinical Drivers & Corrections</h3>
+        <p>The Hughes & Brain tab identifies <strong>critical derangements</strong> and proposes <strong>specific interventions</strong>:</p>
+        <ul>
+            <li>Hyperkalaemia (K >6): Calcium gluconate, insulin + dextrose, salbutamol, dialysis</li>
+            <li>Hypokalaemia (K <3.5): KCl IV or KPO4, accounting for acidemia/alkalemia shifts</li>
+            <li>Severe hypoalbuminaemia: 5% or 20% albumin with calculated mL doses</li>
+            <li>Elevated lactate: Aggressive resuscitation, vasopressors, source control</li>
+            <li>Severe metabolic acidosis: NaHCO3 8.4% with deficit-based dosing</li>
+            <li>Hyperchloraemia: Switch to balanced fluids (Hartmann's, Plasmalyte)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Stewart Approach</h2>
+        <p><strong>Reference:</strong> Stewart PA. "Modern quantitative acid-base chemistry." <em>Canadian Journal of Physiology and Pharmacology</em> 61 (1983): 1444–1461.</p>
+        <h3>Three Independent Variables</h3>
+        <p>Stewart's principle: pH is determined by <strong>three and only three independent variables</strong>. Changing any one affects pH predictably:</p>
+        
+        <h3>1. Strong Ion Difference (SID)</h3>
+        <div class="formula">SID = (Na + K + 2×iCa) − (Cl + Lactate)</div>
+        <ul>
+            <li>Normal: 38–42 mEq/L</li>
+            <li>Low SID (↓Na, ↓K, ↑Cl, ↑Lactate) → Acidifying</li>
+            <li>High SID (↑Na, ↑K, ↓Cl, ↓Lactate) → Alkalinizing</li>
+        </ul>
+
+        <h3>2. Weak Acid Effect (Atot)</h3>
+        <div class="formula">Atot = (Albumin/10) × (0.123 × pH − 0.631) + (PO4/10) × (0.309 × pH − 0.469)</div>
+        <ul>
+            <li>Normal: ~18 mEq/L</li>
+            <li>Low Atot (hypoalbuminaemia, low PO4) → Acidifying effect</li>
+            <li><strong>CLINICAL NOTE:</strong> Atot is <strong>difficult to correct meaningfully</strong> (albumin is hard to increment). Focus on SID correction instead.</li>
+        </ul>
+
+        <h3>3. Respiratory Component (pCO2)</h3>
+        <div class="formula">Predicted pH = 7.4 + 0.16×(SID−38) + 0.04×(Atot−18) − 0.084×((pCO2−40)/7.5)</div>
+        <ul>
+            <li>↑pCO2 (>45) → Acidifying</li>
+            <li>↓pCO2 (<35) → Alkalinizing</li>
+        </ul>
+
+        <h3>Clinically Relevant Levers</h3>
+        <p><strong>Only TWO variables are practically useful for correction:</strong></p>
+        <ul>
+            <li><strong>SID Management:</strong> Adjust Na, K, Cl via fluids (balanced vs. NaCl), supplementation, or osmotic therapy</li>
+            <li><strong>Ventilation:</strong> Adjust minute ventilation (RR × tidal volume) to target pCO2</li>
+        </ul>
+        <p><strong>Atot is supporting context but NOT a primary intervention target.</strong></p>
+    </div>
+
+    <div class="section">
+        <h2>Traditional Boston Approach</h2>
+        <p><strong>Reference:</strong> Goldberg M, Green SB, Moss ML, et al. "Computer-based instruction and diagnosis of acid-base disorders." <em>JAMA</em> 223 (1973): 269–275.</p>
+        
+        <h3>5-Step Method</h3>
+        <ol>
+            <li><strong>Determine pH status:</strong> Acidaemia vs. Alkalaemia vs. Normal</li>
+            <li><strong>Assess respiratory response (Winter's Formula):</strong> For acidaemia only
+                <div class="formula">Expected pCO2 = 1.5 × HCO3 + 8 ± 2</div>
+                <ul>
+                    <li>If measured pCO2 <expected − 2: Concurrent respiratory alkalosis</li>
+                    <li>If measured pCO2 >expected + 2: Concurrent respiratory acidosis</li>
+                    <li>If within ±2: Appropriate compensation</li>
+                </ul>
+            </li>
+            <li><strong>Calculate Anion Gap (uncorrected):</strong> <code>AG = Na − (Cl + HCO3)</code> Normal: 8–16</li>
+            <li><strong>Correct AG for albumin:</strong>
+                <div class="formula">AG_corrected = AG + (40 − Albumin)/4</div>
+            </li>
+            <li><strong>If HAGMA (AG >16), calculate Delta Ratio:</strong>
+                <div class="formula">Δ Ratio = ΔAG / ΔHCO3 = (AG − 12) / (24 − HCO3)</div>
+                <ul>
+                    <li>>2: Concurrent metabolic alkalosis</li>
+                    <1: Concurrent normal AG metabolic acidosis (mixed picture)</li>
+                    <li>1–2: Pure high AG metabolic acidosis</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Differential Diagnosis Mnemonics</h3>
+        <p><strong>GOLDMARK (High AG Metabolic Acidosis):</strong></p>
+        <ul>
+            <li><strong>G</strong>lycols (ethylene glycol, propylene glycol)</li>
+            <li><strong>O</strong>xoproline (acetaminophen toxicity)</li>
+            <li><strong>L</strong>-lactate (hyperlactataemia)</li>
+            <li><strong>D</strong>-lactate (short bowel syndrome)</li>
+            <li><strong>M</strong>ethanol</li>
+            <li><strong>A</strong>spirin (salicylate toxicity)</li>
+            <li><strong>R</strong>enal failure</li>
+            <li><strong>K</strong>etoacidosis (DKA, alcoholic ketoacidosis)</li>
+        </ul>
+
+        <p><strong>USEDCARS (Normal AG Metabolic Acidosis):</strong></p>
+        <ul>
+            <li><strong>U</strong>reterosigmoidostomy (chloride loss in urine)</li>
+            <li><strong>S</strong>aline administration (hyperchloraemic acidosis)</li>
+            <li><strong>E</strong>ndocrine (Addison's disease, hypoaldosteronism)</li>
+            <li><strong>D</strong>iarrhoea (bicarbonate loss, chloride retention)</li>
+            <li><strong>C</strong>arbonic anhydrase inhibitors (acetazolamide)</li>
+            <li><strong>A</strong>mmonium chloride (exogenous)</li>
+            <li><strong>R</strong>TA (renal tubular acidosis: Types 1, 2, 4)</li>
+            <li><strong>S</strong>pironolactone (Type 4 RTA via hyperkalemia)</li>
+        </ul>
+
+        <h3>Osmolar Gap (if measured osmolality available)</h3>
+        <div class="formula">Osmolar Gap = Measured Osmolality − (2×Na + Glucose + Urea)</div>
+        <ul>
+            <li><strong>Normal: <5 mOsm/kg</strong> Accounts for measured particles</li>
+            <li><strong>Elevated (>10): </strong>Unmeasured osmoles present (toxic alcohols: methanol, ethylene glycol, isopropanol)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Figge-Fencl Approach</h2>
+        <p><strong>Reference:</strong> Figge J, Mydosh T, Fencl V. "Serum electrolytes and acid-base status in critically ill patients." <em>American Journal of Respiratory and Critical Care Medicine</em> 150 (1994): 140–147.</p>
+        
+        <h3>Unmeasured Ion Detection</h3>
+        <p>Compares the <strong>predicted pH from Stewart equation</strong> against <strong>measured pH</strong> to detect unmeasured ions:</p>
+        <div class="formula">Predicted pH = 7.4 + 0.16×(SID−38) + 0.04×(Atot−18) − 0.084×((pCO2−40)/7.5)</div>
+        
+        <ul>
+            <li><strong>If measured pH ≈ predicted pH:</strong> Measured ions (Na, K, Cl, Lactate) fully explain the acid-base status</li>
+            <li><strong>If measured pH significantly different from predicted:</strong> Unmeasured ions present
+                <ul>
+                    <li><strong>Unmeasured cations:</strong> Calcium, magnesium, unidentified cations</li>
+                    <li><strong>Unmeasured anions:</strong> Phosphate, sulfate, organic acids</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Clinical Significance</h3>
+        <ul>
+            <li>Hypermagnesaemia (from laxatives, renal failure)</li>
+            <li>Hypercalcaemia (parathyroid disease, malignancy, vitamin D toxicity)</li>
+            <li>Severe phosphate derangements (renal failure)</li>
+            <li>Calciphylaxis or other unmeasured organic acid accumulation</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>iSTAT CG8+ Reference Ranges</h2>
+        <p>All input fields use these Australian clinical reference intervals (CG8+ analyser):</p>
+        <ul>
+            <li><strong>pH:</strong> 7.35–7.45</li>
+            <li><strong>pCO2:</strong> 35–45 mmHg (4.7–6.0 kPa)</li>
+            <li><strong>pO2:</strong> 80–100 mmHg</li>
+            <li><strong>HCO3:</strong> 22–26 mmol/L</li>
+            <li><strong>Na:</strong> 135–145 mmol/L</li>
+            <li><strong>K:</strong> 3.5–5.2 mmol/L</li>
+            <li><strong>Cl:</strong> 95–110 mmol/L</li>
+            <li><strong>iCa:</strong> 1.15–1.32 mmol/L</li>
+            <li><strong>Lactate:</strong> 0.5–2.2 mmol/L</li>
+            <li><strong>Albumin:</strong> 35–50 g/L</li>
+            <li><strong>Glucose:</strong> 3.0–7.8 mmol/L</li>
+            <li><strong>Urea:</strong> 2.5–8.0 mmol/L</li>
+            <li><strong>Creatinine:</strong> 60–120 μmol/L</li>
+            <li><strong>Hb:</strong> 120–180 g/L</li>
+            <li><strong>PO4:</strong> 0.8–1.4 mmol/L</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>How to Use This Tool Effectively</h2>
+        <ol>
+            <li><strong>Load a test case</strong> from the top of the calculator (or enter arbitrary values)</li>
+            <li><strong>Click ANALYZE</strong> to generate all four interpretations</li>
+            <li><strong>Review Hughes & Brain first:</strong> Fast bedside pattern, actionable drivers, specific corrections</li>
+            <li><strong>Compare Stewart:</strong> Confirms the management targets independently using physicochemical reasoning</li>
+            <li><strong>Check Traditional:</strong> Differential diagnosis guidance via GOLDMARK/USEDCARS</li>
+            <li><strong>Examine Figge-Fencl:</strong> Detects hidden unmeasured ion problems</li>
+            <li><strong>Adjust values and re-analyze:</strong> Explore "what if" scenarios to deepen understanding</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Key Teaching Principles</h2>
+        <ul>
+            <li><strong>Three frameworks, one bedside:</strong> Hughes & Brain, Stewart, and Traditional Boston each provide independent but complementary interpretations. They should converge on similar management.</li>
+            <li><strong>K paradox in acidemia:</strong> Low K in acidemia = severe total-body depletion (because H+ shifts push K out). As pH corrects, K will drop further.</li>
+            <li><strong>SID is the main lever in Stewart:</strong> Atot is theoretically important but practically hard to move meaningfully. Focus on correcting strong ions.</li>
+            <li><strong>Hyperchloraemia matters:</strong> High Cl with normal AG indicates NAGMA, not HAGMA. Managed via balanced fluids and SID correction, not bicarbonate.</li>
+            <li><strong>Context-specific corrections:</strong> The same electrolyte abnormality has different management depending on pH state and other drivers.</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
