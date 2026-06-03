@@ -60,7 +60,7 @@
         <h2>Overview: Three Complementary Approaches</h2>
         <p>This calculator implements three independent interpretive frameworks for acid-base disorders. Each uses different variables and equations but should converge on similar management recommendations:</p>
         <ul>
-            <li><strong>Hughes & Brain:</strong> Bedside-friendly 8-step flowchart emphasizing clinical pattern recognition and actionable drivers</li>
+            <li><strong>Hughes & Brain:</strong> Bedside-friendly 8-step flowchart emphasising clinical pattern recognition and actionable drivers</li>
             <li><strong>Stewart:</strong> Physicochemical approach using strong ion difference (SID), weak acid effects (Atot), and respiratory component</li>
             <li><strong>Traditional Boston:</strong> Anion gap method with Delta ratio and differential diagnosis mnemonics</li>
             <li><strong>Figge-Fencl:</strong> Detects unmeasured ions by comparing predicted vs. measured pH</li>
@@ -69,11 +69,11 @@
 
     <div class="section">
         <h2>Hughes & Brain Approach</h2>
-        <p><strong>Reference:</strong> Hughes R & Brain MJ. "A simplified bedside approach to acid-base: fluid physiology utilizing classical and physicochemical approaches." <em>Anaesthesia and Intensive Care Medicine</em> 14:10 (2013): 445–452.</p>
+        <p><strong>Reference:</strong> Hughes R & Brain MJ. "A simplified bedside approach to acid-base: fluid physiology utilising classical and physicochemical approaches." <em>Anaesthesia and Intensive Care Medicine</em> 14:10 (2013): 445–452.</p>
         <h3>8-Step Flowchart</h3>
         <ol>
             <li><strong>pH Status:</strong> Acidaemia (<7.35) vs. Normal (7.35-7.45) vs. Alkalaemia (>7.45)</li>
-            <li><strong>pCO2 Assessment:</strong> Hypoventilation (>45) vs. Normal (35-45) vs. Hyperventilation (<35)</li>
+            <li><strong>pCO2 Assessment:</strong> Hypoventilation (>45) vs. Normal (35-45) vs. Hyperventilation (<35). Determine if compensatory or primary pathology.</li>
             <li><strong>BEecf (Base Excess in extracellular fluid):</strong> Metabolic component
                 <div class="formula">BEecf = −0.93 × (24 − HCO3) − 16 × (7.40 − pH)</div>
                 Normal: −3 to +3 mEq/L
@@ -84,19 +84,30 @@
                 Accounts for unmeasured negative charge from hypoalbuminaemia
             </li>
             <li><strong>Lactate:</strong> 0.5–2.2 mmol/L normal. High lactate suggests tissue hypoperfusion/hypoxia</li>
-            <li><strong>Electrolytes (Na, K, Cl):</strong> Check for hyperchloraemia (Cl >110), hyponatraemia, hyperkalaemia/hypokalaemia</li>
-            <li><strong>Ancillary (Creatinine, Glucose):</strong> Assess renal function, metabolic stress</li>
+            <li><strong>Electrolytes (Na, K, Cl):</strong> 
+                <ul>
+                    <li><strong>Na:</strong> Low Na acidifies (↓SID); high Na alkalinises (↑SID)</li>
+                    <li><strong>Corrected Cl:</strong> <code>Cl(corrected) = Measured Cl × (140 / Na)</code> — Reveals relative hyperchloraemia even if measured Cl borderline</li>
+                    <li><strong>K context-dependent:</strong> In acidaemia, low K = severe total-body depletion (will drop further as pH corrects); high K = expected, will drop. In alkalaemia, low K is critical arrhythmia risk.</li>
+                </ul>
+            </li>
+            <li><strong>Ancillary (Creatinine, Glucose, Osmolality):</strong> Assess renal function, metabolic stress, unmeasured osmoles</li>
         </ol>
-        <h3>Clinical Drivers & Corrections</h3>
-        <p>The Hughes & Brain tab identifies <strong>critical derangements</strong> and proposes <strong>specific interventions</strong>:</p>
+        <h3>Clinical Drivers & SID-Based Corrections</h3>
+        <p>The Hughes & Brain tab identifies <strong>critical derangements</strong> and uses <strong>SID-based calculations</strong> for transparent, actionable interventions:</p>
         <ul>
-            <li>Hyperkalaemia (K >6): Calcium gluconate, insulin + dextrose, salbutamol, dialysis</li>
-            <li>Hypokalaemia (K <3.5): KCl IV or KPO4, accounting for acidemia/alkalemia shifts</li>
-            <li>Severe hypoalbuminaemia: 5% or 20% albumin with calculated mL doses</li>
-            <li>Elevated lactate: Aggressive resuscitation, vasopressors, source control</li>
-            <li>Severe metabolic acidosis: NaHCO3 8.4% with deficit-based dosing</li>
-            <li>Hyperchloraemia: Switch to balanced fluids (Hartmann's, Plasmalyte)</li>
+            <li><strong>Hyperkalaemia (K >6):</strong> Calcium gluconate, insulin + dextrose, salbutamol, dialysis</li>
+            <li><strong>Hypokalaemia (K <3.5 in acidaemia):</strong> Paradoxical depletion signal—KPO4 preferred if concurrent hyperchloraemia; expect further drop as pH corrects</li>
+            <li><strong>Hypoalbuminaemia:</strong> Contributes to acidaemia via low Atot, but albumin infusion is inefficient for pH correction. Focus on SID-based electrolyte management instead.</li>
+            <li><strong>Elevated lactate:</strong> Aggressive resuscitation, vasopressors, source control. Can partially correct pH via NaHCO3 SID correction while treating perfusion.</li>
+            <li><strong>Severe metabolic acidosis (hyperchloremic, lactate-driven, DKA):</strong> Calculate Na deficit needed for target pH, then: <code>NaHCO3 (mL of 8.4%) = Na deficit × 0.6 × 80 / 1</code>. Give HALF initially, recheck ABG in 30 min, reassess before giving remainder (half-correction strategy).</li>
+            <li><strong>Hyperchloraemia (Cl >110 or corrected Cl >110):</strong> Switch to balanced fluids (Hartmann's, Plasmalyte). Use NaHCO3 to raise Na and improve SID.</li>
         </ul>
+        <h3>Ventilation Management</h3>
+        <p><strong>Compensatory Hyperventilation (pCO2 <30, pH <7.35):</strong> Do NOT reduce ventilation. Expect minute ventilation to decrease by ~37–45% as metabolic acidosis is treated. If mechanically ventilated, actively reduce RR/tidal volume as acidosis improves to avoid iatrogenic respiratory alkalosis.</p>
+        <p><strong>Primary Hyperventilation (pCO2 <30, pH ≥7.35):</strong> This IS the problem. If spontaneous, address driver (anxiety, pain, fever). If mechanical, reduce minute ventilation to target pCO2 35–40.</p>
+        <p><strong>Compensatory Hypoventilation (pCO2 >55, pH >7.45):</strong> Do NOT over-ventilate. Let it be. If mechanical, do not increase RR/tidal volume until alkalosis is fully treated.</p>
+        <p><strong>Primary Hypoventilation (pCO2 >55, pH <7.45):</strong> This IS inadequate ventilation. Increase minute ventilation to target pCO2 35–45. If mechanical, fix the settings.</p>
     </div>
 
     <div class="section">
@@ -110,7 +121,7 @@
         <ul>
             <li>Normal: 38–42 mEq/L</li>
             <li>Low SID (↓Na, ↓K, ↑Cl, ↑Lactate) → Acidifying</li>
-            <li>High SID (↑Na, ↑K, ↓Cl, ↓Lactate) → Alkalinizing</li>
+            <li>High SID (↑Na, ↑K, ↓Cl, ↓Lactate) → Alkalinising</li>
         </ul>
 
         <h3>2. Weak Acid Effect (Atot)</h3>
@@ -125,7 +136,7 @@
         <div class="formula">Predicted pH = 7.4 + 0.16×(SID−38) + 0.04×(Atot−18) − 0.084×((pCO2−40)/7.5)</div>
         <ul>
             <li>↑pCO2 (>45) → Acidifying</li>
-            <li>↓pCO2 (<35) → Alkalinizing</li>
+            <li>↓pCO2 (<35) → Alkalinising</li>
         </ul>
 
         <h3>Clinically Relevant Levers</h3>
@@ -192,10 +203,14 @@
         </ul>
 
         <h3>Osmolar Gap (if measured osmolality available)</h3>
-        <div class="formula">Osmolar Gap = Measured Osmolality − (2×Na + Glucose + Urea)</div>
+        <div class="formula">Calculated Osmolality = 2×Na + (Glucose/18) + (Urea/2.8) + 10</div>
+        <div class="formula">Osmolar Gap = Measured Osmolality − Calculated Osmolality</div>
         <ul>
-            <li><strong>Normal: <5 mOsm/kg</strong> Accounts for measured particles</li>
-            <li><strong>Elevated (>10): </strong>Unmeasured osmoles present (toxic alcohols: methanol, ethylene glycol, isopropanol)</li>
+            <li><strong>Explained osmolar gap:</strong> Lactate contributes ~1 mOsm per 4 mmol/L; other unmeasured ions (PO4, Mg) ~2 mOsm</li>
+            <li><strong>Residual gap = Total gap − Explained gap</strong></li>
+            <li><strong>Residual <5 mOsm/kg:</strong> Normal. No concern for toxic alcohol.</li>
+            <li><strong>Residual 5–15 mOsm/kg:</strong> ⚠️ Context-dependent. In sepsis with high lactate = expected and acceptable. In altered mental status + hypotension = concerning for toxic alcohol.</li>
+            <li><strong>Residual >15 mOsm/kg:</strong> 🔴 Highly suspicious for toxic alcohol (methanol, ethylene glycol, isopropanol). If ethylene glycol suspected: Fomepizole 15 mg/kg IV loading, then 10 mg/kg q12h IV.</li>
         </ul>
     </div>
 
@@ -251,13 +266,14 @@
     <div class="section">
         <h2>How to Use This Tool Effectively</h2>
         <ol>
-            <li><strong>Load a test case</strong> from the top of the calculator (or enter arbitrary values)</li>
+            <li><strong>Load a test case</strong> from the top of the calculator (Septic Shock, DKA, COPD, Salicylate, Hyperchloraemia) or enter custom values</li>
             <li><strong>Click ANALYZE</strong> to generate all four interpretations</li>
-            <li><strong>Review Hughes & Brain first:</strong> Fast bedside pattern, actionable drivers, specific corrections</li>
-            <li><strong>Compare Stewart:</strong> Confirms the management targets independently using physicochemical reasoning</li>
-            <li><strong>Check Traditional:</strong> Differential diagnosis guidance via GOLDMARK/USEDCARS</li>
-            <li><strong>Examine Figge-Fencl:</strong> Detects hidden unmeasured ion problems</li>
-            <li><strong>Adjust values and re-analyze:</strong> Explore "what if" scenarios to deepen understanding</li>
+            <li><strong>Review Hughes & Brain first:</strong> Fast bedside pattern recognition, electrolyte interpretation (including corrected Cl), actionable drivers with explicit SID-based dosing, and compensatory vs primary ventilation assessment</li>
+            <li><strong>Compare Stewart:</strong> Confirms management targets independently using physicochemical reasoning (SID, Atot, pCO2)</li>
+            <li><strong>Check Traditional:</strong> Differential diagnosis guidance via GOLDMARK/USEDCARS, anion gap corrections, delta ratio analysis</li>
+            <li><strong>Examine Figge-Fencl:</strong> Detects hidden unmeasured ion problems via pH prediction vs measured pH</li>
+            <li><strong>Adjust sliders (Hughes & Brain):</strong> Use Na, Cl, K, Albumin, Lactate, Hb sliders to explore "what if" scenarios and deepen understanding of how electrolytes drive acid-base status</li>
+            <li><strong>Understand the output:</strong> All NaHCO3 recommendations show TARGET dose (total mEq needed) then INITIAL DOSE (half), with recheck ABG in 30 min strategy. Ventilation advice distinguishes compensatory vs primary pathology and spontaneous vs mechanical management.</li>
         </ol>
     </div>
 
@@ -265,10 +281,14 @@
         <h2>Key Teaching Principles</h2>
         <ul>
             <li><strong>Three frameworks, one bedside:</strong> Hughes & Brain, Stewart, and Traditional Boston each provide independent but complementary interpretations. They should converge on similar management.</li>
-            <li><strong>K paradox in acidemia:</strong> Low K in acidemia = severe total-body depletion (because H+ shifts push K out). As pH corrects, K will drop further.</li>
-            <li><strong>SID is the main lever in Stewart:</strong> Atot is theoretically important but practically hard to move meaningfully. Focus on correcting strong ions.</li>
-            <li><strong>Hyperchloraemia matters:</strong> High Cl with normal AG indicates NAGMA, not HAGMA. Managed via balanced fluids and SID correction, not bicarbonate.</li>
-            <li><strong>Context-specific corrections:</strong> The same electrolyte abnormality has different management depending on pH state and other drivers.</li>
+            <li><strong>Corrected chloride (Cl × 140/Na) reveals hidden patterns:</strong> A borderline measured Cl (108) in context of low Na (135) shows corrected Cl = 112, revealing hyperchloraemic pattern that raw Cl would miss. Always interpret Cl relative to Na.</li>
+            <li><strong>K paradox in acidaemia:</strong> Low K in acidaemia = severe total-body depletion (because H+ shifts push K out of cells → K into serum, then excreted → net loss). As pH corrects, K will drop further. Use KPO4 if concurrent hyperchloraemia.</li>
+            <li><strong>SID-based NaHCO3 dosing is transparent:</strong> Calculate Na deficit → bicarb mL needed (Na deficit × 0.6 × 80 / 1). But ALWAYS use half-correction: give HALF initially, recheck ABG in 30 min, reassess before giving remainder. Avoids hypernatraemia, alkalosis, K crash.</li>
+            <li><strong>SID is the main lever in Stewart:</strong> Atot is theoretically important but practically hard to move meaningfully (albumin infusion is inefficient for pH). Focus on correcting strong ions (Na, Cl, K, Lactate).</li>
+            <li><strong>Hyperchloraemia matters:</strong> High Cl or corrected Cl with normal AG indicates NAGMA, not HAGMA. Managed via balanced fluids and SID correction (NaHCO3), not bicarb alone.</li>
+            <li><strong>Compensatory ventilation is context-sensitive:</strong> Hyperventilation in acidaemia is APPROPRIATE—do NOT reduce ventilation spontaneously; if mechanical, you MUST reduce MV as acidosis improves or risk iatrogenic alkalosis. Hypoventilation in alkalaemia is APPROPRIATE—do NOT over-ventilate; if mechanical, hold RR until alkalosis resolved.</li>
+            <li><strong>Osmolar gap requires decomposition:</strong> High osmolar gap ≠ automatic toxic alcohol. Lactate contributes ~1 mOsm per 4 mmol/L. Subtract lactate + unmeasured ions from total gap. Only the RESIDUAL gap >15 is truly concerning for toxic alcohol. In sepsis with lactate=10 and gap=+15? That's expected, not alarming.</li>
+            <li><strong>Context-specific corrections:</strong> The same electrolyte abnormality has different management depending on pH state, respiratory status, and other drivers. A K of 5.8 in acidaemia (expected, will drop) is managed differently than K=5.8 in alkalaemia (urgent, need K removal).</li>
         </ul>
     </div>
 </div>
