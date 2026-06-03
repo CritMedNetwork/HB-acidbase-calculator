@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iSTAT ABG Master Analyzer</title>
+    <title>About & Formulae - iSTAT ABG Master Analyzer</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -19,832 +19,278 @@
             --accent-safe: #3fb950;
             --font-display: 'Monaco', 'Courier New', monospace;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 20px; line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 20px; line-height: 1.8; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; padding: 20px; border-bottom: 2px solid var(--border); }
         .header h1 { font-size: 1.8rem; margin-bottom: 8px; color: var(--accent-normal); }
-        .header p { color: var(--text-secondary); font-size: 0.9rem; }
-        .case-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; padding: 20px; background: var(--bg-secondary); border-radius: 8px; }
-        .case-btn { padding: 12px 16px; background: var(--bg-tertiary); color: var(--text-primary); border: 2px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; text-align: left; }
-        .case-btn:hover { border-color: var(--accent-normal); background: var(--bg-primary); }
-        .case-btn.active { border-color: var(--accent-normal); background: rgba(88, 166, 255, 0.1); }
-        .case-name { font-weight: 600; margin-bottom: 4px; }
-        .case-desc { font-size: 0.8rem; color: var(--text-secondary); }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; padding: 20px; background: var(--bg-secondary); border-radius: 8px; }
-        .input-group { display: flex; flex-direction: column; }
-        .input-group label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
-        .input-group input { padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 4px; font-family: var(--font-display); }
-        .input-group input:focus { outline: none; border-color: var(--accent-normal); box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.1); }
-        .button-group { display: flex; gap: 12px; margin-bottom: 24px; }
-        .btn-analyze { flex: 1; padding: 12px 24px; background: var(--accent-normal); color: var(--bg-primary); border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 1rem; }
-        .btn-analyze:hover { background: #4184e4; }
-        .tabs { display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
-        .tab-btn { padding: 12px 20px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.95rem; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; }
-        .tab-btn:hover { color: var(--text-primary); }
-        .tab-btn.active { color: var(--accent-normal); border-bottom-color: var(--accent-normal); }
-        .tab-content { display: none; padding: 20px; background: var(--bg-secondary); border-radius: 8px; }
-        .tab-content.active { display: block; }
-        .analysis-section { padding: 16px; background: var(--bg-tertiary); border-left: 4px solid var(--accent-normal); border-radius: 6px; margin-bottom: 20px; }
-        .section-title { font-weight: 600; font-size: 1rem; margin-bottom: 16px; color: var(--accent-normal); font-family: var(--font-display); }
-        .step-flow { display: grid; grid-template-columns: 180px 30px 1fr; gap: 12px; align-items: center; margin-bottom: 0; }
-        .step-box { padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 6px; text-align: center; font-weight: 500; font-size: 0.85rem; min-height: 70px; display: flex; flex-direction: column; justify-content: center; }
-        .step-arrow { text-align: center; color: var(--text-secondary); font-size: 1.2rem; }
-        .step-interpretation { padding: 12px; background: rgba(94, 234, 212, 0.05); border-radius: 4px; border-left: 3px solid var(--accent-safe); font-size: 0.85rem; min-height: 70px; display: flex; align-items: center; }
-        .vertical-connector { text-align: center; color: var(--text-secondary); font-size: 1.5rem; grid-column: 1 / 2; margin: -8px 0; }
-        .slider-group { margin: 16px 0; padding: 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border); }
-        .slider-label { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; font-weight: 500; }
-        .slider-label-value { color: var(--accent-normal); font-family: var(--font-display); }
-        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; -webkit-appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-normal); cursor: pointer; }
-        input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-normal); cursor: pointer; border: none; }
-        .driver-summary { padding: 16px; background: rgba(248, 81, 73, 0.05); border-left: 3px solid var(--accent-critical); border-radius: 4px; margin: 20px 0; font-size: 0.9rem; line-height: 1.8; }
-        .driver-item { padding: 12px; margin-bottom: 12px; background: var(--bg-secondary); border-left: 3px solid var(--accent-warning); border-radius: 4px; }
-        .driver-item.critical { border-left-color: var(--accent-critical); background: rgba(248, 81, 73, 0.05); }
-        .correction { padding: 8px; margin-top: 8px; background: var(--bg-primary); border-radius: 4px; font-family: var(--font-display); font-size: 0.85rem; color: var(--accent-normal); }
-        .disclaimer { padding: 12px; background: rgba(210, 153, 34, 0.1); border-left: 3px solid var(--accent-warning); margin-bottom: 20px; border-radius: 4px; font-size: 0.85rem; color: var(--text-secondary); }
+        .header p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px; }
+        .nav-links { display: flex; gap: 20px; justify-content: center; font-size: 0.95rem; margin-top: 16px; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding-bottom: 4px; transition: all 0.2s; }
+        .nav-links a:hover { color: var(--accent-normal); }
+        .nav-links a.active { color: var(--accent-normal); border-bottom: 3px solid var(--accent-normal); }
+        .section { margin-bottom: 40px; padding: 20px; background: var(--bg-secondary); border-radius: 8px; border-left: 4px solid var(--accent-normal); }
+        .section h2 { font-size: 1.3rem; margin-bottom: 16px; color: var(--accent-normal); }
+        .section h3 { font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; color: var(--accent-warning); }
+        .formula { padding: 12px; background: var(--bg-tertiary); border-left: 3px solid var(--accent-normal); border-radius: 4px; font-family: var(--font-display); font-size: 0.95rem; margin: 12px 0; }
+        .approach { padding: 16px; background: var(--bg-tertiary); border-radius: 6px; margin: 16px 0; }
+        .approach strong { color: var(--accent-normal); }
+        .disclaimer { padding: 12px; background: rgba(210, 153, 34, 0.1); border-left: 3px solid var(--accent-warning); margin-bottom: 20px; border-radius: 4px; font-size: 0.9rem; color: var(--text-secondary); }
+        ul, ol { margin-left: 24px; }
+        li { margin-bottom: 8px; }
+        code { background: var(--bg-tertiary); padding: 2px 6px; border-radius: 3px; font-family: var(--font-display); }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="disclaimer">
-        <strong>⚠️ DISCLAIMER:</strong> Educational tool only. Always correlate with clinical context and verify calculations using current institutional protocols.
-    </div>
-
     <div class="header">
         <h1>iSTAT CG8+ ABG Master Analyzer</h1>
-        <p>Hughes & Brain | Stewart | Traditional Boston | Figge-Fencl</p>
-        <div style="margin-top: 16px; display: flex; gap: 20px; justify-content: center; font-size: 0.95rem;">
-            <a href="index.html" style="color: var(--accent-normal); text-decoration: none; font-weight: 600; border-bottom: 3px solid var(--accent-normal); padding-bottom: 4px;">Calculator</a>
-            <a href="about.html" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; padding-bottom: 4px; transition: all 0.2s;" onmouseover="this.style.color='var(--accent-normal)';" onmouseout="this.style.color='var(--text-secondary)';">About & Formulae</a>
-            <a href="theory.html" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; padding-bottom: 4px; transition: all 0.2s;" onmouseover="this.style.color='var(--accent-normal)';" onmouseout="this.style.color='var(--text-secondary)';">Acid-Base Theory</a>
+        <p>About This Tool & Formulae Reference</p>
+        <div class="nav-links">
+            <a href="index.html">Calculator</a>
+            <a href="about.html" class="active">About & Formulae</a>
+            <a href="theory.html">Acid-Base Theory</a>
         </div>
     </div>
 
-    <div class="case-selector" id="caseOptions">
-        <h3 style="grid-column: 1/-1; margin-bottom: 12px; color: var(--text-secondary);">SELECT A TEST CASE</h3>
+    <div class="disclaimer">
+        <strong>⚠️ DISCLAIMER:</strong> This tool is for educational purposes only. Always correlate with clinical context and verify calculations using current institutional protocols. Not a substitute for clinical judgment.
     </div>
 
-    <div class="input-grid">
-        <div class="input-group"><label>pH</label><input type="number" id="pH" step="0.01" min="6" max="8" placeholder="7.35"></div>
-        <div class="input-group"><label>pCO2 (mmHg)</label><input type="number" id="pCO2" step="1" min="10" max="100" placeholder="40"></div>
-        <div class="input-group"><label>pO2 (mmHg)</label><input type="number" id="pO2" step="1" min="20" max="200" placeholder="90"></div>
-        <div class="input-group"><label>HCO3 (mmol/L)</label><input type="number" id="HCO3" step="0.1" min="1" max="60" placeholder="24"></div>
-        <div class="input-group"><label>BE (from analyzer)</label><input type="number" id="BE" step="0.1" min="-30" max="30" placeholder="0"></div>
-        <div class="input-group"><label>Na (mmol/L)</label><input type="number" id="Na" step="1" min="110" max="160" placeholder="140"></div>
-        <div class="input-group"><label>K (mmol/L)</label><input type="number" id="K" step="0.1" min="2" max="8" placeholder="4.0"></div>
-        <div class="input-group"><label>Cl (mmol/L)</label><input type="number" id="Cl" step="1" min="80" max="120" placeholder="105"></div>
-        <div class="input-group"><label>iCa (mmol/L)</label><input type="number" id="iCa" step="0.01" min="0.5" max="2" placeholder="1.20"></div>
-        <div class="input-group"><label>Lactate (mmol/L)</label><input type="number" id="Lactate" step="0.1" min="0" max="20" placeholder="1.5"></div>
-        <div class="input-group"><label>Albumin (g/L)</label><input type="number" id="Albumin" step="1" min="20" max="60" placeholder="40"></div>
-        <div class="input-group"><label>PO4 (mmol/L)</label><input type="number" id="PO4" step="0.1" min="0.5" max="2.5" placeholder="1.0"></div>
-        <div class="input-group"><label>Glucose (mmol/L)</label><input type="number" id="Glucose" step="0.1" min="1" max="40" placeholder="5.0"></div>
-        <div class="input-group"><label>Hb (g/L)</label><input type="number" id="Hb" step="5" min="60" max="200" placeholder="140"></div>
-        <div class="input-group"><label>Creatinine (μmol/L)</label><input type="number" id="Crea" step="5" min="30" max="300" placeholder="90"></div>
-        <div class="input-group"><label>Urea (mmol/L)</label><input type="number" id="Urea" step="0.5" min="1" max="50" placeholder="7"></div>
-        <div class="input-group"><label>Osmolality (mOsm/kg)</label><input type="number" id="Osmolality" step="1" min="250" max="350" placeholder="290"></div>
+    <div class="section">
+        <h2>Overview: Three Complementary Approaches</h2>
+        <p>This calculator implements three independent interpretive frameworks for acid-base disorders. Each uses different variables and equations but should converge on similar management recommendations:</p>
+        <ul>
+            <li><strong>Hughes & Brain:</strong> Bedside-friendly 8-step flowchart emphasising clinical pattern recognition and actionable drivers</li>
+            <li><strong>Stewart:</strong> Physicochemical approach using strong ion difference (SID), weak acid effects (Atot), and respiratory component</li>
+            <li><strong>Traditional Boston:</strong> Anion gap method with Delta ratio and differential diagnosis mnemonics</li>
+            <li><strong>Figge-Fencl:</strong> Detects unmeasured ions by comparing predicted vs. measured pH</li>
+        </ul>
     </div>
 
-    <div class="button-group">
-        <button class="btn-analyze" onclick="analyzeCase()">ANALYZE</button>
+    <div class="section">
+        <h2>Hughes & Brain Approach</h2>
+        <p><strong>Reference:</strong> Hughes R & Brain MJ. "A simplified bedside approach to acid-base: fluid physiology utilising classical and physicochemical approaches." <em>Anaesthesia and Intensive Care Medicine</em> 14:10 (2013): 445–452.</p>
+        <h3>8-Step Flowchart</h3>
+        <ol>
+            <li><strong>pH Status:</strong> Acidaemia (<7.35) vs. Normal (7.35-7.45) vs. Alkalaemia (>7.45)</li>
+            <li><strong>pCO2 Assessment:</strong> Hypoventilation (>45) vs. Normal (35-45) vs. Hyperventilation (<35). Determine if compensatory or primary pathology.</li>
+            <li><strong>BEecf (Base Excess in extracellular fluid):</strong> Metabolic component
+                <div class="formula">BEecf = −0.93 × (24 − HCO3) − 16 × (7.40 − pH)</div>
+                Normal: −3 to +3 mEq/L
+            </li>
+            <li><strong>Anion Gap (raw):</strong> <code>AG = Na − (Cl + HCO3)</code> Normal: 8–16</li>
+            <li><strong>Anion Gap (corrected for albumin):</strong>
+                <div class="formula">AG_corrected = AG + (40 − Albumin)/4</div>
+                Accounts for unmeasured negative charge from hypoalbuminaemia
+            </li>
+            <li><strong>Lactate:</strong> 0.5–2.2 mmol/L normal. High lactate suggests tissue hypoperfusion/hypoxia</li>
+            <li><strong>Electrolytes (Na, K, Cl):</strong> 
+                <ul>
+                    <li><strong>Na:</strong> Low Na acidifies (↓SID); high Na alkalinises (↑SID)</li>
+                    <li><strong>Corrected Cl:</strong> <code>Cl(corrected) = Measured Cl × (140 / Na)</code> — Reveals relative hyperchloraemia even if measured Cl borderline</li>
+                    <li><strong>K context-dependent:</strong> In acidaemia, low K = severe total-body depletion (will drop further as pH corrects); high K = expected, will drop. In alkalaemia, low K is critical arrhythmia risk.</li>
+                </ul>
+            </li>
+            <li><strong>Ancillary (Creatinine, Glucose, Osmolality):</strong> Assess renal function, metabolic stress, unmeasured osmoles</li>
+        </ol>
+        <h3>Clinical Drivers & SID-Based Corrections</h3>
+        <p>The Hughes & Brain tab identifies <strong>critical derangements</strong> and uses <strong>SID-based calculations</strong> for transparent, actionable interventions:</p>
+        <ul>
+            <li><strong>Hyperkalaemia (K >6):</strong> Calcium gluconate, insulin + dextrose, salbutamol, dialysis</li>
+            <li><strong>Hypokalaemia (K <3.5 in acidaemia):</strong> Paradoxical depletion signal—KPO4 preferred if concurrent hyperchloraemia; expect further drop as pH corrects</li>
+            <li><strong>Hypoalbuminaemia:</strong> Contributes to acidaemia via low Atot, but albumin infusion is inefficient for pH correction. Focus on SID-based electrolyte management instead.</li>
+            <li><strong>Elevated lactate:</strong> Aggressive resuscitation, vasopressors, source control. Can partially correct pH via NaHCO3 SID correction while treating perfusion.</li>
+            <li><strong>Severe metabolic acidosis (hyperchloremic, lactate-driven, DKA):</strong> Calculate Na deficit needed for target pH, then: <code>NaHCO3 (mL of 8.4%) = Na deficit × 0.6 × 80 / 1</code>. Give HALF initially, recheck ABG in 30 min, reassess before giving remainder (half-correction strategy).</li>
+            <li><strong>Hyperchloraemia (Cl >110 or corrected Cl >110):</strong> Switch to balanced fluids (Hartmann's, Plasmalyte). Use NaHCO3 to raise Na and improve SID.</li>
+        </ul>
+        <h3>Ventilation Management</h3>
+        <p><strong>Compensatory Hyperventilation (pCO2 <30, pH <7.35):</strong> Do NOT reduce ventilation. Expect minute ventilation to decrease by ~37–45% as metabolic acidosis is treated. If mechanically ventilated, actively reduce RR/tidal volume as acidosis improves to avoid iatrogenic respiratory alkalosis.</p>
+        <p><strong>Primary Hyperventilation (pCO2 <30, pH ≥7.35):</strong> This IS the problem. If spontaneous, address driver (anxiety, pain, fever). If mechanical, reduce minute ventilation to target pCO2 35–40.</p>
+        <p><strong>Compensatory Hypoventilation (pCO2 >55, pH >7.45):</strong> Do NOT over-ventilate. Let it be. If mechanical, do not increase RR/tidal volume until alkalosis is fully treated.</p>
+        <p><strong>Primary Hypoventilation (pCO2 >55, pH <7.45):</strong> This IS inadequate ventilation. Increase minute ventilation to target pCO2 35–45. If mechanical, fix the settings.</p>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('hughes')">Hughes & Brain</button>
-        <button class="tab-btn" onclick="switchTab('stewart')">Stewart</button>
-        <button class="tab-btn" onclick="switchTab('traditional')">Traditional</button>
-        <button class="tab-btn" onclick="switchTab('figge')">Figge-Fencl</button>
+    <div class="section">
+        <h2>Stewart Approach</h2>
+        <p><strong>Reference:</strong> Stewart PA. "Modern quantitative acid-base chemistry." <em>Canadian Journal of Physiology and Pharmacology</em> 61 (1983): 1444–1461.</p>
+        <h3>Three Independent Variables</h3>
+        <p>Stewart's principle: pH is determined by <strong>three and only three independent variables</strong>. Changing any one affects pH predictably:</p>
+        
+        <h3>1. Strong Ion Difference (SID)</h3>
+        <div class="formula">SID = (Na + K + 2×iCa) − (Cl + Lactate)</div>
+        <ul>
+            <li>Normal: 38–42 mEq/L</li>
+            <li>Low SID (↓Na, ↓K, ↑Cl, ↑Lactate) → Acidifying</li>
+            <li>High SID (↑Na, ↑K, ↓Cl, ↓Lactate) → Alkalinising</li>
+        </ul>
+
+        <h3>2. Weak Acid Effect (Atot)</h3>
+        <div class="formula">Atot = (Albumin/10) × (0.123 × pH − 0.631) + (PO4/10) × (0.309 × pH − 0.469)</div>
+        <ul>
+            <li>Normal: ~18 mEq/L</li>
+            <li>Low Atot (hypoalbuminaemia, low PO4) → Acidifying effect</li>
+            <li><strong>CLINICAL NOTE:</strong> Atot is <strong>difficult to correct meaningfully</strong> (albumin is hard to increment). Focus on SID correction instead.</li>
+        </ul>
+
+        <h3>3. Respiratory Component (pCO2)</h3>
+        <div class="formula">Predicted pH = 7.4 + 0.16×(SID−38) + 0.04×(Atot−18) − 0.084×((pCO2−40)/7.5)</div>
+        <ul>
+            <li>↑pCO2 (>45) → Acidifying</li>
+            <li>↓pCO2 (<35) → Alkalinising</li>
+        </ul>
+
+        <h3>Clinically Relevant Levers</h3>
+        <p><strong>Only TWO variables are practically useful for correction:</strong></p>
+        <ul>
+            <li><strong>SID Management:</strong> Adjust Na, K, Cl via fluids (balanced vs. NaCl), supplementation, or osmotic therapy</li>
+            <li><strong>Ventilation:</strong> Adjust minute ventilation (RR × tidal volume) to target pCO2</li>
+        </ul>
+        <p><strong>Atot is supporting context but NOT a primary intervention target.</strong></p>
     </div>
 
-    <div id="hughes" class="tab-content active"><div id="hughesOutput"></div></div>
-    <div id="stewart" class="tab-content"><div id="stewartOutput"></div></div>
-    <div id="traditional" class="tab-content"><div id="traditionalOutput"></div></div>
-    <div id="figge" class="tab-content"><div id="figgeOutput"></div></div>
+    <div class="section">
+        <h2>Traditional Boston Approach</h2>
+        <p><strong>Reference:</strong> Goldberg M, Green SB, Moss ML, et al. "Computer-based instruction and diagnosis of acid-base disorders." <em>JAMA</em> 223 (1973): 269–275.</p>
+        
+        <h3>5-Step Method</h3>
+        <ol>
+            <li><strong>Determine pH status:</strong> Acidaemia vs. Alkalaemia vs. Normal</li>
+            <li><strong>Assess respiratory response (Winter's Formula):</strong> For acidaemia only
+                <div class="formula">Expected pCO2 = 1.5 × HCO3 + 8 ± 2</div>
+                <ul>
+                    <li>If measured pCO2 <expected − 2: Concurrent respiratory alkalosis</li>
+                    <li>If measured pCO2 >expected + 2: Concurrent respiratory acidosis</li>
+                    <li>If within ±2: Appropriate compensation</li>
+                </ul>
+            </li>
+            <li><strong>Calculate Anion Gap (uncorrected):</strong> <code>AG = Na − (Cl + HCO3)</code> Normal: 8–16</li>
+            <li><strong>Correct AG for albumin:</strong>
+                <div class="formula">AG_corrected = AG + (40 − Albumin)/4</div>
+            </li>
+            <li><strong>If HAGMA (AG >16), calculate Delta Ratio:</strong>
+                <div class="formula">Δ Ratio = ΔAG / ΔHCO3 = (AG − 12) / (24 − HCO3)</div>
+                <ul>
+                    <li>>2: Concurrent metabolic alkalosis</li>
+                    <1: Concurrent normal AG metabolic acidosis (mixed picture)</li>
+                    <li>1–2: Pure high AG metabolic acidosis</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Differential Diagnosis Mnemonics</h3>
+        <p><strong>GOLDMARK (High AG Metabolic Acidosis):</strong></p>
+        <ul>
+            <li><strong>G</strong>lycols (ethylene glycol, propylene glycol)</li>
+            <li><strong>O</strong>xoproline (acetaminophen toxicity)</li>
+            <li><strong>L</strong>-lactate (hyperlactataemia)</li>
+            <li><strong>D</strong>-lactate (short bowel syndrome)</li>
+            <li><strong>M</strong>ethanol</li>
+            <li><strong>A</strong>spirin (salicylate toxicity)</li>
+            <li><strong>R</strong>enal failure</li>
+            <li><strong>K</strong>etoacidosis (DKA, alcoholic ketoacidosis)</li>
+        </ul>
+
+        <p><strong>USEDCARS (Normal AG Metabolic Acidosis):</strong></p>
+        <ul>
+            <li><strong>U</strong>reterosigmoidostomy (chloride loss in urine)</li>
+            <li><strong>S</strong>aline administration (hyperchloraemic acidosis)</li>
+            <li><strong>E</strong>ndocrine (Addison's disease, hypoaldosteronism)</li>
+            <li><strong>D</strong>iarrhoea (bicarbonate loss, chloride retention)</li>
+            <li><strong>C</strong>arbonic anhydrase inhibitors (acetazolamide)</li>
+            <li><strong>A</strong>mmonium chloride (exogenous)</li>
+            <li><strong>R</strong>TA (renal tubular acidosis: Types 1, 2, 4)</li>
+            <li><strong>S</strong>pironolactone (Type 4 RTA via hyperkalemia)</li>
+        </ul>
+
+        <h3>Osmolar Gap (if measured osmolality available)</h3>
+        <div class="formula">Calculated Osmolality = 2×Na + (Glucose/18) + (Urea/2.8) + 10</div>
+        <div class="formula">Osmolar Gap = Measured Osmolality − Calculated Osmolality</div>
+        <ul>
+            <li><strong>Explained osmolar gap:</strong> Lactate contributes ~1 mOsm per 4 mmol/L; other unmeasured ions (PO4, Mg) ~2 mOsm</li>
+            <li><strong>Residual gap = Total gap − Explained gap</strong></li>
+            <li><strong>Residual <5 mOsm/kg:</strong> Normal. No concern for toxic alcohol.</li>
+            <li><strong>Residual 5–15 mOsm/kg:</strong> ⚠️ Context-dependent. In sepsis with high lactate = expected and acceptable. In altered mental status + hypotension = concerning for toxic alcohol.</li>
+            <li><strong>Residual >15 mOsm/kg:</strong> 🔴 Highly suspicious for toxic alcohol (methanol, ethylene glycol, isopropanol). If ethylene glycol suspected: Fomepizole 15 mg/kg IV loading, then 10 mg/kg q12h IV.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Figge-Fencl Approach</h2>
+        <p><strong>Reference:</strong> Figge J, Mydosh T, Fencl V. "Serum electrolytes and acid-base status in critically ill patients." <em>American Journal of Respiratory and Critical Care Medicine</em> 150 (1994): 140–147.</p>
+        
+        <h3>Unmeasured Ion Detection</h3>
+        <p>Compares the <strong>predicted pH from Stewart equation</strong> against <strong>measured pH</strong> to detect unmeasured ions:</p>
+        <div class="formula">Predicted pH = 7.4 + 0.16×(SID−38) + 0.04×(Atot−18) − 0.084×((pCO2−40)/7.5)</div>
+        
+        <ul>
+            <li><strong>If measured pH ≈ predicted pH:</strong> Measured ions (Na, K, Cl, Lactate) fully explain the acid-base status</li>
+            <li><strong>If measured pH significantly different from predicted:</strong> Unmeasured ions present
+                <ul>
+                    <li><strong>Unmeasured cations:</strong> Calcium, magnesium, unidentified cations</li>
+                    <li><strong>Unmeasured anions:</strong> Phosphate, sulfate, organic acids</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Clinical Significance</h3>
+        <ul>
+            <li>Hypermagnesaemia (from laxatives, renal failure)</li>
+            <li>Hypercalcaemia (parathyroid disease, malignancy, vitamin D toxicity)</li>
+            <li>Severe phosphate derangements (renal failure)</li>
+            <li>Calciphylaxis or other unmeasured organic acid accumulation</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>iSTAT CG8+ Reference Ranges</h2>
+        <p>All input fields use these Australian clinical reference intervals (CG8+ analyser):</p>
+        <ul>
+            <li><strong>pH:</strong> 7.35–7.45</li>
+            <li><strong>pCO2:</strong> 35–45 mmHg (4.7–6.0 kPa)</li>
+            <li><strong>pO2:</strong> 80–100 mmHg</li>
+            <li><strong>HCO3:</strong> 22–26 mmol/L</li>
+            <li><strong>Na:</strong> 135–145 mmol/L</li>
+            <li><strong>K:</strong> 3.5–5.2 mmol/L</li>
+            <li><strong>Cl:</strong> 95–110 mmol/L</li>
+            <li><strong>iCa:</strong> 1.15–1.32 mmol/L</li>
+            <li><strong>Lactate:</strong> 0.5–2.2 mmol/L</li>
+            <li><strong>Albumin:</strong> 35–50 g/L</li>
+            <li><strong>Glucose:</strong> 3.0–7.8 mmol/L</li>
+            <li><strong>Urea:</strong> 2.5–8.0 mmol/L</li>
+            <li><strong>Creatinine:</strong> 60–120 μmol/L</li>
+            <li><strong>Hb:</strong> 120–180 g/L</li>
+            <li><strong>PO4:</strong> 0.8–1.4 mmol/L</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>How to Use This Tool Effectively</h2>
+        <ol>
+            <li><strong>Load a test case</strong> from the top of the calculator (Septic Shock, DKA, COPD, Salicylate, Hyperchloraemia) or enter custom values</li>
+            <li><strong>Click ANALYZE</strong> to generate all four interpretations</li>
+            <li><strong>Review Hughes & Brain first:</strong> Fast bedside pattern recognition, electrolyte interpretation (including corrected Cl), actionable drivers with explicit SID-based dosing, and compensatory vs primary ventilation assessment</li>
+            <li><strong>Compare Stewart:</strong> Confirms management targets independently using physicochemical reasoning (SID, Atot, pCO2)</li>
+            <li><strong>Check Traditional:</strong> Differential diagnosis guidance via GOLDMARK/USEDCARS, anion gap corrections, delta ratio analysis</li>
+            <li><strong>Examine Figge-Fencl:</strong> Detects hidden unmeasured ion problems via pH prediction vs measured pH</li>
+            <li><strong>Adjust sliders (Hughes & Brain):</strong> Use Na, Cl, K, Albumin, Lactate, Hb sliders to explore "what if" scenarios and deepen understanding of how electrolytes drive acid-base status</li>
+            <li><strong>Understand the output:</strong> All NaHCO3 recommendations show TARGET dose (total mEq needed) then INITIAL DOSE (half), with recheck ABG in 30 min strategy. Ventilation advice distinguishes compensatory vs primary pathology and spontaneous vs mechanical management.</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Key Teaching Principles</h2>
+        <ul>
+            <li><strong>Three frameworks, one bedside:</strong> Hughes & Brain, Stewart, and Traditional Boston each provide independent but complementary interpretations. They should converge on similar management.</li>
+            <li><strong>Corrected chloride (Cl × 140/Na) reveals hidden patterns:</strong> A borderline measured Cl (108) in context of low Na (135) shows corrected Cl = 112, revealing hyperchloraemic pattern that raw Cl would miss. Always interpret Cl relative to Na.</li>
+            <li><strong>K paradox in acidaemia:</strong> Low K in acidaemia = severe total-body depletion (because H+ shifts push K out of cells → K into serum, then excreted → net loss). As pH corrects, K will drop further. Use KPO4 if concurrent hyperchloraemia.</li>
+            <li><strong>SID-based NaHCO3 dosing is transparent:</strong> Calculate Na deficit → bicarb mL needed (Na deficit × 0.6 × 80 / 1). But ALWAYS use half-correction: give HALF initially, recheck ABG in 30 min, reassess before giving remainder. Avoids hypernatraemia, alkalosis, K crash.</li>
+            <li><strong>SID is the main lever in Stewart:</strong> Atot is theoretically important but practically hard to move meaningfully (albumin infusion is inefficient for pH). Focus on correcting strong ions (Na, Cl, K, Lactate).</li>
+            <li><strong>Hyperchloraemia matters:</strong> High Cl or corrected Cl with normal AG indicates NAGMA, not HAGMA. Managed via balanced fluids and SID correction (NaHCO3), not bicarb alone.</li>
+            <li><strong>Compensatory ventilation is context-sensitive:</strong> Hyperventilation in acidaemia is APPROPRIATE—do NOT reduce ventilation spontaneously; if mechanical, you MUST reduce MV as acidosis improves or risk iatrogenic alkalosis. Hypoventilation in alkalaemia is APPROPRIATE—do NOT over-ventilate; if mechanical, hold RR until alkalosis resolved.</li>
+            <li><strong>Osmolar gap requires decomposition:</strong> High osmolar gap ≠ automatic toxic alcohol. Lactate contributes ~1 mOsm per 4 mmol/L. Subtract lactate + unmeasured ions from total gap. Only the RESIDUAL gap >15 is truly concerning for toxic alcohol. In sepsis with lactate=10 and gap=+15? That's expected, not alarming.</li>
+            <li><strong>Context-specific corrections:</strong> The same electrolyte abnormality has different management depending on pH state, respiratory status, and other drivers. A K of 5.8 in acidaemia (expected, will drop) is managed differently than K=5.8 in alkalaemia (urgent, need K removal).</li>
+        </ul>
+    </div>
 </div>
-
-<script>
-const cases = [
-    { name: "Septic Shock", description: "High lactate, low albumin, AKI, K+", data: { pH: 7.28, pCO2: 31, pO2: 87, HCO3: 16, BE: -10, Na: 128, K: 5.8, Cl: 102, iCa: 0.92, Lactate: 8.5, Albumin: 22, PO4: 1.0, Glucose: 8.2, Hb: 115, Crea: 180, Urea: 12, Osmolality: 305 } },
-    { name: "Chronic COPD", description: "Respiratory acidosis, compensatory HCO3", data: { pH: 7.32, pCO2: 74, pO2: 54, HCO3: 42, BE: 12, Na: 138, K: 4.5, Cl: 98, iCa: 1.15, Lactate: 1.8, Albumin: 42, PO4: 1.0, Glucose: 5.2, Hb: 180, Crea: 95, Urea: 6, Osmolality: 288 } },
-    { name: "DKA", description: "High AG acidosis, hyperglycaemia, K+", data: { pH: 7.18, pCO2: 22, pO2: 102, HCO3: 11, BE: -18, Na: 132, K: 5.8, Cl: 108, iCa: 1.10, Lactate: 2.2, Albumin: 40, PO4: 1.0, Glucose: 28.3, Hb: 160, Crea: 110, Urea: 9, Osmolality: 312 } },
-    { name: "Salicylate Overdose", description: "Mixed respiratory alkalosis + metabolic acidosis", data: { pH: 7.42, pCO2: 18, pO2: 110, HCO3: 12, BE: -14, Na: 140, K: 4.2, Cl: 105, iCa: 1.23, Lactate: 1.5, Albumin: 38, PO4: 1.0, Glucose: 7.8, Hb: 145, Crea: 92, Urea: 5, Osmolality: 295 } },
-    { name: "Hyperchloremic Acidosis", description: "Normal AG NAGMA, high Cl from diarrhea/RTA", data: { pH: 7.25, pCO2: 35, pO2: 92, HCO3: 15, BE: -8, Na: 140, K: 3.2, Cl: 115, iCa: 1.18, Lactate: 1.2, Albumin: 40, PO4: 0.9, Glucose: 5.5, Hb: 135, Crea: 85, Urea: 7, Osmolality: 292 } }
-];
-
-function initCases() {
-    const container = document.getElementById('caseOptions');
-    cases.forEach((caseObj, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'case-btn';
-        btn.innerHTML = `<div class="case-name">${caseObj.name}</div><div class="case-desc">${caseObj.description}</div>`;
-        btn.onclick = () => loadCase(idx);
-        container.appendChild(btn);
-    });
-}
-
-function loadCase(idx) {
-    const caseData = cases[idx];
-    Object.keys(caseData.data).forEach(key => {
-        document.getElementById(key).value = caseData.data[key];
-    });
-    document.querySelectorAll('.case-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
-    analyzeCase();
-}
-
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabName).classList.add('active');
-    event.target.classList.add('active');
-}
-
-function analyzeCase() {
-    const data = {
-        pH: parseFloat(document.getElementById('pH').value) || 7.40,
-        pCO2: parseFloat(document.getElementById('pCO2').value) || 40,
-        pO2: parseFloat(document.getElementById('pO2').value) || 90,
-        HCO3: parseFloat(document.getElementById('HCO3').value) || 24,
-        BE: parseFloat(document.getElementById('BE').value) || 0,
-        Na: parseFloat(document.getElementById('Na').value) || 140,
-        K: parseFloat(document.getElementById('K').value) || 4.0,
-        Cl: parseFloat(document.getElementById('Cl').value) || 105,
-        iCa: parseFloat(document.getElementById('iCa').value) || 1.20,
-        Lactate: parseFloat(document.getElementById('Lactate').value) || 1.5,
-        Albumin: parseFloat(document.getElementById('Albumin').value) || 40,
-        PO4: parseFloat(document.getElementById('PO4').value) || 1.0,
-        Glucose: parseFloat(document.getElementById('Glucose').value) || 5.0,
-        Hb: parseFloat(document.getElementById('Hb').value) || 140,
-        Crea: parseFloat(document.getElementById('Crea').value) || 90,
-        Urea: parseFloat(document.getElementById('Urea').value) || 7,
-        Osmolality: parseFloat(document.getElementById('Osmolality').value) || 290
-    };
-
-    const BEecf = -0.93 * (24 - data.HCO3) - 16 * (7.40 - data.pH);
-    const AnGap = data.Na - (data.Cl + data.HCO3);
-    const AG_corrected = AnGap + ((40 - data.Albumin) / 4);
-    const acidaemia = data.pH < 7.35;
-    const SID = (data.Na + data.K + 2*data.iCa) - (data.Cl + data.Lactate);
-    const Atot = (data.Albumin/10) * (0.123 * data.pH - 0.631) + (data.PO4/10) * (0.309 * data.pH - 0.469);
-    const predicted_pH = 7.4 + 0.16*(SID-38) + 0.04*(Atot-18) - 0.084*((data.pCO2-40)/7.5);
-
-    document.getElementById('hughesOutput').innerHTML = buildHughesBrain(data, BEecf, AnGap, AG_corrected, acidaemia);
-    document.getElementById('stewartOutput').innerHTML = buildStewart(data, SID, Atot, predicted_pH);
-    document.getElementById('traditionalOutput').innerHTML = buildTraditional(data, AnGap, AG_corrected, BEecf, acidaemia);
-    document.getElementById('figgeOutput').innerHTML = buildFigge(data, predicted_pH);
-    setupSliders();
-}
-
-function setupSliders() {
-    ['k-slider', 'albumin-slider', 'lactate-slider', 'hb-slider'].forEach(id => {
-        const slider = document.getElementById(id);
-        if (slider) slider.addEventListener('input', (e) => {
-            document.getElementById(e.target.getAttribute('data-param')).value = parseFloat(e.target.value);
-            analyzeCase();
-        });
-    });
-    ['na-slider', 'cl-slider', 'albumin-slider-stew', 'po4-slider', 'pco2-slider'].forEach(id => {
-        const slider = document.getElementById(id);
-        if (slider) slider.addEventListener('input', (e) => {
-            document.getElementById(e.target.getAttribute('data-param')).value = parseFloat(e.target.value);
-            analyzeCase();
-        });
-    });
-}
-
-function buildHughesBrain(d, BE, AG, AGc, acid) {
-    let h = '<div class="analysis-section"><div class="section-title">Hughes & Brain: 8-Step Analysis</div>';
-    const calc_osm = (2 * d.Na) + d.Glucose + d.Urea;
-    h += '<div style="margin-bottom: 24px; display: grid; grid-template-columns: 180px 30px 1fr; gap: 12px; align-items: start;">';
-    
-    // Step 1
-    h += '<div class="step-box"><strong>Step 1<br/>pH</strong><br/>' + d.pH.toFixed(2) + '</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (acid ? '🔴 ACIDAEMIA' : d.pH > 7.45 ? '🔵 ALKALAEMIA' : '🟢 NORMAL (7.35-7.45)') + '</div>';
-    
-    // Vertical connector
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    // Step 2
-    h += '<div class="step-box"><strong>Step 2<br/>pCO2</strong><br/>' + d.pCO2.toFixed(0) + ' mmHg</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (d.pCO2 > 45 ? '↑ HYPOVENTILATION' : d.pCO2 < 35 ? '↓ HYPERVENTILATION' : '✓ Normal (35-45)') + '</div>';
-    
-    // Vertical connector
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    // Step 3
-    h += '<div class="step-box"><strong>Step 3<br/>BEecf</strong><br/>' + BE.toFixed(1) + ' mEq/L</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (BE < -3 ? '🔴 ACIDOSIS' : BE > 3 ? '🔵 ALKALOSIS' : '🟢 Normal (-3 to +3)') + '</div>';
-    
-    // Vertical connector
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    // Step 4-5
-    h += '<div class="step-box"><strong>Steps 4–5<br/>Anion Gap</strong><br/>Raw: ' + AG.toFixed(0) + '<br/>Corr: ' + AGc.toFixed(1) + '</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (AGc > 16 ? '🔴 HIGH AG<br/>(HAGMA)' : '🟢 NORMAL AG<br/>(0-16)') + '</div>';
-    
-    // Vertical connector
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    // Step 6
-    h += '<div class="step-box"><strong>Step 6<br/>Lactate</strong><br/>' + d.Lactate.toFixed(1) + ' mmol/L</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (d.Lactate > 4 ? '🔴 SEVERE (>4)' : d.Lactate > 2.2 ? '🟡 ELEVATED' : '🟢 NORMAL (0.5-2.2)') + '</div>';
-    
-    // Vertical connector
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    // Step 7
-    const corrected_Cl = d.Cl * (140 / d.Na);
-    h += '<div class="step-box"><strong>Step 7<br/>Electrolytes</strong><br/>Na ' + d.Na.toFixed(0) + ' | Cl ' + d.Cl.toFixed(0) + ' | Cl(corr) ' + corrected_Cl.toFixed(1) + '<br/>K ' + d.K.toFixed(1) + '</div>';
-    h += '<div class="step-arrow">→</div>';
-    let elec_status = '';
-    if (d.Na < 135 || d.Na > 145) elec_status += '⚠️ Na abnormal | ';
-    if (d.Cl > 110 || corrected_Cl > 110) elec_status += '🔴 Cl HIGH (hyperchloraemic) | ';
-    if (d.Cl < 95) elec_status += '⚠️ Cl low | ';
-    if (d.K > 5.5 || d.K < 3.5) elec_status += '⚠️ K abnormal';
-    if (!elec_status) elec_status = '✓ Normal';
-    h += '<div class="step-interpretation">' + elec_status + '</div>';
-    
-    // Vertical connector
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    // Step 8
-    h += '<div class="step-box"><strong>Step 8<br/>Clinical</strong><br/>Crea ' + d.Crea + '<br/>Glu ' + d.Glucose.toFixed(1) + '</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">Assess: Perfusion, renal function, O2 capacity</div>';
-    
-    h += '</div>';
-    
-    // DRIVER SUMMARY WITH CLINICAL CORRECTIONS
-    h += '<div class="driver-summary"><strong style="color: var(--accent-critical); font-size: 1.1rem;">CRITICAL DRIVERS & CLINICAL CORRECTIONS (80 kg patient)</strong>';
-    
-    // Context-specific warnings for each case
-    if (d.Glucose > 20 && d.pH < 7.25 && d.HCO3 < 15) {
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ LIKELY DKA – K MANAGEMENT WARNING:</strong> ' + (d.K > 5.5 ? 'K ' + d.K.toFixed(1) + ' appears HIGH but TOTAL-BODY K IS SEVERELY DEPLETED' : d.K < 3.5 ? 'K ' + d.K.toFixed(1) + ' is paradoxically LOW = severe depletion' : 'K ' + d.K.toFixed(1) + ' is normal but TOTAL-BODY K IS LIKELY DEPLETED') + '. Insulin + IV fluids will drive K INTO cells (+ pH correction). Start K replacement EARLY. Recheck K every 1-2 hours initially.</div>';
-    }
-    if (d.Lactate > 6 && d.pH < 7.30) {
-        let k_context_lactate = '';
-        if (d.K > 5.5) k_context_lactate = 'K ' + d.K.toFixed(1) + ' is HIGH, which is expected (H+ shifts in, K+ shifts out), but may mask underlying depletion.';
-        else if (d.K < 3.5) k_context_lactate = 'K ' + d.K.toFixed(1) + ' is LOW in acidemia = severe depletion.';
-        else k_context_lactate = 'K ' + d.K.toFixed(1) + ' is normal but may not reflect intracellular status.';
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE HYPERLACTATAEMIA & ACIDEMIA:</strong> ' + k_context_lactate + ' Tissue damage/rhabdo can release K artificially. As perfusion improves and acidosis corrects, K will shift unpredictably. Aggressive monitoring essential.</div>';
-    }
-    const corrected_Cl_warning = d.Cl * (140 / d.Na);
-    if ((d.Cl > 110 || corrected_Cl_warning > 110) && d.pH < 7.35) {
-        let k_chlor_msg = '';
-        if (d.K < 3.5) {
-            k_chlor_msg = '🟡 K ' + d.K.toFixed(1) + ' is paradoxically LOW in acidemia = massive depletion. Correct with KPO4 (not KCl). As pH corrects, K will FALL further.';
-        } else if (d.K > 5) {
-            k_chlor_msg = '🟡 K ' + d.K.toFixed(1) + ' is HIGH (expected in acidemia). As pH corrects, K will FALL. Monitor closely.';
-        } else {
-            k_chlor_msg = '🟡 K ' + d.K.toFixed(1) + ' is normal but likely depleted. Once pH corrects, K may drop.';
-        }
-        const cl_display = d.Cl > 110 ? 'Cl ' + d.Cl.toFixed(0) : 'Corrected Cl ' + corrected_Cl_warning.toFixed(1) + ' (measured ' + d.Cl.toFixed(0) + ')';
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ HYPERCHLOREMIC ACIDOSIS – STRONG ION ABNORMALITY (' + cl_display + '):</strong><br/>Fix Cl/Na first (Hartmann\'s or NaHCO3). ' + k_chlor_msg + '</div>';
-    }
-    
-    // Additional pattern warnings
-    if (d.K > 6.5 && d.pH < 7.25) {
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE HYPERKALAEMIA IN SEVERE ACIDEMIA:</strong> This is additive cardiac toxicity. ECG changes expected. Treat both urgently—acidosis correction alone will drive K HIGHER initially before it drops. Calcium gluconate first, then aggressive K lowering (insulin, bicarb, dialysis).</div>';
-    }
-    
-    if (d.Na < 130 && d.K > 5.5 && d.Cl < 95) {
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ ADRENAL CRISIS PATTERN (Low Na + High K + Low Cl):</strong> Consider acute adrenal insufficiency. Treat with IV hydrocortisone 100 mg stat, then aggressive saline (0.9% NaCl). K will fall rapidly with treatment.</div>';
-    }
-    
-    if (d.pCO2 > 80 && d.pH < 7.20 && d.HCO3 > 40) {
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE RESPIRATORY ACIDOSIS:</strong> High pCO2 + high HCO3 = chronic compensation. Acute decompensation implies critical airway/ventilation problem. Consider intubation if not already mechanically ventilated.</div>';
-    }
-    
-    if (d.pH > 7.55 && d.K < 3.5) {
-        h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ SEVERE ALKALEMIA + HYPOKALAEMIA:</strong> This is the worst combination for arrhythmias. H+ has shifted into cells → K+ shifted OUT (depleting serum K further). Even "mild" hypokalemia becomes lethal in alkalemia. Urgent K replacement needed.</div>';
-    }
-    
-    if (Math.abs(d.pH - 7.40) < 0.05 && BE > 3) {
-        h += '<div style="padding: 12px; margin-bottom: 12px; background: rgba(94, 234, 212, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-safe);">✓ COMPENSATED – EXCELLENT RESPIRATORY RESPONSE:</strong> pH near-normal despite metabolic alkalosis, suggesting strong respiratory compensation (low pCO2). Patient is compensating well. Focus on addressing underlying cause (GI losses, diuretics, etc.).</div>';
-    }
-    
-    if (Math.abs(d.Osmolality - calc_osm) > 20) {
-        const osm_gap = d.Osmolality - calc_osm;
-        if (osm_gap > 0) {
-            h += '<div style="padding: 12px; margin-bottom: 12px; background: rgba(248, 81, 73, 0.15); border-left: 3px solid var(--accent-critical); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-critical);">⚠️ LARGE OSMOLAR GAP (+' + osm_gap.toFixed(0) + '):</strong> Unmeasured osmoles present. Suspect toxic alcohol (methanol, ethylene glycol, isopropanol) especially if high anion gap + hypotension + neurological symptoms. Fomepizole if ethylene glycol suspected.</div>';
-        }
-    }
-    
-    
-    if (d.K > 6) {
-        h += '<div class="driver-item critical">🔴 <strong>SEVERE HYPERKALAEMIA (K ' + d.K.toFixed(1) + ') – IMMEDIATE ACTION REQUIRED</strong>';
-        h += '<div class="correction">• <strong>Calcium:</strong> 10 mL calcium gluconate 10% IV over 2-5 min (cardiac protection)<br/>';
-        h += '• <strong>Insulin:</strong> 10 units regular IV + 25 mL 50% dextrose IV push<br/>';
-        h += '• <strong>Salbutamol:</strong> 10-20 mg nebulised (β2 agonist, shifts K intracellularly)<br/>';
-        h += '• <strong>Diuretics:</strong> Furosemide 40-80 mg IV if euvolaemic</div></div>';
-    } else if (d.K > 5.5) {
-        h += '<div class="driver-item critical">🔴 <strong>Hyperkalaemia (K ' + d.K.toFixed(1) + ') – HIGH CARDIAC RISK</strong>';
-        h += '<div class="correction">• <strong>Insulin:</strong> 10 units + 25 mL 50% dextrose IV<br/>';
-        h += '• <strong>Salbutamol:</strong> 10 mg nebulised<br/>';
-        h += '• <strong>Sodium polystyrene:</strong> 15 g PO/PR (slower, use PRN)<br/>';
-        h += '• <strong>Loop diuretic:</strong> Furosemide 40 mg IV if volume replete</div></div>';
-    } else if (d.K < 3.5) {
-        let k_context = '';
-        if (acid) {
-            k_context = '🔴 <strong>PARADOXICALLY LOW IN ACIDEMIA</strong> – suggests massive total-body K deficit. As pH corrects, K will FALL further (H+ shifts out of cells → K+ shifts back in).';
-        } else if (d.pH > 7.45) {
-            k_context = '🔴 Expected in alkalemia (H+ shifts into cells → K+ shifts out). As pH corrects, K will RISE.';
-        }
-        h += '<div class="driver-item critical">🔴 <strong>Hypokalaemia (K ' + d.K.toFixed(1) + ') – ARRHYTHMIA RISK' + (k_context ? '<br/>' + k_context : '') + '</strong>';
-        h += '<div class="correction">';
-        if (acid && d.K < 3.5) {
-            h += '• <strong>Critical:</strong> K is paradoxically low in acidemia = severe depletion<br/>';
-            h += '• <strong>Avoid KCl if Cl is high</strong> (hyperchloraemic acidosis) – use KPO4 instead<br/>';
-            h += '• <strong>⚠️ WARNING:</strong> As pH corrects, serum K will DROP further (H+ shifts back out, K+ shifts back in)<br/>';
-            h += '• <strong>Replacement strategy:</strong> Consider KPO4 10-20 mmol IV before correcting acidosis<br/>';
-            h += '• Monitor: ECG continuously; repeat K frequently (K will fall as pH corrects)<br/>';
-        } else {
-            h += '• <strong>KCl replacement IV:</strong> 10-20 mmol in 100 mL 0.9% NaCl over 30-60 min<br/>';
-            h += '• Can repeat if K <3.0 mmol/L or ECG changes<br/>';
-            h += '• Oral (if tolerated): 20 mmol slow-release daily<br/>';
-            h += '• Monitor: ECG, repeat K after 2-4 hours<br/>';
-        }
-        h += '</div></div>';
-    }
-    
-    if (d.Albumin < 30) {
-        h += '<div class="driver-item critical">🔴 <strong>Severe Hypoalbuminaemia (' + d.Albumin.toFixed(0) + ' g/L)</strong>';
-        h += '<div class="correction">• <strong>20% Albumin:</strong> ' + Math.round((45 - d.Albumin) * 0.15) + ' mL (to target 35 g/L)<br/>';
-        h += '• <strong>OR 5% Albumin:</strong> ' + Math.round((45 - d.Albumin) * 0.6) + ' mL IV<br/>';
-        h += '• Monitor: Albumin, fluid status, weight</div></div>';
-    } else if (d.Albumin < 35) {
-        h += '<div class="driver-item">🟡 <strong>Hypoalbuminaemia (' + d.Albumin.toFixed(0) + ' g/L)</strong>';
-        h += '<div class="correction">• <strong>5% Albumin:</strong> ' + Math.round((40 - d.Albumin) * 0.4) + ' mL IV if symptomatic<br/>';
-        h += '• Optimize nutrition, assess liver function</div></div>';
-    }
-    
-    if (d.Lactate > 4) {
-        h += '<div class="driver-item critical">🔴 <strong>Severe Hyperlactataemia (' + d.Lactate.toFixed(1) + ' mmol/L) – TISSUE HYPOXIA/SHOCK</strong>';
-        h += '<div class="correction">• <strong>Aggressive resuscitation:</strong> IV fluids, blood if Hb <90<br/>';
-        h += '• <strong>Vasopressors if hypotensive:</strong> Noradrenaline 0.01-0.5 mcg/kg/min IV<br/>';
-        h += '• <strong>Source control:</strong> Assess for infection, sepsis, hypoperfusion<br/>';
-        h += '• <strong>Consider ECMO/RRT:</strong> If refractory</div></div>';
-    } else if (d.Lactate > 2.2) {
-        h += '<div class="driver-item">🟡 <strong>Elevated Lactate (' + d.Lactate.toFixed(1) + ' mmol/L)</strong>';
-        h += '<div class="correction">• Assess perfusion status, MAP, urine output<br/>';
-        h += '• Optimize oxygen delivery (Hb target >90)<br/>';
-        h += '• Reassess in 2-4 hours</div></div>';
-    }
-    
-    if (d.Hb < 90) {
-        h += '<div class="driver-item critical">🔴 <strong>Severe Anaemia (Hb ' + d.Hb + ' g/L) – O2 DEFICIT</strong>';
-        h += '<div class="correction">• <strong>Packed RBC transfusion:</strong> 1 unit raises Hb ~8-10 g/L<br/>';
-        h += '• Target Hb >90 (ICU) or >100 (ACS/TBI)<br/>';
-        h += '• Type & crossmatch, consider massive transfusion protocol if ongoing blood loss</div></div>';
-    }
-    
-    // Calculate SID-based approach upfront (applies to all acidosis severities if hyperchloremic)
-    const current_SID = (d.Na + d.K + 2*d.iCa) - (d.Cl + d.Lactate);
-    const target_pH = 7.35;
-    const current_Atot = (d.Albumin/10) * (0.123 * d.pH - 0.631) + (d.PO4/10) * (0.309 * d.pH - 0.469);
-    const required_SID = 38 + ((target_pH - 7.4 - 0.04*(current_Atot-18) + 0.084*((d.pCO2-40)/7.5)) / 0.16);
-    const SID_deficit = required_SID - current_SID;
-    const required_Na = required_SID + (d.Cl + d.Lactate) - (d.K + 2*d.iCa);
-    const na_deficit = required_Na - d.Na;
-    const bicarb_mL = Math.round(na_deficit * 0.6 * 80 / 1);
-    
-    // Classify acidosis type
-    const is_dka = d.Glucose > 15 && d.pH < 7.20 && d.HCO3 < 15;
-    const is_high_lactate = d.Lactate > 4;
-    const corrected_Cl_acidosis = d.Cl * (140 / d.Na);
-    const is_hyperchloremic = (d.Cl > 110 || corrected_Cl_acidosis > 110) && Math.abs(d.Na - 140) < 10;
-    
-    // Metabolic acidosis handling - prioritize etiology over severity
-    if (is_hyperchloremic && BE < -6) {
-        // HYPERCHLOREMIC takes priority over BE severity - always use SID-based approach
-        const corrected_Cl_calc = d.Cl * (140 / d.Na);
-        h += '<div class="driver-item">' + '🟡 <strong>ELECTROLYTE-DRIVEN METABOLIC ACIDOSIS (HYPERCHLORAEMIC)</strong><br/>Acidemia from strong ion imbalance (high Cl), not organic acids.';
-        h += '<div class="correction"><strong>SID-based correction strategy:</strong><br/>';
-        h += '• <strong>Corrected Cl:</strong> ' + corrected_Cl_calc.toFixed(1) + ' mmol/L (measured ' + d.Cl.toFixed(0) + ') – reveals Cl excess in context of Na ' + d.Na.toFixed(0) + '<br/>';
-        h += '• <strong>Current SID:</strong> ' + current_SID.toFixed(1) + ' mEq/L | <strong>Required SID (target pH 7.35):</strong> ' + required_SID.toFixed(1) + ' mEq/L | <strong>Deficit:</strong> ' + (required_SID - current_SID).toFixed(1) + ' mEq/L<br/>';
-        h += '• <strong>Current Na:</strong> ' + d.Na.toFixed(0) + ' mmol/L | <strong>Required Na:</strong> ' + required_Na.toFixed(0) + ' mmol/L | <strong>Na deficit:</strong> ' + na_deficit.toFixed(1) + ' mmol/L<br/>';
-        h += '• <strong>For 80 kg patient:</strong> Na deficit of ' + na_deficit.toFixed(1) + ' requires approximately ' + bicarb_mL + ' mL of 8.4% NaHCO3 (raises Na, improves SID → corrects pH)<br/>';
-        const bicarb_initial_hc = Math.round(bicarb_mL / 2);
-        h += '<strong>Dosing strategy:</strong><br/>';
-        h += '• <strong>NaHCO3 8.4% target:</strong> ' + bicarb_mL + ' mL total<br/>';
-        h += '• <strong>INITIAL DOSE (HALF-CORRECTION):</strong> ' + bicarb_initial_hc + ' mL IV over 20-30 min<br/>';
-        h += '• <strong>Recheck ABG 30 min after</strong>; give remaining if pH still <7.35 and Na <' + Math.round(required_Na - 5) + '<br/>';
-        h += '• <strong>Parallel fluid strategy:</strong> Switch to Hartmann\'s or Plasmalyte (chloride-poor) to gradually dilute Cl excess without additional Na load<br/>';
-        h += '• Monitor: Cl, Na, K trends (K drops as pH corrects); watch for hypernatraemia if full dose given without fluid switch</div></div>';
-    } else if (is_dka) {
-        h += '<div class="driver-item">' + '🔴 <strong>ANION-DRIVEN METABOLIC ACIDOSIS (DKA PATTERN)</strong><br/>Acidemia from ketone accumulation (organic anions), NOT electrolyte derangement (Na & Cl near-normal). High K is compensation to acidosis.';
-        h += '<div class="correction"><strong>TREAT UNDERLYING CAUSE FIRST (DKA):</strong><br/>';
-        h += '• <strong>Primary:</strong> Insulin 0.1 unit/kg/hr IV infusion (clears ketones)<br/>';
-        h += '• <strong>Fluid:</strong> 0.9% NaCl 1 L/hr (fluid deficit ~100–200 mL/kg)<br/>';
-        h += '• <strong>K replacement:</strong> Start 10–20 mmol/hr once K <5.5 (will drop rapidly)<br/>';
-        h += '• <strong>Bicarb 8.4%:</strong> Reserve for pH <6.9 ONLY; if given, ' + Math.round(bicarb_mL / 4) + '–' + Math.round(bicarb_mL / 2) + ' mL cautiously<br/>';
-        h += '• Most improvement from DKA treatment, not bicarb. Recheck ABG q2–4h</div></div>';
-    } else if (is_high_lactate) {
-        h += '<div class="driver-item">' + '🔴 <strong>ANION-DRIVEN METABOLIC ACIDOSIS (SEVERE HYPERLACTATAEMIA)</strong><br/>Acidemia from lactate accumulation, NOT electrolyte derangement. Treat tissue hypoperfusion.';
-        h += '<div class="correction"><strong>ADDRESS TISSUE HYPOPERFUSION:</strong><br/>';
-        h += '• <strong>Primary:</strong> Aggressive resuscitation (IV fluids, blood if Hb <90, vasopressors if MAP inadequate)<br/>';
-        h += '• <strong>Source control:</strong> Sepsis? Shock? Hypoxia?<br/>';
-        h += '• <strong>Bicarb 8.4%:</strong> If pH <7.10 AND resuscitation ongoing, ' + Math.round(bicarb_mL / 4) + ' mL aliquots only<br/>';
-        h += '• Most effective treatment is perfusion restoration → lactate clearance</div></div>';
-    } else if (BE < -15) {
-        const bicarb_deficit = Math.abs(BE) * 0.5 * 80; // 0.5 × weight for ECF
-        const bicarb_mL_84pct = Math.round(bicarb_deficit / 1); // 8.4% = 1 mEq/mL
-        const bicarb_initial = Math.round(bicarb_mL_84pct / 2); // Half-correction first
-        h += '<div class="driver-item">🔴 <strong>Severe Metabolic Acidosis (BEecf ' + BE.toFixed(1) + ')</strong>';
-        h += '<div class="correction">• <strong>Target NaHCO3 8.4%:</strong> ' + bicarb_mL_84pct + ' mL total (estimated ' + bicarb_deficit.toFixed(0) + ' mEq deficit)<br/>';
-        h += '• <strong>INITIAL DOSE (HALF-CORRECTION):</strong> ' + bicarb_initial + ' mL IV over 30-60 min<br/>';
-        h += '• <strong>Recheck ABG 30 min after first dose</strong><br/>';
-        h += '• Can give remaining ' + bicarb_initial + ' mL if pH still <7.20, reassess after each aliquot<br/>';
-        h += '• Address underlying cause (lactate, DKA, renal failure)<br/>';
-        h += '• Monitor: Hypernatraemia risk, K trends (expect drop as pH corrects)</div></div>';
-    } else if (BE < -6) {
-        // Moderate acidosis - if not hyperchloremic, DKA, or lactate-driven
-        if (bicarb_mL > 0 && d.pH < 7.20) {
-            const bicarb_initial_mod = Math.round(bicarb_mL / 2);
-            h += '<div class="driver-item">' + '🟡 <strong>METABOLIC ACIDOSIS (BEecf ' + BE.toFixed(1) + ')</strong>';
-            h += '<div class="correction">• <strong>NaHCO3 8.4% target:</strong> ' + bicarb_mL + ' mL total<br/>';
-            h += '• <strong>INITIAL DOSE (HALF-CORRECTION):</strong> ' + bicarb_initial_mod + ' mL IV over 15-30 min<br/>';
-            h += '• <strong>Recheck ABG 30 min after</strong>; reassess before giving remainder<br/>';
-            h += '• Address underlying cause (lactate, DKA, renal failure, etc.)<br/>';
-            h += '• Monitor: K will drop as pH corrects; watch for volume overload</div></div>';
-        } else {
-            h += '<div class="driver-item">' + '🟡 <strong>METABOLIC ACIDOSIS (BEecf ' + BE.toFixed(1) + ')</strong>';
-            h += '<div class="correction">• Address underlying cause preferentially<br/>';
-            h += '• If pH >7.20: Focus on cause, not pH correction<br/>';
-            h += '• Recheck ABG after intervention</div></div>';
-        }
-    }
-    
-    // Metabolic Alkalosis section
-    if (d.HCO3 > 26 && d.pH > 7.45) {
-        const target_pCO2_low = 35;
-        const target_pCO2_high = 40;
-        const exp_pCO2_alk = 40 + (0.7 * (d.HCO3 - 24)); // Winter's formula approximation for alkalosis
-        const mv_increase_to_exp = Math.round(((exp_pCO2_alk / 40) - 1) * 100);
-        
-        h += '<div class="driver-item">🔵 <strong>METABOLIC ALKALOSIS (HCO3 ' + d.HCO3.toFixed(0) + ' mmol/L, pH ' + d.pH.toFixed(2) + ')</strong>';
-        h += '<div class="correction">• <strong>Expected respiratory compensation:</strong> pCO2 should rise to ~' + Math.round(exp_pCO2_alk) + ' mmHg to partially compensate<br/>';
-        h += '• <strong>Current pCO2:</strong> ' + d.pCO2.toFixed(0) + ' mmHg | <strong>Expected:</strong> ~' + Math.round(exp_pCO2_alk) + ' mmHg';
-        if (d.pCO2 < exp_pCO2_alk - 5) {
-            h += ' → 🔴 <strong>INSUFFICIENT respiratory compensation</strong> (pCO2 too low) – pH rising unchecked';
-        } else if (d.pCO2 > exp_pCO2_alk + 5) {
-            h += ' → 🟡 <strong>EXCESSIVE respiratory compensation</strong> (pCO2 too high) – but still better than worsening alkalosis';
-        } else {
-            h += ' → ✓ <strong>Appropriate respiratory compensation</strong>';
-        }
-        h += '<br/>';
-        h += '• <strong>If spontaneously breathing:</strong> Hypoventilation is compensatory—allow it. Do NOT force hyperventilation. The patient\'s respiratory drive increases naturally in alkalosis.<br/>';
-        h += '• <strong>If mechanically ventilated:</strong> CAUTION: Do not over-ventilate. Reduce RR or tidal volume as needed to allow pCO2 to rise toward expected level, or risk worsening alkalemia.<br/>';
-        h += '• <strong>Primary management:</strong> Treat underlying cause (K replacement if hypokalemic, stop diuretics, volume repletion, etc.)<br/>';
-        h += '• Monitor: Recheck ABG q1–2h; watch pCO2 rise as compensation activates and alkalosis resolves</div></div>';
-    } else if (d.HCO3 > 26 && d.pH <= 7.45) {
-        h += '<div class="driver-item">🟡 <strong>METABOLIC ALKALOSIS (HCO3 ' + d.HCO3.toFixed(0) + ' mmol/L)</strong>';
-        h += '<div class="correction">• pH is currently normal/low-normal, but HCO3 is elevated—risk of alkalemia if process continues<br/>';
-        h += '• <strong>Address underlying cause:</strong> K depletion, GI losses, volume depletion, diuretics<br/>';
-        h += '• If K low: KCl replacement will help suppress further HCO3 rise<br/>';
-        h += '• Monitor: K, HCO3, pH trends</div></div>';
-    }
-    
-    if (d.pCO2 < 30 && d.pH < 7.35) {
-        // Hyperventilation in context of acidemia = COMPENSATION, not a problem
-        // Calculate MV adjustment needed to move from current pCO2 to target (35-40)
-        const target_pCO2_low = 35;
-        const target_pCO2_high = 40;
-        const mv_adjust_to_35 = Math.round(((d.pCO2 / target_pCO2_low) - 1) * 100);
-        const mv_adjust_to_40 = Math.round(((d.pCO2 / target_pCO2_high) - 1) * 100);
-        const adjust_direction_35 = mv_adjust_to_35 < 0 ? 'decrease' : 'increase';
-        const adjust_direction_40 = mv_adjust_to_40 < 0 ? 'decrease' : 'increase';
-        
-        h += '<div class="driver-item">🟡 <strong>Hyperventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – LIKELY APPROPRIATE COMPENSATION</strong>';
-        h += '<div class="correction">• <strong>Context:</strong> pH is low (acidaemia) → hyperventilation is compensatory respiratory response<br/>';
-        h += '• <strong>DO NOT reduce minute ventilation.</strong> Allow respiratory compensation to work. If ventilated, target low normal (35–40 mmHg) EtCO2 over time, slowly reducing minute ventilation as pH improves.<br/>';
-        h += '• <strong>Once acidosis improves, you should have gradually decreased minute ventilation by ~' + Math.abs(mv_adjust_to_35) + '–' + Math.abs(mv_adjust_to_40) + '%</strong> to allow pCO2 to drift back to normal range.<br/>';
-        h += '• <strong>If spontaneously breathing:</strong> This adjustment happens automatically—no intervention needed. The patient\'s respiratory drive decreases naturally as pH improves.<br/>';
-        h += '• <strong>If mechanically ventilated:</strong> Monitor closely and reduce RR or tidal volume as pH normalizes, or risk iatrogenic respiratory alkalosis.<br/>';
-        h += '• <strong>Management:</strong> Treat underlying metabolic acidosis (address lactate, DKA, Cl excess, etc.)<br/>';
-        h += '• Monitor: Recheck ABG q1–2h; watch for pCO2 rise toward normal as metabolic component improves</div></div>';
-    } else if (d.pCO2 < 30 && d.pH >= 7.35) {
-        // Hyperventilation without acidemia = inappropriate
-        const mv_decrease = Math.round(((40 - d.pCO2) / 40) * 100);
-        h += '<div class="driver-item">🔴 <strong>Inappropriate Hyperventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg in normal/high pH)</strong>';
-        h += '<div class="correction">• <strong>Context:</strong> pH is normal or high, yet pCO2 is low → hyperventilation is inappropriate<br/>';
-        h += '• <strong>Causes:</strong> Anxiety, pain, sepsis, mechanical ventilation settings too aggressive<br/>';
-        h += '• <strong>If spontaneous:</strong> Reassurance, analgesia, anxiolytics<br/>';
-        h += '• <strong>If mechanical:</strong> Reduce RR or tidal volume by ~' + mv_decrease + '% to target pCO2 35–40<br/>';
-        h += '• Monitor: PEEP, sedation adequacy</div></div>';
-    } else if (d.pCO2 > 55) {
-        const mv_increase = Math.round(((d.pCO2 - 40) / 40) * 100);
-        // Check if this is compensatory (high pCO2 with high pH = respiratory compensation for metabolic alkalosis)
-        const is_compensatory_hypovent = d.pH > 7.45;
-        
-        if (is_compensatory_hypovent) {
-            h += '<div class="driver-item">🟡 <strong>Hypoventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – LIKELY COMPENSATORY FOR METABOLIC ALKALOSIS</strong>';
-            h += '<div class="correction">• <strong>Context:</strong> pH is high (alkalemia) → hypoventilation is compensatory respiratory response to reduce pCO2 magnitude of pH rise<br/>';
-            h += '• <strong>DO NOT increase minute ventilation aggressively.</strong> Allow respiratory compensation to work. If ventilated, target toward expected pCO2 level (based on HCO3).<br/>';
-            h += '• <strong>If spontaneously breathing:</strong> This is appropriate—no intervention needed. The patient\'s respiratory drive decreases naturally in alkalosis, allowing pCO2 to rise.<br/>';
-            h += '• <strong>If mechanically ventilated:</strong> Do NOT over-ventilate. Reduce RR or tidal volume to allow pCO2 rise, or you\'ll worsen alkalemia. Monitor closely as alkalosis is treated.<br/>';
-            h += '• <strong>Primary management:</strong> Treat underlying metabolic alkalosis (K replacement, address GI losses, volume repletion)<br/>';
-            h += '• Monitor: Recheck ABG q1–2h; as alkalosis improves, pCO2 should naturally decline</div></div>';
-        } else {
-            h += '<div class="driver-item">🔴 <strong>Hypoventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – INAPPROPRIATE (causing/worsening acidosis)</strong>';
-            h += '<div class="correction">• <strong>Minute ventilation adjustment:</strong> Increase by ~' + mv_increase + '% to target pCO2 35-45<br/>';
-            h += '• <strong>If spontaneous:</strong> Encourage deep breathing, assess for respiratory depression, pain, sedation adequacy<br/>';
-            h += '• <strong>If mechanically ventilated:</strong> Increase RR or tidal volume; check for compliance issues, obstruction, circuit problems<br/>';
-            h += '• Monitor: Sedation level, ABG response, respiratory mechanics</div></div>';
-        }
-    }
-    
-    if (d.Na < 130) {
-        const na_deficit = (140 - d.Na) * 0.5 * 80;
-        const saline_3pct_mL = Math.round(na_deficit / 0.51);
-        const saline_234pct_mL = Math.round(na_deficit / 4);
-        h += '<div class="driver-item critical">🔴 <strong>Severe Hyponatraemia (Na ' + d.Na + ') – SEIZURE RISK</strong>';
-        h += '<div class="correction">• <strong>3% NaCl:</strong> ' + saline_3pct_mL + ' mL IV (250 mL bag preferred)<br/>';
-        h += '• <strong>OR 23.4% NaCl:</strong> ' + saline_234pct_mL + ' mL IV (10 mL ampoule)<br/>';
-        h += '• Target: Raise Na by 10-12 mmol/L acutely, then 8 mmol/L daily<br/>';
-        h += '• Risk of osmotic demyelination if corrected too fast</div></div>';
-    } else if (d.Na < 135) {
-        const na_deficit = (140 - d.Na) * 0.6 * 80;
-        const saline_3pct_mL = Math.round(na_deficit / 0.51);
-        h += '<div class="driver-item">🟡 <strong>Hyponatraemia (Na ' + d.Na + ') – OSMOLALITY-GUIDED APPROACH</strong>';
-        h += '<div class="correction"><strong>Step 1: Measure serum osmolality</strong><br/>';
-        h += '• <strong>If Osmolality >300 (Hyper-osmotic):</strong> Pseudohyponatraemia (hyperglycaemia, hyperproteinaemia)<br/>';
-        h += '  → Treat hyperglycaemia; repeat Na<br/>';
-        h += '• <strong>If Osmolality 280–300 (Iso-osmotic):</strong> Pseudohyponatraemia (lab artifact)<br/>';
-        h += '  → Repeat Na, check lipids<br/>';
-        h += '• <strong>If Osmolality <280 (Hypo-osmotic): MEASURE URINE OSMOLALITY</strong><br/>';
-        h += '  <strong>If Urine Osm >100:</strong> SIADH, heart failure, cirrhosis, nephrotic → Fluid restrict 500–800 mL/day<br/>';
-        h += '  <strong>If Urine Osm <100:</strong> Primary polydipsia or adrenal insufficiency → Fluid restrict<br/>';
-        h += '• <strong>Correct slowly:</strong> 8–10 mmol/L daily (risk of osmotic demyelination)<br/>';
-        h += '• <strong>If symptomatic (seizures):</strong> 3% NaCl ' + saline_3pct_mL + ' mL IV over 30 min</div></div>';
-    }
-    
-    const corrected_Cl_standalone = d.Cl * (140 / d.Na);
-    if (d.Cl > 110 || corrected_Cl_standalone > 110) {
-        const cl_alert = d.Cl > 110 ? 'Cl ' + d.Cl.toFixed(0) : 'Corrected Cl ' + corrected_Cl_standalone.toFixed(1) + ' (measured ' + d.Cl.toFixed(0) + ')';
-        h += '<div class="driver-item critical">🔴 <strong>Hyperchloraemia (' + cl_alert + ' mmol/L) – STRONG ION ABNORMALITY</strong>';
-        h += '<div class="correction">• <strong>Primary problem:</strong> High Cl is reducing SID → causes NAGMA (normal AG acidosis)<br/>';
-        h += '• <strong>See Metabolic Acidosis section above</strong> for SID-based correction strategy (NaHCO3 volume, K targets)<br/>';
-        h += '• <strong>Fluid strategy:</strong> Switch to balanced fluids (Hartmann\'s, Plasmalyte) to gradually dilute Cl excess<br/>';
-        h += '• Monitor: Cl trends, acid-base status after corrections</div></div>';
-    }
-    
-    h += '</div>';
-    
-    // SLIDERS SECTION
-    h += '<div style="margin-top: 20px; padding: 12px; background: var(--bg-tertiary); border-radius: 6px; border-top: 2px solid var(--accent-normal);"><strong style="display: block; margin-bottom: 16px; color: var(--accent-normal);">INTERACTIVE DRIVERS: Adjust sliders to explore scenarios</strong>';
-    h += '<div class="slider-group"><div class="slider-label"><span>K (Potassium)</span><span class="slider-label-value">' + d.K.toFixed(1) + ' mmol/L</span></div><input type="range" id="k-slider" min="2" max="8" step="0.1" value="' + d.K + '" data-param="K"></div>';
-    h += '<div class="slider-group"><div class="slider-label"><span>Albumin</span><span class="slider-label-value">' + d.Albumin.toFixed(0) + ' g/L</span></div><input type="range" id="albumin-slider" min="20" max="60" step="1" value="' + d.Albumin + '" data-param="Albumin"></div>';
-    h += '<div class="slider-group"><div class="slider-label"><span>Lactate</span><span class="slider-label-value">' + d.Lactate.toFixed(1) + ' mmol/L</span></div><input type="range" id="lactate-slider" min="0.5" max="20" step="0.1" value="' + d.Lactate + '" data-param="Lactate"></div>';
-    h += '<div class="slider-group"><div class="slider-label"><span>Haemoglobin</span><span class="slider-label-value">' + d.Hb.toFixed(0) + ' g/L</span></div><input type="range" id="hb-slider" min="60" max="200" step="5" value="' + d.Hb + '" data-param="Hb"></div>';
-    h += '</div>';
-    
-    h += '</div>';
-    return h;
-}
-
-function buildStewart(d, SID, Atot, pred_pH) {
-    let h = '<div class="analysis-section"><div class="section-title">Stewart: Three Independent Variables</div>';
-    h += '<div style="margin-bottom: 24px; display: grid; grid-template-columns: 180px 30px 1fr; gap: 12px; align-items: start;">';
-    
-    h += '<div class="step-box"><strong>Variable 1<br/>SID</strong><br/>' + SID.toFixed(1) + ' mEq/L</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (SID < 38 ? '🔴 LOW<br/>(Acidifying)' : SID > 42 ? '🔵 HIGH<br/>(Alkalinizing)' : '🟢 NORMAL<br/>(38-42)') + '</div>';
-    
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    h += '<div class="step-box"><strong>Variable 2<br/>Atot</strong><br/>' + Atot.toFixed(1) + ' mEq/L</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (Atot < 18 ? '🔴 LOW<br/>(Acidifying)' : Atot > 18 ? '🔵 HIGH<br/>(Alkalinizing)' : '🟢 NORMAL<br/>(~18)') + '</div>';
-    
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    h += '<div class="step-box"><strong>Variable 3<br/>pCO2</strong><br/>' + d.pCO2.toFixed(0) + ' mmHg</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation">' + (d.pCO2 < 35 ? '↓ Low<br/>(Alkalinizing)' : d.pCO2 > 45 ? '↑ High<br/>(Acidifying)' : '✓ Normal<br/>(35-45)') + '</div>';
-    
-    h += '<div class="vertical-connector">↓</div><div></div><div></div>';
-    
-    h += '<div class="step-box"><strong>PREDICTED<br/>pH</strong><br/>Stewart Eqn</div>';
-    h += '<div class="step-arrow">→</div>';
-    h += '<div class="step-interpretation"><strong style="color: var(--accent-normal); font-size: 1rem;">pH = ' + pred_pH.toFixed(2) + '</strong><br/>Measured: ' + d.pH.toFixed(2) + '<br/>Δ: ' + (d.pH - pred_pH).toFixed(3) + '</div>';
-    
-    h += '</div>';
-    
-    // DRIVER SUMMARY
-    h += '<div class="driver-summary"><strong style="color: var(--accent-critical); font-size: 1.1rem;">STEWART DRIVER ANALYSIS (80 kg patient)</strong>';
-    h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(88, 166, 255, 0.1); border-left: 3px solid var(--accent-normal); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-normal);">⚡ CLINICAL INSIGHT:</strong> SID management is far more effective than Atot correction. Albumin is very hard to increment meaningfully even with high doses, so focus on correcting strong ions (Na, K, Cl, Lactate) to improve pH. Atot is a contributing factor but not your main lever. <strong>In practice: Your two clinically relevant Stewart levers are SID correction and ventilation adjustment.</strong><br/><br/><strong style="margin-top: 8px; display: block;">CORRECTED CHLORIDE (Cl × 140/Na):</strong> If measured Cl looks borderline (105–110) but corrected Cl >110, this reveals hidden hyperchloremic pattern in context of low Na. Always interpret Cl relative to Na using corrected Cl.<br/><br/><strong style="margin-top: 8px; display: block;">⚠️ HALF-CORRECTION RULE:</strong> All NaHCO3 dosing shown as TARGET (total needed). <strong>Give HALF initially</strong>, recheck ABG in 30 min, then reassess. This avoids hypernatraemia, volume overload, K crash, and overcorrection to alkalemia. Titrate, don\'t dump.</div>';
-    
-    // Calculate SID target and Na requirement
-    const current_SID_stew = (d.Na + d.K + 2*d.iCa) - (d.Cl + d.Lactate);
-    const target_pH_stew = 7.35;
-    const current_Atot_stew = (d.Albumin/10) * (0.123 * d.pH - 0.631) + (d.PO4/10) * (0.309 * d.pH - 0.469);
-    const required_SID_stew = 38 + ((target_pH_stew - 7.4 - 0.04*(current_Atot_stew-18) + 0.084*((d.pCO2-40)/7.5)) / 0.16);
-    const required_Na_stew = required_SID_stew + (d.Cl + d.Lactate) - (d.K + 2*d.iCa);
-    const na_deficit_stew = required_Na_stew - d.Na;
-    const bicarb_mL_stew = Math.round(na_deficit_stew * 0.6 * 80 / 1);
-    
-    h += '<div style="padding: 12px; margin-bottom: 16px; background: rgba(58, 182, 182, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-safe);">SID TARGET & CORRECTION STRATEGY (Target pH 7.35):</strong><br/>';
-    h += '• <strong>Current SID:</strong> ' + current_SID_stew.toFixed(1) + ' | <strong>Required SID:</strong> ' + required_SID_stew.toFixed(1) + ' | <strong>Deficit:</strong> ' + (required_SID_stew - current_SID_stew).toFixed(1) + ' mEq/L<br/>';
-    h += '• <strong>Current Na:</strong> ' + d.Na.toFixed(0) + ' | <strong>Required Na:</strong> ' + required_Na_stew.toFixed(0) + ' | <strong>Deficit:</strong> ' + na_deficit_stew.toFixed(1) + ' mmol/L<br/>';
-    if (bicarb_mL_stew > 0) {
-        const bicarb_initial_stew = Math.round(bicarb_mL_stew / 2);
-        h += '• <strong>NaHCO3 8.4% target:</strong> ' + bicarb_mL_stew + ' mL total (SID deficit ' + (required_SID_stew - current_SID_stew).toFixed(1) + ' mEq/L)<br/>';
-        h += '• <strong>INITIAL DOSE (HALF-CORRECTION):</strong> ' + bicarb_initial_stew + ' mL IV over 20-30 min<br/>';
-        h += '• <strong>Recheck ABG in 30 min</strong>; reassess pH response before giving remainder<br/>';
-        h += '• Parallel: Use balanced fluids (Hartmann\'s/Plasmalyte) for remaining SID correction<br/>';
-        h += '• Safety: Monitor Na (hypernatraemia risk), K (drops as pH corrects), volume status<br/>';
-        h += '• <strong>Na already adequate or high:</strong> Focus on K/Cl/Lactate correction instead<br/>';
-    } else {
-        h += '• <strong>Na is at target:</strong> SID correction achieved via other ions<br/>';
-    }
-    h += '• <strong>Alternative approach:</strong> Hartmann\'s/Plasmalyte ' + Math.round(((required_SID_stew - current_SID_stew) * 0.6 * 80) / 500) * 500 + ' mL to gradually restore SID</div>';
-    
-    if (SID < 35) {
-        const vol_needed = (38 - SID) * 0.6 * 80;
-        h += '<div class="driver-item critical">🔴 <strong>SID Critically Low (' + SID.toFixed(1) + ') – SEVERE ACIDOSIS RISK</strong>';
-        h += '<div class="correction"><strong>Correct by increasing SID:</strong><br/>';
-        h += '• <strong>Option 1 – Fluids:</strong> Hartmann\'s or Plasmalyte ~' + Math.round(vol_needed / 500) * 500 + ' mL IV (balanced = ↑SID)<br/>';
-        h += '• <strong>Option 2 – Limit Cl-related Acidaemia:</strong> Discontinue 0.9% NaCl (hyperchloraemic)<br/>';
-        if (d.K < 4.0) {
-            h += '• <strong>Option 3 – K replacement:</strong> KCl 10-20 mmol in 100 mL over 30-60 min (SID-neutral: K+ and Cl− cancel)<br/>';
-        }
-        h += '• <strong>Option 4 – Add Na:</strong> NaHCO3 8.4%: ~50 mL IV OR hypertonic saline 3% ' + Math.round((140 - d.Na) * 0.5 * 80 / 0.51) + ' mL<br/>';
-        h += '• Assess: Which strong ion is deficient? (Na loss, K loss, Cl excess?)</div></div>';
-    } else if (SID < 38) {
-        h += '<div class="driver-item">🟡 <strong>SID Low (' + SID.toFixed(1) + ') – Acidifying Effect</strong>';
-        h += '<div class="correction"><strong>Incremental SID correction:</strong><br/>';
-        h += '• <strong>First line:</strong> Use Hartmann\'s or Plasmalyte over 0.9% NaCl<br/>';
-        if (d.K < 4.5) {
-            h += '• <strong>If K low:</strong> KCl 10 mmol in 100 mL IV<br/>';
-        }
-        if (d.Na < 140) {
-            h += '• <strong>If Na low:</strong> Hypertonic saline or NaHCO3<br/>';
-        }
-        h += '• Monitor SID response after interventions</div></div>';
-    } else if (SID > 42) {
-        h += '<div class="driver-item">🔵 <strong>SID High (' + SID.toFixed(1) + ') – Alkalinizing Effect</strong>';
-        h += '<div class="correction">• Associated with contraction alkalosis (saline loss, vomiting)<br/>';
-        h += '• OR unmeasured cation excess<br/>';
-        h += '• <strong>Management:</strong> Fluid resuscitation with 0.9% NaCl, address GI losses<br/>';
-        h += '• Address underlying cause (diuretics? NG suction?)</div></div>';
-    }
-    
-    if (d.Albumin < 35) {
-        h += '<div class="driver-item">🟡 <strong>Low Atot from Hypoalbuminaemia (' + d.Albumin.toFixed(0) + ' g/L)</strong>';
-        h += '<div class="correction">• <strong>Albumin replacement:</strong> 5% ' + Math.round((40 - d.Albumin) * 0.4) + ' mL IV<br/>';
-        h += '• Hypoalbuminaemia → low unmeasured anions → acidifying effect<br/>';
-        h += '• Optimize nutrition & liver function</div></div>';
-    }
-    
-    if (d.pCO2 < 30) {
-        const mv_decrease = Math.round(((40 - d.pCO2) / 40) * 100);
-        const is_compensatory_hypvent = d.pH < 7.35;
-        
-        if (is_compensatory_hypvent) {
-            h += '<div class="driver-item">🟡 <strong>Hyperventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – LIKELY COMPENSATORY FOR METABOLIC ACIDOSIS</strong>';
-            h += '<div class="correction">• <strong>Context:</strong> pH is low → hyperventilation is compensatory respiratory response<br/>';
-            h += '• <strong>Do NOT reduce minute ventilation.</strong> Allow respiratory compensation to work<br/>';
-            h += '• <strong>If spontaneously breathing:</strong> Hyperventilation is appropriate—no intervention needed<br/>';
-            h += '• <strong>If mechanically ventilated:</strong> Maintain or increase minute ventilation until metabolic acidosis is treated. Risk: over-correcting (reducing MV too early) worsens acidosis<br/>';
-            h += '• <strong>Primary focus:</strong> Treat underlying metabolic acidosis (lactate, DKA, renal failure, Cl excess)<br/>';
-            h += '• Monitor: Recheck ABG q1–2h; as acidosis improves, pCO2 will naturally rise</div></div>';
-        } else {
-            h += '<div class="driver-item">🔴 <strong>Inappropriate Hyperventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – Creating/worsening alkalosis</strong>';
-            h += '<div class="correction">• <strong>Context:</strong> pH is normal or high, yet pCO2 is low → hyperventilation is inappropriate<br/>';
-            h += '• <strong>Minute ventilation adjustment:</strong> Reduce by ~' + mv_decrease + '% to target pCO2 35-40<br/>';
-            h += '• <strong>If spontaneous:</strong> Reassurance, reduce sedation/anxiety, analgesia if painful, address PEEP<br/>';
-            h += '• <strong>If mechanical:</strong> Reduce RR or tidal volume; be cautious not to overcorrect<br/>';
-            h += '• Monitor: Target pCO2 35-45 mmHg</div></div>';
-        }
-    } else if (d.pCO2 > 55) {
-        const mv_increase = Math.round(((d.pCO2 - 40) / 40) * 100);
-        const is_compensatory_hypovent_trad = d.pH > 7.45;
-        
-        if (is_compensatory_hypovent_trad) {
-            h += '<div class="driver-item">🟡 <strong>Hypoventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – LIKELY COMPENSATORY FOR METABOLIC ALKALOSIS</strong>';
-            h += '<div class="correction">• <strong>Context:</strong> pH is high → hypoventilation is compensatory to limit pH rise<br/>';
-            h += '• <strong>Do NOT aggressively increase minute ventilation.</strong> Allow respiratory compensation to work<br/>';
-            h += '• <strong>If spontaneously breathing:</strong> Hypoventilation is appropriate—no intervention needed. Respiratory drive decreases naturally in alkalosis<br/>';
-            h += '• <strong>If mechanically ventilated:</strong> Do NOT over-ventilate. Be cautious with RR/tidal volume increases, or you\'ll worsen alkalemia. Monitor closely as alkalosis is treated<br/>';
-            h += '• <strong>Primary focus:</strong> Treat underlying metabolic alkalosis (K replacement, address GI losses, volume status)<br/>';
-            h += '• Monitor: Recheck ABG q1–2h; as alkalosis improves, pCO2 will naturally decline</div></div>';
-        } else {
-            h += '<div class="driver-item">🔴 <strong>Hypoventilation (pCO2 ' + d.pCO2.toFixed(0) + ' mmHg) – Causing/worsening respiratory acidosis</strong>';
-            h += '<div class="correction">• <strong>Minute ventilation adjustment:</strong> Increase by ~' + mv_increase + '% to target pCO2 35-45<br/>';
-            h += '• <strong>If spontaneous:</strong> Assess for respiratory depression, pain, inadequate sedation; encourage deep breathing<br/>';
-            h += '• <strong>If mechanical:</strong> Increase RR or tidal volume; check for compliance issues, obstruction, or circuit problems<br/>';
-            h += '• Monitor: Sedation level, blood gas response, respiratory mechanics</div></div>';
-        }
-    } else if (d.pCO2 > 45) {
-        h += '<div class="driver-item">🟡 <strong>Mildly Elevated pCO2 (' + d.pCO2.toFixed(0) + ' mmHg)</strong>';
-        h += '<div class="correction">• Mild hyperventilation may be permissive in some conditions<br/>';
-        h += '• If persistent: Increase minute ventilation by 10-15%</div></div>';
-    } else if (d.pCO2 < 35) {
-        h += '<div class="driver-item">🟡 <strong>Mildly Low pCO2 (' + d.pCO2.toFixed(0) + ' mmHg)</strong>';
-        h += '<div class="correction">• Usually compensatory for metabolic acidosis<br/>';
-        h += '• If inappropriate: Reduce minute ventilation by 10-15%</div></div>';
-    }
-    
-    if (Math.abs(d.pH - pred_pH) > 0.1) {
-        h += '<div class="driver-item critical">⚠️ <strong>UNMEASURED IONS DETECTED (Δ pH = ' + (d.pH - pred_pH).toFixed(3) + ')</strong>';
-        h += '<div class="correction">• Likely sources: Unmeasured cations (Ca, Mg) or anions (PO4, SO4)<br/>';
-        h += '• Consider: Hypermagnesaemia, calciphylaxis, renal failure<br/>';
-        h += '• Figge-Fencl correction may apply</div></div>';
-    }
-    
-    h += '</div>';
-    
-    // SLIDERS
-    h += '<div style="margin-top: 20px; padding: 12px; background: var(--bg-tertiary); border-radius: 6px; border-top: 2px solid var(--accent-normal);"><strong style="display: block; margin-bottom: 16px; color: var(--accent-normal);">INTERACTIVE: Adjust variables to see SID, Atot, predicted pH change</strong>';
-    h += '<div class="slider-group"><div class="slider-label"><span>Na</span><span class="slider-label-value">' + d.Na.toFixed(0) + '</span></div><input type="range" id="na-slider" min="110" max="160" step="1" value="' + d.Na + '" data-param="Na"></div>';
-    h += '<div class="slider-group"><div class="slider-label"><span>Cl</span><span class="slider-label-value">' + d.Cl.toFixed(0) + '</span></div><input type="range" id="cl-slider" min="80" max="120" step="1" value="' + d.Cl + '" data-param="Cl"></div>';
-    h += '<div class="slider-group"><div class="slider-label"><span>Albumin</span><span class="slider-label-value">' + d.Albumin.toFixed(0) + ' g/L</span></div><input type="range" id="albumin-slider-stew" min="20" max="60" step="1" value="' + d.Albumin + '" data-param="Albumin"></div>';
-    h += '<div class="slider-group"><div class="slider-label"><span>pCO2</span><span class="slider-label-value">' + d.pCO2.toFixed(0) + '</span></div><input type="range" id="pco2-slider" min="10" max="100" step="1" value="' + d.pCO2 + '" data-param="pCO2"></div>';
-    h += '</div>';
-    
-    h += '</div>';
-    return h;
-}
-
-function buildTraditional(d, AG, AGc, BE, acid) {
-    let h = '<div class="analysis-section"><div class="section-title">Traditional Boston: GOLDMARK & USEDCARS</div>';
-    h += '<div class="step-box"><strong>STEP 1: pH Status</strong> → pH = ' + d.pH.toFixed(2) + ' ' + (acid ? '🔴 ACIDAEMIA' : d.pH > 7.45 ? '🔵 ALKALAEMIA' : '🟢 NORMAL') + '</div>';
-    h += '<div class="step-box"><strong>STEP 2: Winter\'s Formula (Expected pCO2 if acidaemia)</strong><br/>';
-    if (acid) {
-        const exp_pCO2 = 1.5 * d.HCO3 + 8;
-        h += 'Expected = 1.5 × HCO3 + 8 ± 2 = ' + exp_pCO2.toFixed(0) + ' mmHg → Measured = ' + d.pCO2.toFixed(0) + ' mmHg<br/>';
-        if (d.pCO2 < exp_pCO2 - 2) h += '🔵 Appropriate respiratory compensation';
-        else if (d.pCO2 > exp_pCO2 + 2) h += '🔴 Concurrent respiratory acidosis';
-        else h += '✓ Appropriate';
-    }
-    h += '</div>';
-    h += '<div class="step-box"><strong>STEP 3: Anion Gap</strong><br/>AG = Na − (Cl + HCO3) = ' + AG.toFixed(0) + '<br/>Corrected (for Albumin ' + d.Albumin.toFixed(0) + ') = ' + AGc.toFixed(1) + ' → ' + (AGc > 16 ? '🔴 HIGH (HAGMA)' : '🟢 NORMAL') + '</div>';
-    h += '<div class="step-box"><strong>STEP 4: Delta Ratio (if HAGMA)</strong><br/>';
-    if (AGc > 16) {
-        const delta = (AG - 12) / (24 - d.HCO3);
-        h += 'Δ AG / Δ HCO3 = ' + delta.toFixed(2) + ' → ' + (delta > 2 ? '🔵 Concurrent metabolic alkalosis' : delta < 1 ? '🔴 Concurrent NAGMA' : '✓ Pure HAGMA');
-    }
-    h += '</div>';
-    h += '<div class="step-box"><strong>STEP 5: Differential & Mnemonics</strong><br/>';
-    if (acid) {
-        if (AGc > 16) {
-            h += '🔴 <strong>HIGH AG METABOLIC ACIDOSIS (HAGMA)</strong><br/><strong style="color: var(--accent-normal);">GOLDMARK:</strong><br/>• <strong>G</strong>lycols • <strong>O</strong>xoproline • <strong>L</strong>-lactate • <strong>D</strong>-lactate • <strong>M</strong>ethanol • <strong>A</strong>spirin • <strong>R</strong>enal failure • <strong>K</strong>etoacidosis';
-        } else {
-            h += '🔴 <strong>NORMAL AG METABOLIC ACIDOSIS (NAGMA)</strong><br/><strong style="color: var(--accent-normal);">USEDCARS:</strong><br/>• <strong>U</strong>reterosigmoidostomy • <strong>S</strong>aline • <strong>E</strong>ndocrine (Addison\'s) • <strong>D</strong>iarrhoea • <strong>C</strong>CA inhibitors • <strong>A</strong>mmonium chloride • <strong>R</strong>TA • <strong>S</strong>pironolactone';
-        }
-    }
-    h += '</div>';
-    
-    h += '<div class="step-box"><strong>OSMOLAR GAP (if measured osmolality available)</strong><br/>';
-    const calc_osm = (2 * d.Na) + d.Glucose + d.Urea;
-    const osm_gap = d.Osmolality - calc_osm;
-    h += 'Osmolar Gap = Measured (' + d.Osmolality.toFixed(0) + ') − Calculated (2×Na ' + (2*d.Na).toFixed(0) + ' + Glucose ' + d.Glucose.toFixed(1) + ' + Urea ' + d.Urea.toFixed(0) + ')<br/>';
-    h += 'Osmolar Gap = ' + osm_gap.toFixed(0) + ' mOsm/kg<br/>';
-    if (osm_gap > 10) {
-        h += '🔴 <strong>ELEVATED (>10):</strong> Unmeasured osmoles present (toxic alcohols: methanol, ethylene glycol, isopropanol)<br/>';
-    } else if (osm_gap > 5) {
-        h += '🟡 <strong>BORDERLINE (5-10):</strong> Consider unmeasured osmoles, but could be normal variation';
-    } else {
-        h += '🟢 <strong>NORMAL (<5):</strong> Accounted osmoles only';
-    }
-    h += '</div></div>';
-    return h;
-}
-
-function buildFigge(d, pred_pH) {
-    let h = '<div class="analysis-section"><div class="section-title">Figge-Fencl: Unmeasured Ions Detection & Management</div>';
-    
-    // Calculate SID-based unmeasured ion burden
-    const current_SID_figge = (d.Na + d.K + 2*d.iCa) - (d.Cl + d.Lactate);
-    const target_pH_figge = 7.35;
-    const current_Atot_figge = (d.Albumin/10) * (0.123 * d.pH - 0.631) + (d.PO4/10) * (0.309 * d.pH - 0.469);
-    const required_SID_figge = 38 + ((target_pH_figge - 7.4 - 0.04*(current_Atot_figge-18) + 0.084*((d.pCO2-40)/7.5)) / 0.16);
-    const unmeasured_ion_burden = required_SID_figge - current_SID_figge;
-    
-    h += '<div class="step-box"><strong>Predicted vs Measured pH</strong><br/>Predicted: ' + pred_pH.toFixed(2) + ' | Measured: ' + d.pH.toFixed(2) + ' | Δ: ' + (d.pH - pred_pH).toFixed(3) + '<br/>';
-    
-    if (Math.abs(d.pH - pred_pH) > 0.1) {
-        h += '⚠️ <strong>UNMEASURED IONS PRESENT</strong><br/>';
-        h += '<strong style="color: var(--accent-normal); display: block; margin-top: 8px;">Unmeasured Ion Burden:</strong><br/>';
-        h += '• <strong>SID deficit accounted by unmeasured ions:</strong> ~' + Math.abs(unmeasured_ion_burden).toFixed(1) + ' mEq/L<br/>';
-        h += '• ' + (unmeasured_ion_burden > 0 ? '🔴 <strong>Unmeasured ANIONS present</strong> (negative ions like PO4, SO4, organic acids)' : '🔵 <strong>Unmeasured CATIONS present</strong> (positive ions like Ca, Mg)') + '<br/>';
-        h += '<strong style="color: var(--accent-normal); display: block; margin-top: 12px;">Investigation & Management:</strong><br/>';
-        h += '• <strong>Measure:</strong> Serum calcium, magnesium, phosphate, sulfate<br/>';
-        h += '• <strong>Consider causes:</strong> ' + (unmeasured_ion_burden > 0 ? 'High phosphate (renal failure), sulfate (renal failure), organic acidosis' : 'Hypermagnesaemia (laxatives, renal failure), hypercalcaemia, hyperparathyroidism') + '<br/>';
-        h += '• <strong>Management:</strong> Address underlying cause while correcting measured SID/ventilation<br/>';
-        h += '• <strong>Note:</strong> These unmeasured ions account for ~' + Math.abs(unmeasured_ion_burden).toFixed(1) + ' mEq of the pH discrepancy—correct them to fully resolve acidosis';
-    } else {
-        h += '✓ <strong>MEASURED IONS EXPLAIN pH</strong><br/>No significant unmeasured ion effect (Δ pH <0.1). Proceed with SID and ventilation management based on Hughes & Brain and Stewart analyses.';
-    }
-    h += '</div></div>';
-    return h;
-}
-
-window.onload = initCases;
-</script>
 </body>
 </html>
