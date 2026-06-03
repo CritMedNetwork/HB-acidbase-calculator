@@ -375,7 +375,6 @@ function buildHughesBrain(d, BE, AG, AGc, acid) {
         h += '<div style="padding: 12px; margin-bottom: 12px; background: rgba(94, 234, 212, 0.1); border-left: 3px solid var(--accent-safe); border-radius: 4px; font-size: 0.9rem;"><strong style="color: var(--accent-safe);">✓ COMPENSATED – EXCELLENT RESPIRATORY RESPONSE:</strong> pH near-normal despite metabolic alkalosis, suggesting strong respiratory compensation (low pCO2). Patient is compensating well. Focus on addressing underlying cause (GI losses, diuretics, etc.).</div>';
     }
     
-    const calc_osm = (2 * d.Na) + (d.Glucose / 18) + (d.Urea / 2.8) + 10;
     if (d.Osmolality && Math.abs(d.Osmolality - calc_osm) > 10) {
         const osm_gap = d.Osmolality - calc_osm;
         // Estimate lactate contribution to osmolar gap: ~1 mOsm per 4 mmol/L lactate
@@ -940,9 +939,9 @@ function buildTraditional(d, AG, AGc, BE, acid) {
     h += '</div>';
     
     h += '<div class="step-box"><strong>OSMOLAR GAP (if measured osmolality available)</strong><br/>';
-    const calc_osm = (2 * d.Na) + d.Glucose + d.Urea;
-    const osm_gap = d.Osmolality - calc_osm;
-    h += 'Osmolar Gap = Measured (' + d.Osmolality.toFixed(0) + ') − Calculated (2×Na ' + (2*d.Na).toFixed(0) + ' + Glucose ' + d.Glucose.toFixed(1) + ' + Urea ' + d.Urea.toFixed(0) + ')<br/>';
+    const calc_osm_trad = (2 * d.Na) + (d.Glucose / 18) + (d.Urea / 2.8) + 10;
+    const osm_gap = d.Osmolality - calc_osm_trad;
+    h += 'Osmolar Gap = Measured (' + d.Osmolality.toFixed(0) + ') − Calculated (2×Na ' + (2*d.Na).toFixed(0) + ' + Glucose/18 ' + (d.Glucose/18).toFixed(1) + ' + Urea/2.8 ' + (d.Urea/2.8).toFixed(1) + ')<br/>';
     h += 'Osmolar Gap = ' + osm_gap.toFixed(0) + ' mOsm/kg<br/>';
     if (osm_gap > 10) {
         h += '🔴 <strong>ELEVATED (>10):</strong> Unmeasured osmoles present (toxic alcohols: methanol, ethylene glycol, isopropanol)<br/>';
