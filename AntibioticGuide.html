@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antibiotic Lookup by Site </title>
+    <title>Antibiotic Lookup by Site | Configurable Pharmacy</title>
     <style>
         * {
             margin: 0;
@@ -284,11 +284,21 @@
             border: 1px solid #bdc3c7;
             padding: 12px;
             text-align: left;
+            vertical-align: top;
         }
 
         th {
             background-color: #34495e;
             color: white;
+            font-weight: 600;
+        }
+
+        th:first-child {
+            min-width: 140px;
+        }
+
+        td:first-child {
+            min-width: 140px;
             font-weight: 600;
         }
 
@@ -298,6 +308,24 @@
 
         tr:hover {
             background-color: #e8f4f8;
+        }
+
+        .broadest-drug {
+            color: #27ae60 !important;
+            font-weight: 700;
+        }
+
+        .broadest-drug .drug-link {
+            color: #27ae60 !important;
+        }
+
+        .widest-drug {
+            color: #ff4500 !important;
+            font-weight: 700;
+        }
+
+        .widest-drug .drug-link {
+            color: #ff4500 !important;
         }
 
         .beta-lactam { color: #2c3e50; font-weight: 500; }
@@ -498,14 +526,6 @@
 </div>
 
 <div class="content">
-    <div class="legend">
-        <h3>📋 Legend & Key Principles</h3>
-        <div class="legend-item"><strong>‡</strong> Limited CNS penetration — verify for meningitis</div>
-        <div class="legend-item"><strong>△</strong> Consult Infectious Diseases specialist</div>
-        <div class="legend-item"><strong>*</strong> nmMRSA: Lincomycin may be preferred; mrMRSA: Vancomycin recommended</div>
-        <div class="legend-item"><strong>—</strong> Organism rarely implicated or not routinely indicated</div>
-    </div>
-
     <table id="mainTable">
         <thead>
             <tr>
@@ -525,6 +545,17 @@
 
     <div class="dosing-reference" id="dosingReference">
         <!-- Dosing modals will be populated here -->
+    </div>
+
+    <div class="legend" style="margin-top: 40px;">
+        <h3>📋 Legend & Key Principles</h3>
+        <div class="legend-item"><strong style="color: #27ae60;">🟢 Green Text [Under Site]</strong> Antibiotic covering the MOST pathogens at that site (broadest spectrum for that location)</div>
+        <div class="legend-item"><strong style="color: #ff4500;">🟠 Orange-Red Text [Under Organism]</strong> Antibiotic used for the MOST sites for that pathogen (most versatile for that bug)</div>
+        <div class="legend-item"><strong>How to use:</strong> Pick a row (site) → look for green drug (broadest options). Pick a column (pathogen) → look for orange-red drug (most sites covered).</div>
+        <div class="legend-item"><strong>‡</strong> Limited CNS penetration — verify for meningitis</div>
+        <div class="legend-item"><strong>△</strong> Consult Infectious Diseases specialist</div>
+        <div class="legend-item"><strong>*</strong> nmMRSA: Lincomycin may be preferred; mrMRSA: Vancomycin recommended</div>
+        <div class="legend-item"><strong>—</strong> Organism rarely implicated or not routinely indicated</div>
     </div>
 </div>
 
@@ -746,13 +777,73 @@ function renderTable() {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
 
-    for (const [site, pathogens] of Object.entries(tableData)) {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td><strong>${site}</strong></td>`;
+    const pathogens = ['Streptococci', 'MSSA', 'MRSA', 'Enterococci', 'Enterobacteriaceae', 'Pseudomonas', 'Atypicals'];
 
-        for (const pathogen of ['Streptococci', 'MSSA', 'MRSA', 'Enterococci', 'Enterobacteriaceae', 'Pseudomonas', 'Atypicals']) {
-            const drugs = pathogens[pathogen];
+    // Calculate broadest antibiotic per ROW (site)
+    const broadestPerSite = {};
+    for (const [site, pathogenData] of Object.entries(tableData)) {
+        const drugCounts = {};
+        
+        for (const pathogen of pathogens) {
+            const drugs = pathogenData[pathogen];
+            if (drugs !== '—' && Array.isArray(drugs)) {
+                const filtered = drugs.filter(d => availableAntibiotics.includes(d));
+                filtered.forEach(drug => {
+                    drugCounts[drug] = (drugCounts[drug] || 0) + 1;
+                });
+            }
+        }
+
+        // Find drug with highest count
+        let broadestDrug = null;
+        let maxCount = 0;
+        for (const [drug, count] of Object.entries(drugCounts)) {
+            if (count > maxCount) {
+                maxCount = count;
+                broadestDrug = drug;
+            }
+        }
+        broadestPerSite[site] = broadestDrug;
+    }
+
+    // Calculate widest antibiotic per COLUMN (pathogen)
+    const widestPerPathogen = {};
+    for (const pathogen of pathogens) {
+        const drugCounts = {};
+        
+        for (const [site, pathogenData] of Object.entries(tableData)) {
+            const drugs = pathogenData[pathogen];
+            if (drugs !== '—' && Array.isArray(drugs)) {
+                const filtered = drugs.filter(d => availableAntibiotics.includes(d));
+                filtered.forEach(drug => {
+                    drugCounts[drug] = (drugCounts[drug] || 0) + 1;
+                });
+            }
+        }
+
+        // Find drug with highest count
+        let widestDrug = null;
+        let maxCount = 0;
+        for (const [drug, count] of Object.entries(drugCounts)) {
+            if (count > maxCount) {
+                maxCount = count;
+                widestDrug = drug;
+            }
+        }
+        widestPerPathogen[pathogen] = widestDrug;
+    }
+
+    // Render rows
+    for (const [site, pathogens_data] of Object.entries(tableData)) {
+        const row = document.createElement('tr');
+        const broadest = broadestPerSite[site];
+        const siteLabel = broadest ? `<strong>${site}</strong><br/><span style="font-size: 12px; color: #27ae60; font-weight: 600;">[${broadest}]</span>` : `<strong>${site}</strong>`;
+        row.innerHTML = `<td>${siteLabel}</td>`;
+
+        for (const pathogen of pathogens) {
+            const drugs = pathogens_data[pathogen];
             let html = '';
+            let cellClass = '';
 
             if (drugs === '—') {
                 html = '<span style="color: #95a5a6;">—</span>';
@@ -763,7 +854,18 @@ function renderTable() {
                 } else {
                     html = filtered.map(drug => {
                         const drugClass = getdrugClass(drug);
-                        return `<span class="${drugClass}"><a class="drug-link" onclick="openDrugModal('${drug}')">${drug}</a></span>`;
+                        let highlight = '';
+                        
+                        // Check if this is the broadest drug for this row
+                        if (drug === broadest) {
+                            highlight = ' broadest-drug';
+                        }
+                        // Check if this is the widest drug for this column
+                        if (drug === widestPerPathogen[pathogen]) {
+                            highlight = ' widest-drug';
+                        }
+                        
+                        return `<span class="${drugClass}${highlight}"><a class="drug-link" onclick="openDrugModal('${drug}')">${drug}</a></span>`;
                     }).join(', ');
                 }
             }
@@ -775,6 +877,17 @@ function renderTable() {
 
         tbody.appendChild(row);
     }
+
+    // Update column headers with widest drugs
+    const thead = document.querySelector('table thead tr');
+    const headers = Array.from(thead.querySelectorAll('th'));
+    
+    pathogens.forEach((pathogen, index) => {
+        const widest = widestPerPathogen[pathogen];
+        if (widest && index < pathogens.length) {
+            headers[index + 1].innerHTML = `${pathogen}<br/><span style="font-size: 12px; color: #ff4500; font-weight: 600;">[${widest}]</span>`;
+        }
+    });
 }
 
 function getdrugClass(drug) {
