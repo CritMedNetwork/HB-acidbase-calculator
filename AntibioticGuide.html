@@ -3,177 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antibiotics by Site of Infection & Likely Pathogen - With Dosing Modals</title>
+    <title>Antibiotic Lookup by Site | Configurable Pharmacy</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
             padding: 20px;
-            background: #f5f5f5;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #1a3a52;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 13px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        thead {
-            background: #1a3a52;
-            color: white;
-        }
-        th {
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            border: 1px solid #0d1f2d;
-            font-size: 13px;
-        }
-        th.site-header {
-            min-width: 140px;
-            width: 140px;
-        }
-        th.pathogen-header {
-            min-width: 130px;
-        }
-        td {
-            padding: 12px 8px;
-            border: 1px solid #ddd;
-            font-size: 13px;
-            vertical-align: top;
-        }
-        td.site-cell {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #1a3a52;
-            width: 140px;
-            min-width: 140px;
-        }
-        /* Color-coded antibiotic classes */
-        .beta-lactam {
-            color: #2c5aa0;
-        }
-        .glycopeptide {
-            color: #6f2da8;
-        }
-        .linezolid {
-            color: #d4752d;
-        }
-        .fluoroquinolone {
-            color: #2d8b6f;
-        }
-        .macrolide {
-            color: #8b2d2d;
-        }
-        .aminoglycoside {
-            color: #d4752d;
-        }
-        .anaerobe {
-            color: #c75d4a;
-        }
-        /* Clickable antibiotic link */
-        .drug-link {
-            cursor: pointer;
-            text-decoration: underline;
-            font-weight: 500;
-            transition: opacity 0.2s;
-        }
-        .drug-link:hover {
-            opacity: 0.7;
-            text-decoration: none;
-        }
-        /* CNS penetration warning */
-        .limited-cns::after {
-            content: "‡";
-            color: #d32f2f;
-            font-weight: bold;
-            margin-left: 2px;
-        }
-        /* ID consultation flag */
-        .consult-id::before {
-            content: "△ ";
-            color: #f57c00;
-            font-weight: bold;
-        }
-        /* nmMRSA distinction */
-        .mrsa-note {
-            font-size: 11px;
-            color: #d32f2f;
-            font-style: italic;
-            margin-top: 4px;
-            display: block;
-        }
-        /* Legend section */
-        .legend {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 6px;
-        }
-        .legend-title {
-            grid-column: 1 / -1;
-            font-weight: 600;
-            color: #1a3a52;
-            margin-bottom: 10px;
-        }
-        .legend-item {
+
+        .header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-        }
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin-right: 8px;
-        }
-        /* Footnotes */
-        .footnotes {
-            background: #f8f9fa;
+            margin-bottom: 30px;
+            background: white;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2c3e50;
+        }
+
+        .pharmacy-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
             border-radius: 6px;
-            border-left: 4px solid #1a3a52;
-            margin-bottom: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
         }
-        .footnote {
-            margin-bottom: 10px;
-            font-size: 13px;
-            line-height: 1.5;
+
+        .pharmacy-btn:hover {
+            background-color: #2980b9;
         }
-        .footnote:last-child {
-            margin-bottom: 0;
+
+        .pharmacy-btn.active {
+            background-color: #e74c3c;
         }
-        .footnote-symbol {
-            font-weight: bold;
-            margin-right: 8px;
-            display: inline-block;
-            min-width: 20px;
-        }
+
         /* Modal Styles */
         .modal {
             display: none;
@@ -183,1553 +63,935 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s;
+            background-color: rgba(0,0,0,0.4);
+            overflow-y: auto;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .modal-content {
             background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 8px;
             width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
+            max-width: 1000px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s;
+            padding: 30px;
         }
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+
         .modal-header {
-            border-bottom: 2px solid #1a3a52;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
             padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+
+        .filter-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
             margin-bottom: 20px;
         }
-        .modal-header h2 {
-            color: #1a3a52;
-            margin-bottom: 5px;
+
+        .filter-section {
+            display: flex;
+            flex-direction: column;
         }
-        .modal-header .drug-class {
-            font-size: 12px;
-            color: #666;
-            font-style: italic;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .close:hover,
-        .close:focus {
-            color: #1a3a52;
-        }
-        .dosing-section {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        .dosing-section:last-child {
-            border-bottom: none;
-        }
-        .dosing-section h3 {
-            color: #1a3a52;
-            margin-bottom: 10px;
-            font-size: 14px;
-            background: #f8f9fa;
-            padding: 8px;
-            border-left: 3px solid #2c5aa0;
-            border-radius: 3px;
-        }
-        .dosing-item {
+
+        .filter-section h3 {
+            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 12px;
-            padding-left: 15px;
-            line-height: 1.6;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .filter-section.available h3 {
+            color: #27ae60;
+        }
+
+        .filter-section.unavailable h3 {
+            color: #e74c3c;
+        }
+
+        .antibiotics-list {
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #fafafa;
+        }
+
+        .antibiotics-list.available {
+            border-color: #27ae60;
+            background-color: #f0fdf4;
+        }
+
+        .antibiotics-list.unavailable {
+            border-color: #e74c3c;
+            background-color: #fef2f2;
+        }
+
+        .antibiotic-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: grab;
+            font-size: 13px;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .antibiotic-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .antibiotic-tag.available {
+            background-color: #d4edda;
+            border-color: #27ae60;
+            color: #155724;
+        }
+
+        .antibiotic-tag.unavailable {
+            background-color: #f8d7da;
+            border-color: #e74c3c;
+            color: #721c24;
+        }
+
+        .antibiotic-tag:active {
+            cursor: grabbing;
+        }
+
+        .move-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .move-btn:hover {
+            opacity: 0.7;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .btn-primary {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #229954;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+
+        .legend h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .legend-item {
+            margin: 5px 0;
             font-size: 13px;
         }
-        .dosing-item strong {
-            color: #1a3a52;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
         }
-        .dosing-note {
+
+        th, td {
+            border: 1px solid #bdc3c7;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        tr:hover {
+            background-color: #e8f4f8;
+        }
+
+        .beta-lactam { color: #2c3e50; font-weight: 500; }
+        .glycopeptide { color: #8e44ad; font-weight: 500; }
+        .oxazolidinone { color: #c0392b; font-weight: 500; }
+        .fluoroquinolone { color: #d35400; font-weight: 500; }
+        .macrolide { color: #16a085; font-weight: 500; }
+        .anaerobe { color: #7f8c8d; font-weight: 500; }
+
+        .drug-link {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .drug-link:hover {
+            color: #2980b9;
+        }
+
+        .drug-dosing-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .drug-dosing-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drug-modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .drug-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+
+        .drug-modal-header h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .drug-class {
             font-size: 12px;
-            color: #666;
+            color: #7f8c8d;
             font-style: italic;
-            margin-top: 15px;
-            padding: 10px;
-            background: #fffacd;
-            border-left: 3px solid #f57c00;
-            border-radius: 3px;
+            margin-top: 5px;
         }
-        .info-box {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+
+        .dosing-section {
             margin-bottom: 20px;
         }
-        .info-section {
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #1a3a52;
-        }
-        .info-section h3 {
-            color: #1a3a52;
-            margin-bottom: 10px;
+
+        .dosing-section h3 {
             font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            border-left: 3px solid #3498db;
+            padding-left: 10px;
         }
-        .info-section ul {
-            margin-left: 20px;
-            font-size: 12px;
+
+        .dosing-item {
+            font-size: 13px;
             line-height: 1.6;
+            margin-bottom: 8px;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
         }
-        .info-section li {
-            margin-bottom: 6px;
+
+        .dosing-note {
+            background-color: #fffbea;
+            border-left: 3px solid #f39c12;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 13px;
         }
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                padding: 0;
-            }
-            .modal {
-                display: none !important;
-            }
+
+        .close-drug-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s;
         }
-        @media (max-width: 1024px) {
-            .container {
-                padding: 15px;
+
+        .close-drug-modal:hover {
+            color: #e74c3c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .filter-container {
+                grid-template-columns: 1fr;
             }
-            th, td {
-                padding: 8px 6px;
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            table {
                 font-size: 12px;
             }
-            .modal-content {
-                width: 95%;
-                margin: 20% auto;
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        @media print {
+            .header, .pharmacy-btn, .modal {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Antibiotics by Site of Infection & Likely Pathogen</h1>
-        <p class="subtitle">Select empiric options; local resistance & patient factors apply | Click any antibiotic for dosing</p>
 
-        <!-- Legend -->
-        <div class="legend">
-            <div class="legend-title">Antibiotic Classes (Color Key) — Click drug names for full dosing</div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #2c5aa0;"></div>
-                <span><strong>Beta-lactams</strong> (Penicillins, Cephalosporins, Carbapenems, Monobactams)</span>
+<div class="header">
+    <h1>🏥 Antibiotic Lookup by Site & Pathogen</h1>
+    <button class="pharmacy-btn" onclick="openPharmacyFilter()">⚙️ My Pharmacy</button>
+</div>
+
+<!-- Pharmacy Filter Modal -->
+<div id="pharmacyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Configure Available Antibiotics</h2>
+            <button class="close-btn" onclick="closePharmacyFilter()">&times;</button>
+        </div>
+
+        <p style="margin-bottom: 20px; color: #555; font-size: 14px;">
+            <strong>Drag or use buttons to move antibiotics</strong> between "Available" (shown in guide) and "Not Available" (hidden from guide).
+        </p>
+
+        <div class="filter-container">
+            <div class="filter-section available">
+                <h3>✅ Available at My Pharmacy</h3>
+                <div id="availableList" class="antibiotics-list available"></div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #6f2da8;"></div>
-                <span><strong>Glycopeptides / Lipoglycopeptides</strong></span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #d4752d;"></div>
-                <span><strong>Oxazolidinones & Linezolid</strong></span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #2d8b6f;"></div>
-                <span><strong>Fluoroquinolones</strong></span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #8b2d2d;"></div>
-                <span><strong>Macrolides</strong></span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #c75d4a;"></div>
-                <span><strong>Anaerobes</strong> (Bacteroides, Peptostreptococcus, Clostridium spp.)</span>
+
+            <div class="filter-section unavailable">
+                <h3>❌ Not Available</h3>
+                <div id="unavailableList" class="antibiotics-list unavailable"></div>
             </div>
         </div>
 
-        <!-- Footnotes -->
-        <div class="footnotes">
-            <div class="footnote">
-                <span class="footnote-symbol">‡</span>
-                <strong>Limited CNS penetration.</strong> Verify suitability for meningitis/encephalitis/CNS infections before use.
-            </div>
-            <div class="footnote">
-                <span class="footnote-symbol">△</span>
-                <strong>Consult Infectious Diseases specialist.</strong> Complex condition or risk factors warrant ID input.
-            </div>
-            <div class="footnote">
-                <span class="footnote-symbol">*</span>
-                <strong>nmMRSA distinction:</strong> If non-multi-resistant MRSA risk only, Lincomycin may be preferred over Vancomycin. If full multi-resistant MRSA (mrMRSA) suspected, Vancomycin recommended.
-            </div>
-            <div class="footnote">
-                <span class="footnote-symbol">—</span>
-                <strong>Organism rarely implicated at this site or therapy not routinely indicated.</strong>
-            </div>
-        </div>
-
-        <!-- Main Table -->
-        <table>
-            <thead>
-                <tr>
-                    <th class="site-header">Site of Infection (Location)</th>
-                    <th class="pathogen-header">Streptococci<br/>(incl. S. pneumoniae, S. pyogenes, viridans group)</th>
-                    <th class="pathogen-header">Staphylococcus aureus (MSSA)</th>
-                    <th class="pathogen-header">Staphylococcus aureus (MRSA)*</th>
-                    <th class="pathogen-header">Enterococci<br/>(E. faecalis, most common)</th>
-                    <th class="pathogen-header">Enterobacteriaceae<br/>(E. coli, Klebsiella, Proteus, Enterobacter, Citrobacter, Serratia)</th>
-                    <th class="pathogen-header">Pseudomonas aeruginosa</th>
-                    <th class="pathogen-header">Atypicals<br/>(Mycoplasma, Chlamydia, Legionella)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- CNS / Meningitis -->
-                <tr>
-                    <td class="site-cell consult-id">CNS / Meningitis<br/>(Community acquired)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('penicillin-g')">Penicillin G</span> (if susceptible)</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefotaxime')">Cefotaxime</span></span><br/>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span> (if resistant)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('nafcillin')">Nafcillin</span> / Oxacillin</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefazolin')">Cefazolin</span></span><br/>
-                        <span class="beta-lactam limited-cns">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span> (alternative)</span>
-                    </td>
-                    <td>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('linezolid')">Linezolid</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('daptomycin')">Daptomycin</span></span><span class="mrsa-note">If mrMRSA; if nmMRSA only, consider Lincomycin</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ampicillin')">Ampicillin</span> (E. faecalis)</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span> (synergy)</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefotaxime')">Cefotaxime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('meropenem')">Meropenem</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftazidime')">Ceftazidime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span>
-                    </td>
-                    <td>—</td>
-                </tr>
-
-                <!-- Ear (Otitis Media / Externa) -->
-                <tr>
-                    <td class="site-cell">Ear (Otitis Media /<br/>Externa)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin')">Amoxicillin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('penicillin-v')">Penicillin V</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefdinir')">Cefdinir</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('dicloxacillin')">Dicloxacillin</span> / Flucloxacillin</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cephalexin')">Cephalexin</span></span>
-                    </td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin-clavulanate')">Amoxicillin-clavulanate</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefdinir')">Cefdinir</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('levofloxacin')">Levofloxacin</span> (if needed)</span>
-                    </td>
-                    <td>—</td>
-                    <td>—</td>
-                </tr>
-
-                <!-- Sinus / Upper Respiratory -->
-                <tr>
-                    <td class="site-cell">Sinus / Upper<br/>Respiratory<br/>(Sinusitis, Pharyngitis)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin')">Amoxicillin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin-clavulanate')">Amoxicillin-clavulanate</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefdinir')">Cefdinir</span> / Cefuroxime</span>
-                    </td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin-clavulanate')">Amoxicillin-clavulanate</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span> (alternative)</span>
-                    </td>
-                    <td>—</td>
-                    <td>
-                        <span class="macrolide">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span></span><br/>
-                        <span class="macrolide">• <span class="drug-link" onclick="openModal('azithromycin')">Azithromycin</span></span><br/>
-                        <span class="macrolide">• <span class="drug-link" onclick="openModal('clarithromycin')">Clarithromycin</span></span>
-                    </td>
-                </tr>
-
-                <!-- Lower Respiratory (CAP, HAP, Aspiration) -->
-                <tr>
-                    <td class="site-cell">Lower Respiratory<br/>(CAP, HAP, Aspiration)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('levofloxacin')">Levofloxacin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin')">Amoxicillin</span> (if mild)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefazolin')">Cefazolin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('nafcillin')">Nafcillin</span> / Oxacillin</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin-clavulanate')">Amoxicillin-clavulanate</span></span>
-                    </td>
-                    <td>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('linezolid')">Linezolid</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ampicillin')">Ampicillin</span> (rare)</span><br/>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span> (VRE risk)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('levofloxacin')">Levofloxacin</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftazidime')">Ceftazidime</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('levofloxacin')">Levofloxacin</span></span>
-                    </td>
-                    <td>
-                        <span class="macrolide">• <span class="drug-link" onclick="openModal('azithromycin')">Azithromycin</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('levofloxacin')">Levofloxacin</span></span><br/>
-                        <span class="macrolide">• <span class="drug-link" onclick="openModal('moxifloxacin')">Moxifloxacin</span></span>
-                    </td>
-                </tr>
-
-                <!-- Oral / Dental -->
-                <tr>
-                    <td class="site-cell">Oral / Dental<br/>(Including aspiration risk)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('penicillin-v')">Penicillin V</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin')">Amoxicillin</span></span><br/>
-                        <span class="beta-lactam limited-cns">• <span class="drug-link" onclick="openModal('clindamycin')">Clindamycin</span> (allergy)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('dicloxacillin')">Dicloxacillin</span> / Flucloxacillin</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cephalexin')">Cephalexin</span></span>
-                    </td>
-                    <td>
-                        <span class="linezolid limited-cns">• <span class="drug-link" onclick="openModal('clindamycin')">Clindamycin</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('tmp-smx')">TMP-SMX</span></span>
-                    </td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('amoxicillin-clavulanate')">Amoxicillin-clavulanate</span></span><br/>
-                        <span class="linezolid limited-cns">• <span class="drug-link" onclick="openModal('clindamycin')">Clindamycin</span></span><br/>
-                        <span class="anaerobe">• <span class="drug-link" onclick="openModal('metronidazole')">Metronidazole</span></span>
-                    </td>
-                </tr>
-
-                <!-- Intra-abdominal / GI -->
-                <tr>
-                    <td class="site-cell consult-id">Intra-abdominal / GI<br/>(Incl. biliary, peritonitis, diverticulitis)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ampicillin-sulbactam')">Ampicillin-sulbactam</span></span>
-                    </td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ampicillin')">Ampicillin</span></span><br/>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span> (if needed)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ertapenem')">Ertapenem</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftazidime')">Ceftazidime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('meropenem')">Meropenem</span></span>
-                    </td>
-                    <td>
-                        <span class="anaerobe">• <span class="drug-link" onclick="openModal('metronidazole')">Metronidazole</span></span><br/>
-                        <span class="anaerobe">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span><br/>
-                        <span class="anaerobe">• <span class="drug-link" onclick="openModal('ertapenem')">Ertapenem</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('ertapenem')">Ertapenem</span></span>
-                    </td>
-                </tr>
-
-                <!-- Bladder / Lower UTI -->
-                <tr>
-                    <td class="site-cell">Bladder / Lower UTI<br/>(Cystitis)</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('nitrofurantoin')">Nitrofurantoin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('fosfomycin')">Fosfomycin</span></span><br/>
-                        <span class="beta-lactam">(E. faecalis only)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('nitrofurantoin')">Nitrofurantoin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('tmp-smx')">TMP-SMX</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('fosfomycin')">Fosfomycin</span></span><br/>
-                        <span class="beta-lactam">• Pivmecillinam (where available)</span>
-                    </td>
-                    <td>—</td>
-                    <td>—</td>
-                </tr>
-
-                <!-- Pyelonephritis / Upper UTI -->
-                <tr>
-                    <td class="site-cell">Pyelonephritis / Upper UTI</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ampicillin')">Ampicillin</span></span><br/>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span> (if needed)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('ciprofloxacin')">Ciprofloxacin</span> / <span class="drug-link" onclick="openModal('levofloxacin')">Levofloxacin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('tmp-smx')">TMP-SMX</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span>
-                    </td>
-                    <td>—</td>
-                    <td>—</td>
-                </tr>
-
-                <!-- Skin & Soft Tissue -->
-                <tr>
-                    <td class="site-cell">Skin & Soft Tissue<br/>(Cellulitis, Abscess, Diabetic Foot)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('penicillin-v')">Penicillin V</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cephalexin')">Cephalexin</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('dicloxacillin')">Dicloxacillin</span> / Flucloxacillin</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefazolin')">Cefazolin</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cephalexin')">Cephalexin</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('tmp-smx')">TMP-SMX</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span></span><br/>
-                        <span class="linezolid limited-cns">• <span class="drug-link" onclick="openModal('clindamycin')">Clindamycin</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('linezolid')">Linezolid</span></span>
-                    </td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('tmp-smx')">TMP-SMX</span> (wounds)</span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('ciprofloxacin')">Ciprofloxacin</span></span><br/>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('ciprofloxacin')">Ciprofloxacin</span> (select cases)</span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ciprofloxacin')">Ciprofloxacin</span> (sweat / burns)</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span>
-                    </td>
-                    <td>—</td>
-                </tr>
-
-                <!-- Bone & Joint -->
-                <tr>
-                    <td class="site-cell consult-id">Bone & Joint<br/>(Osteomyelitis, Septic Arthritis)</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('penicillin-g')">Penicillin G</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('nafcillin')">Nafcillin</span> / Oxacillin</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefazolin')">Cefazolin</span></span>
-                    </td>
-                    <td>
-                        <span class="glycopeptide">• <span class="drug-link" onclick="openModal('vancomycin')">Vancomycin</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('daptomycin')">Daptomycin</span></span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('linezolid')">Linezolid</span></span><span class="mrsa-note">If mrMRSA; if nmMRSA only, consider Lincomycin</span>
-                    </td>
-                    <td>—</td>
-                    <td>
-                        <span class="fluoroquinolone">• <span class="drug-link" onclick="openModal('ciprofloxacin')">Ciprofloxacin</span></span><br/>
-                        <span class="fluoroquinolone">(Gram-negative osteo)</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span>
-                    </td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftazidime')">Ceftazidime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefepime')">Cefepime</span></span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('piperacillin-tazobactam')">Piperacillin-tazobactam</span></span>
-                    </td>
-                    <td>—</td>
-                </tr>
-
-                <!-- Pelvic / STI -->
-                <tr>
-                    <td class="site-cell">Pelvic / STI<br/>(PID, Gonorrhea, Chlamydia)</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('ceftriaxone')">Ceftriaxone</span> (Gonorrhea)</span><br/>
-                        <span class="beta-lactam">• <span class="drug-link" onclick="openModal('cefixime')">Cefixime</span> (PID)</span><br/>
-                        <span class="macrolide">• <span class="drug-link" onclick="openModal('doxycycline')">Doxycycline</span></span><br/>
-                        <span class="macrolide">(PID partner coverage)</span>
-                    </td>
-                    <td>—</td>
-                    <td>
-                        <span class="anaerobe">• <span class="drug-link" onclick="openModal('metronidazole')">Metronidazole</span> (PID)</span><br/>
-                        <span class="linezolid">• <span class="drug-link" onclick="openModal('clindamycin')">Clindamycin</span></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Info Boxes -->
-        <div class="info-box">
-            <div class="info-section">
-                <h3>KEY PRINCIPLES</h3>
-                <ul>
-                    <li>Use narrowest effective spectrum</li>
-                    <li>Reassess at 48 hours</li>
-                    <li>De-escalate when possible</li>
-                    <li>Duration depends on site & severity</li>
-                </ul>
-            </div>
-            <div class="info-section">
-                <h3>NOTES</h3>
-                <ul>
-                    <li>Chart shows common empiric antibiotic choices for likely pathogens by site</li>
-                    <li>Local resistance & patient factors apply</li>
-                    <li><strong>Click any antibiotic name</strong> for pediatric & adult dosing information</li>
-                </ul>
-            </div>
-            <div class="info-section">
-                <h3>ABBREVIATIONS</h3>
-                <ul>
-                    <li>CAP = Community-Acquired Pneumonia</li>
-                    <li>HAP = Hospital-Acquired Pneumonia</li>
-                    <li>VRE = Vancomycin-Resistant Enterococcus</li>
-                    <li>PID = Pelvic Inflammatory Disease</li>
-                    <li>UTI = Urinary Tract Infection</li>
-                    <li>MRSA/nmMRSA = (Multi-)Resistant Staphylococcus aureus</li>
-                </ul>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MODALS START HERE -->
-
-    <!-- Ampicillin Modal -->
-    <div id="ampicillinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ampicillin')">&times;</span>
-            <div class="modal-header">
-                <h2>Ampicillin</h2>
-                <div class="drug-class">Beta-lactam (Penicillin group) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Community-acquired pneumonia (Neonates):</strong><br/>50 mg/kg/dose every 6–12 hours; refer to neonatal dosing section</div>
-                <div class="dosing-item"><strong>Pyelonephritis/Urosepsis (>1 month):</strong><br/>50 mg/kg/dose IV every 6 hours (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Sepsis (Neonatal):</strong><br/>0–7 days: 50 mg/kg/dose every 12 hours<br/>8–28 days: 50 mg/kg/dose every 8 hours</div>
-                <div class="dosing-item"><strong>Intra-abdominal/GI infections (>1 month):</strong><br/>50 mg/kg/dose every 6 hours (maximum 2 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Respiratory — Birth to 1 week:</strong><br/>50 mg/kg/dose q12h (maximum 1.2 g/dose)</div>
-                <div class="dosing-item"><strong>Septicemia (if no meningitis, HiB immune):</strong><br/>25 mg/kg/dose q6h (maximum 2g/dose)</div>
-                <div class="dosing-item"><strong>Neonatal meningitis:</strong><br/>0–7 days: 50 mg/kg/dose q12h<br/>8–28 days: 50 mg/kg/dose q8h</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard IV/IM infections (pneumonia, UTI, soft tissue):</strong><br/>500 mg–1 g IV/IM every 6 hours (2–8 g/day total)</div>
-                <div class="dosing-item"><strong>Severe/serious infections:</strong><br/>2 g IV every 4–6 hours (8–12 g/day)</div>
-                <div class="dosing-item"><strong>Meningitis:</strong><br/>2 g IV every 4 hours (8–12 g/day total); some recommend up to 2 g q3h for optimal CNS penetration</div>
-                <div class="dosing-item"><strong>Endocarditis (streptococcal):</strong><br/>2–3 g IV every 4 hours (12–18 g/day)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl <50 mL/min):</strong><br/>Reduce frequency; consult guidelines for specific adjustments</div>
-            </div>
-            <div class="dosing-note">
-                <strong>TDM:</strong> Not routinely required. <strong>Half-life:</strong> ~1 hour. <strong>Renal adjustment:</strong> Yes (moderate to significant). <strong>Note:</strong> Refer to neonatal dosing sections in source guidelines for exact neonatal regimens.
-            </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="resetPharmacyDefaults()">Reset to Default</button>
+            <button class="btn-primary" onclick="closePharmacyFilter()">Done</button>
         </div>
     </div>
+</div>
 
-    <!-- Amoxicillin Modal -->
-    <div id="amoxicillinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('amoxicillin')">&times;</span>
-            <div class="modal-header">
-                <h2>Amoxicillin</h2>
-                <div class="drug-class">Beta-lactam (Penicillin group) | PO</div>
+<!-- Drug Dosing Modal -->
+<div id="drugModal" class="drug-dosing-modal">
+    <div class="drug-modal-content">
+        <div class="drug-modal-header">
+            <div>
+                <h2 id="drugName"></h2>
+                <div class="drug-class" id="drugClass"></div>
             </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Community-acquired pneumonia (>1 month, uncomplicated):</strong><br/>30 mg/kg/dose orally every 8 hours (maximum 1 g/dose)</div>
-                <div class="dosing-item"><strong>Uncomplicated UTI (>3 months):</strong><br/>Not primary first-line; prefer TMP-SMX or cefalexin</div>
-                <div class="dosing-item"><strong>Otitis media:</strong><br/>30 mg/kg/dose orally every 8 hours (maximum 1 g/dose) for 5 days</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Respiratory — 1 week to 4 years:</strong><br/>Not detailed as IV; Benzylpenicillin IV preferred</div>
-                <div class="dosing-item"><strong>Oral use:</strong><br/>Standard dosing: 30 mg/kg/dose every 8 hours</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Mild-to-moderate infections (standard):</strong><br/>500 mg orally every 8 hours (1.5 g/day) OR 875 mg twice daily</div>
-                <div class="dosing-item"><strong>Severe infections or pneumonia:</strong><br/>875 mg–1 g orally every 8 hours (2.6–3 g/day)</div>
-                <div class="dosing-item"><strong>Acute otitis media (high-dose):</strong><br/>875 mg twice daily or 500 mg three times daily</div>
-                <div class="dosing-item"><strong>Helicobacter pylori (part of triple therapy):</strong><br/>1 g orally twice daily for 10–14 days (with PPI + clarithromycin or PPI + metronidazole)</div>
-                <div class="dosing-item"><strong>Gonorrhea (single dose):</strong><br/>3 g orally as a single dose (now less commonly used due to resistance)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl <30 mL/min):</strong><br/>500 mg orally every 12 hours</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Route:</strong> Primarily oral; IV forms rarely used in adults. <strong>Bioavailability:</strong> ~80% orally (high, take with or without food). <strong>Half-life:</strong> ~1 hour. <strong>Note:</strong> Extended-release formulations (1 g once daily) available but less common in US.
-            </div>
+            <button class="close-drug-modal" onclick="closeDrugModal()">&times;</button>
         </div>
+        <div id="drugContent"></div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="legend">
+        <h3>📋 Legend & Key Principles</h3>
+        <div class="legend-item"><strong>‡</strong> Limited CNS penetration — verify for meningitis</div>
+        <div class="legend-item"><strong>△</strong> Consult Infectious Diseases specialist</div>
+        <div class="legend-item"><strong>*</strong> nmMRSA: Lincomycin may be preferred; mrMRSA: Vancomycin recommended</div>
+        <div class="legend-item"><strong>—</strong> Organism rarely implicated or not routinely indicated</div>
     </div>
 
-    <!-- Vancomycin Modal -->
-    <div id="vancomycinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('vancomycin')">&times;</span>
-            <div class="modal-header">
-                <h2>Vancomycin</h2>
-                <div class="drug-class">Glycopeptide | IV</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Meningitis (CSF penetration—Gram-positive cocci):</strong><br/>15 mg/kg/dose IV every 6 hours (maximum initial dose 750 mg). Perform TDM.</div>
-                <div class="dosing-item"><strong>CNS/Meningitis (>1 month):</strong><br/>15 mg/kg/dose IV every 6 hours; discuss with ID</div>
-                <div class="dosing-item"><strong>Community-acquired sepsis (if MRSA risk):</strong><br/>15 mg/kg every 6 hours (maximum initial 750 mg). Perform TDM.</div>
-                <div class="dosing-item"><strong>Bone & joint (if mrMRSA):</strong><br/>15 mg/kg/dose every 6 hours (maximum initial dose 750 mg). Perform TDM.</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Meningitis (if G+ cocci in CSF):</strong><br/>15 mg/kg/dose q6h (maximum 500 mg/dose)</div>
-                <div class="dosing-item"><strong>Hospital-acquired sepsis:</strong><br/>15 mg/kg/dose q8h</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard infections (intermittent dosing):</strong><br/>15–20 mg/kg IV every 8–12 hours (typical: 1–1.5 g every 8–12 h); target trough 15–20 mcg/mL</div>
-                <div class="dosing-item"><strong>Serious infections (SAE, endocarditis):</strong><br/>15–20 mg/kg IV every 6–8 hours; target trough 15–20 mcg/mL (some experts recommend 20–25 for MRSA)</div>
-                <div class="dosing-item"><strong>Meningitis (CNS penetration critical):</strong><br/>15–20 mg/kg IV every 4–6 hours (typical: 2 g every 6–8 h OR 15–20 mg/kg q4–6h for optimal CSF levels); target trough 20–25 mcg/mL (or AUC-guided: AUC 400–600 mg·h/L)</div>
-                <div class="dosing-item"><strong>Continuous IV infusion (alternative):</strong><br/>Loading dose 25–30 mg/kg, then 30–40 mg/kg/day as continuous infusion; monitor via AUC target (preferred)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>Normal renal function: standard dosing<br/>CrCl 40–60: q12h<br/>CrCl <40: reduce dose significantly (often q24–48h or longer); requires TDM guidance</div>
-            </div>
-            <div class="dosing-note">
-                <strong>TDM MANDATORY:</strong> Target trough 15–20 mcg/mL (standard) or 20–25 for serious infections/meningitis; AUC-guided dosing (target AUC 400–600 mg·h/L) now preferred. Draw trough just before 4th dose (steady-state). <strong>Half-life:</strong> 4–6 hours (normal renal function). <strong>CNS penetration:</strong> 15–30% (variable; higher with meningeal inflammation). <strong>Note:</strong> Reserve for MRSA/resistant organisms or penicillin allergy; preferred over linezolid for cost/safety.
-            </div>
-        </div>
+    <table id="mainTable">
+        <thead>
+            <tr>
+                <th>Site of Infection</th>
+                <th>Streptococci</th>
+                <th>MSSA</th>
+                <th>MRSA*</th>
+                <th>Enterococci</th>
+                <th>Enterobacteriaceae</th>
+                <th>Pseudomonas</th>
+                <th>Atypicals</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+
+    <div class="dosing-reference" id="dosingReference">
+        <!-- Dosing modals will be populated here -->
     </div>
+</div>
 
-    <!-- Ceftriaxone Modal -->
-    <div id="ceftriaxoneModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ceftriaxone')">&times;</span>
-            <div class="modal-header">
-                <h2>Ceftriaxone</h2>
-                <div class="drug-class">Beta-lactam (3rd-generation Cephalosporin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Community-acquired sepsis (non-PICU, >1 month):</strong><br/>100 mg/kg once daily (maximum 4 g/day); OR 50 mg/kg/dose every 6 hours</div>
-                <div class="dosing-item"><strong>Meningitis (>1 month):</strong><br/>100 mg/kg/dose (maximum 4 g/dose) once daily</div>
-                <div class="dosing-item"><strong>Lower respiratory (CAP, HAP, aspiration):</strong><br/>50 mg/kg/dose every 6 hours (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Intra-abdominal/GI:</strong><br/>50 mg/kg/dose every 6 hours (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Bone & Joint (alternative dosing):</strong><br/>Referenced as alternative; check full guideline for site-specific dosing</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Meningitis (if G+ cocci in CSF):</strong><br/>50 mg/kg/dose q12h (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Respiratory (severe, toxic ± O₂):</strong><br/>50 mg/kg/dose q24h (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>GI (peritonitis, cholangitis, NEC, appendicitis):</strong><br/>50 mg/kg/dose q12h (maximum 2 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard infections (respiratory, soft tissue, intra-abdominal):</strong><br/>1 g IV/IM every 12 hours OR 500 mg every 8 hours (total 2–4 g/day)</div>
-                <div class="dosing-item"><strong>Moderate-to-severe infections:</strong><br/>2 g IV every 12 hours (4 g/day total)</div>
-                <div class="dosing-item"><strong>Meningitis (excellent CNS penetration):</strong><br/>2 g IV every 12 hours (4 g/day); some use 2 g q8h for optimal CSF levels in severe meningitis</div>
-                <div class="dosing-item"><strong>Gonorrhea (single IM dose):</strong><br/>250 mg IM once (now standard for gonorrhea, often with azithromycin or doxycycline for chlamydia)</div>
-                <div class="dosing-item"><strong>Surgical prophylaxis (single preop dose):</strong><br/>1–2 g IV once (redose every 12 hours if prolonged procedure)</div>
-                <div class="dosing-item"><strong>Endocarditis (streptococcal, native valve):</strong><br/>2 g IV every 12 hours for 4 weeks</div>
-                <div class="dosing-item"><strong>Renal dosing:</strong><br/>Minimal adjustment needed (hepatic metabolism). Use normal dosing even in CrCl <10 mL/min</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent CNS/tissue penetration, long half-life (~8 hours), minimal renal adjustment needed, IV/IM option, excellent OPAT agent. <strong>Biliary excretion:</strong> ~40–60%; good for biliary infections. <strong>Note:</strong> Long half-life allows once- or twice-daily dosing, ideal for outpatient therapy.
-            </div>
-        </div>
-    </div>
+<script>
+// ============ PHARMACY FILTER LOGIC ============
 
-    <!-- Cefotaxime Modal -->
-    <div id="cefotaximeModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cefotaxime')">&times;</span>
-            <div class="modal-header">
-                <h2>Cefotaxime</h2>
-                <div class="drug-class">Beta-lactam (3rd-generation Cephalosporin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Community-acquired sepsis (non-PICU, >1 month):</strong><br/>50 mg/kg/dose IV every 6 hours (maximum 2 g/dose); review at 48 hours</div>
-                <div class="dosing-item"><strong>Meningitis (>1 month):</strong><br/>50 mg/kg/dose IV every 6 hours (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>CNS/Meningitis (>1 month):</strong><br/>Cefotaxime IV 50 mg/kg/dose every 6 hours (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Intra-abdominal/GI (peritonitis):</strong><br/>50 mg/kg/dose every 6 hours (maximum 2 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Respiratory (severe, toxic ± O₂):</strong><br/>25 mg/kg/dose q8h (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Neonatal meningitis:</strong><br/>Age-dependent; refer to neonatal dosing section</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard infections (sepsis, pneumonia, UTI):</strong><br/>1–2 g IV/IM every 8 hours (3–6 g/day total)</div>
-                <div class="dosing-item"><strong>Severe infections:</strong><br/>2 g IV every 6–8 hours (6–8 g/day)</div>
-                <div class="dosing-item"><strong>Meningitis (preferred 3rd-gen ceph for CNS penetration):</strong><br/>2 g IV every 4 hours (8 g/day) OR 2 g every 4–6 hours depending on severity (some use up to 12 g/day)</div>
-                <div class="dosing-item"><strong>Endocarditis or bacteremia:</strong><br/>2 g IV every 6–8 hours (8–12 g/day)</div>
-                <div class="dosing-item"><strong>Gynecologic infections (intra-abdominal):</strong><br/>2 g IV every 6 hours</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl 50–80: standard dosing<br/>CrCl 10–50: reduce frequency (q8–12h depending on severity)<br/>CrCl <10: q24h</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Superior CNS penetration vs. ceftriaxone (35–50% CSF penetration), excellent for meningitis, short half-life (~1 hour) requires frequent dosing. <strong>Renal adjustment:</strong> Moderate. <strong>Note:</strong> Often preferred over ceftriaxone for meningitis due to better CSF levels; hepatic metabolism (60%), renal (40%).
-            </div>
-        </div>
-    </div>
+const allAntibiotics = [
+    // Beta-lactams
+    'Ampicillin', 'Amoxicillin', 'Amoxicillin-clavulanate', 'Penicillin G', 'Penicillin V', 
+    'Nafcillin', 'Oxacillin', 'Dicloxacillin', 'Flucloxacillin',
+    'Cefazolin', 'Cephalexin', 'Cefdinir', 'Cefixime',
+    'Ceftriaxone', 'Cefotaxime', 'Ceftazidime', 'Cefepime',
+    'Piperacillin-tazobactam', 'Ampicillin-sulbactam', 'Ertapenem', 'Meropenem',
+    // Glycopeptides
+    'Vancomycin',
+    // Oxazolidinones
+    'Linezolid', 'Daptomycin',
+    // Fluoroquinolones
+    'Ciprofloxacin', 'Levofloxacin', 'Moxifloxacin',
+    // Macrolides
+    'Azithromycin', 'Clarithromycin',
+    // Aminoglycosides
+    'Gentamicin',
+    // Anaerobes & Others
+    'Clindamycin', 'Metronidazole', 'Doxycycline',
+    'TMP-SMX', 'Nitrofurantoin', 'Fosfomycin'
+];
 
-    <!-- Clindamycin Modal -->
-    <div id="clindamycinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('clindamycin')">&times;</span>
-            <div class="modal-header">
-                <h2>Clindamycin</h2>
-                <div class="drug-class">Lincosamide | IV/PO | ⚠️ Limited CNS penetration</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Oral/Dental (allergy option for penicillin-allergic):</strong><br/>Clindamycin 10 mg/kg/dose orally three times daily (maximum 600 mg/dose)</div>
-                <div class="dosing-item"><strong>Lower respiratory (PICU, if life-threatening or MRSA):</strong><br/>15 mg/kg/dose every 8 hours (maximum 1.2 g/dose)</div>
-                <div class="dosing-item"><strong>Severe cellulitis (inpatient, if nmMRSA):</strong><br/>15 mg/kg/dose IV every 8 hours (maximum 1.2 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Oral/Dental:</strong><br/>Standard pediatric dosing per age; refer to full guideline</div>
-                <div class="dosing-item"><strong>Oral aspiration (severe):</strong><br/>Clindamycin recommended for anaerobic coverage</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Mild-to-moderate infections (PO):</strong><br/>300 mg orally every 6–8 hours (1.2–1.8 g/day)</div>
-                <div class="dosing-item"><strong>Severe infections (PO):</strong><br/>450 mg orally every 6 hours (1.8 g/day)</div>
-                <div class="dosing-item"><strong>IV/IM (serious infections):</strong><br/>600–900 mg IV/IM every 6–8 hours (2.4–3.6 g/day); up to 1.2 g q4h for life-threatening</div>
-                <div class="dosing-item"><strong>Bone & joint (severe MRSA):</strong><br/>900 mg IV every 8 hours (2.7 g/day)</div>
-                <div class="dosing-item"><strong>Aspiration pneumonia (anaerobic coverage):</strong><br/>600 mg IV every 6–8 hours (2.4 g/day)</div>
-                <div class="dosing-item"><strong>Gynecologic infections:</strong><br/>600 mg IV every 6–8 hours (2.4 g/day)</div>
-                <div class="dosing-item"><strong>Pelvic inflammatory disease (PID):</strong><br/>900 mg IV every 8 hours for 24 hours after clinical improvement, then switch to PO (450 mg q6h)</div>
-                <div class="dosing-item"><strong>C. difficile colitis (pseudomembranous colitis):</strong><br/>300 mg orally four times daily for 7–10 days (now less preferred; vancomycin or fidaxomicin preferred)</div>
-                <div class="dosing-item"><strong>Renal dosing:</strong><br/>No dose adjustment needed; hepatic metabolism</div>
-            </div>
-            <div class="dosing-note">
-                <strong>⚠️ CRITICAL — Does NOT provide CNS penetration.</strong> Do NOT use as monotherapy for meningitis. <strong>Advantages:</strong> Good anaerobic coverage (Bacteroides, Peptostreptococcus, Clostridium, Prevotella), MRSA coverage, excellent oral bioavailability, IV/PO option, good skin/soft tissue penetration. <strong>Caution:</strong> C. difficile-associated diarrhea (dose/duration dependent; limit to <7–10 days); allergic cross-reactivity with erythromycin (5–10%); hepatotoxicity (rare).
-            </div>
-        </div>
-    </div>
+let availableAntibiotics = [...allAntibiotics];
+let unavailableAntibiotics = [];
 
-    <!-- Linezolid Modal -->
-    <div id="linezolid Modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('linezolid')">&times;</span>
-            <div class="modal-header">
-                <h2>Linezolid</h2>
-                <div class="drug-class">Oxazolidinone | IV/PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>MRSA coverage (alternative to vancomycin):</strong><br/>Referenced in bone/joint and other MRSA-resistant infections; exact pediatric dosing not detailed in snippet</div>
-            </div>
-            <div class="dosing-section">
-                <h3>General Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Infants & children:</strong><br/>10 mg/kg IV or PO every 8 hours (younger children may require higher mg/kg doses)</div>
-                <div class="dosing-item"><strong>Older children/adolescents:</strong><br/>600 mg IV or PO every 12 hours</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard infections (skin, soft tissue, pneumonia, VRE):</strong><br/>600 mg IV or PO every 12 hours (1.2 g/day)</div>
-                <div class="dosing-item"><strong>Bone & joint infections (MRSA):</strong><br/>600 mg IV or PO every 8 hours (1.8 g/day)</div>
-                <div class="dosing-item"><strong>Meningitis or CNS infections:</strong><br/>600 mg IV every 8 hours (1.8 g/day); good CSF penetration (60–90%)</div>
-                <div class="dosing-item"><strong>Nosocomial pneumonia (resistant Gram-negatives or MRSA):</strong><br/>600 mg IV every 12 hours (1.2 g/day)</div>
-                <div class="dosing-item"><strong>Bacteremia or endocarditis (MRSA/VRE):</strong><br/>600 mg every 8 hours; some recommend 600 mg q6h for optimal levels</div>
-                <div class="dosing-item"><strong>Renal dosing:</strong><br/>No adjustment needed; <5% renal excretion</div>
-                <div class="dosing-item"><strong>Hepatic impairment:</strong><br/>Use with caution; no formal dosing adjustments, but monitor closely</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent CNS penetration (60–90% CSF levels), 100% oral bioavailability (no IV necessary if tolerated PO), MRSA/VRE coverage, no TDM required, rapidly bactericidal. <strong>Caution:</strong> Monitor CBC baseline and weekly (thrombocytopenia, anemia with prolonged use); serotonin syndrome with SSRIs/SNRIs/MAOIs; lactic acidosis (rare, chronic use); B12 deficiency (rare). <strong>Cost:</strong> Expensive (often $100+ per dose IV). <strong>Duration:</strong> Limit to 28 days when possible.
-            </div>
-        </div>
-    </div>
+// Load from localStorage
+function loadPharmacySettings() {
+    const saved = localStorage.getItem('pharmacyAntibiotics');
+    if (saved) {
+        const { available, unavailable } = JSON.parse(saved);
+        availableAntibiotics = available;
+        unavailableAntibiotics = unavailable;
+    }
+}
 
-    <!-- Gentamicin Modal -->
-    <div id="gentamicinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('gentamicin')">&times;</span>
-            <div class="modal-header">
-                <h2>Gentamicin</h2>
-                <div class="drug-class">Aminoglycoside | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Endocarditis (>1 month, <10 years):</strong><br/>7.5 mg/kg once daily (maximum 320 mg/day). Perform TDM.</div>
-                <div class="dosing-item"><strong>Endocarditis (>10 years):</strong><br/>6 mg/kg once daily (maximum 560 mg/day). Perform TDM.</div>
-                <div class="dosing-item"><strong>Bone & Joint (>1 month to <10 years):</strong><br/>7.5 mg/kg once daily (maximum 320 mg/day)</div>
-                <div class="dosing-item"><strong>Bone & Joint (>10 years):</strong><br/>6 mg/kg once daily (maximum 560 mg/day)</div>
-                <div class="dosing-item"><strong>Note (all):</strong> Perform TDM; adjust for renal function</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Neonatal (<2 kg, <1 month old):</strong><br/>2.5 mg/kg/dose q24h</div>
-                <div class="dosing-item"><strong>Normal gestation (2–4 weeks):</strong><br/>5 mg/kg/dose q24h</div>
-                <div class="dosing-item"><strong>Premature, <30 weeks:</strong><br/>2.5 mg/kg/dose q36h</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Once-daily dosing (preferred for most infections):</strong><br/>5–7 mg/kg IV/IM once daily (typical: 400–600 mg once daily for 70 kg adult); target peak 20–30 mcg/mL, trough <1 mcg/mL</div>
-                <div class="dosing-item"><strong>Traditional divided dosing (for synergy in endocarditis):</strong><br/>1–1.5 mg/kg IV/IM every 8 hours (3–4.5 mg/kg/day total); target peak 5–10 mcg/mL, trough 0.5–2 mcg/mL</div>
-                <div class="dosing-item"><strong>Severe sepsis/endocarditis (empiric while awaiting TDM):</strong><br/>Loading: 2 mg/kg IV then 1.7 mg/kg every 8 hours (or 7 mg/kg once daily)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>Normal (>80): standard dosing<br/>CrCl 40–80: 5–7 mg/kg every 24h or 1–1.5 mg/kg every 12h<br/>CrCl 10–40: 2–3.5 mg/kg every 24h<br/>CrCl <10: reduced dosing, TDM guided (often q48–72h)</div>
-                <div class="dosing-item"><strong>Obesity (dose based on ideal body weight):</strong><br/>Use IBW + 0.4(actual - IBW) for dosing</div>
-            </div>
-            <div class="dosing-note">
-                <strong>TDM MANDATORY:</strong> Once-daily regimen: check peak (1 h post-dose, target 20–30) and trough (pre-dose, target <1); traditional dosing: peak (0.5–1 h post-dose, 5–10) and trough (pre-dose, 0.5–2). Draw at steady-state (after 3rd–4th dose). <strong>Half-life:</strong> 2–3 hours (normal renal function). <strong>Renal adjustment:</strong> Significant. <strong>Note:</strong> Once-daily preferred; lower toxicity, better efficacy vs. divided dosing.
-            </div>
-        </div>
-    </div>
+// Save to localStorage
+function savePharmacySettings() {
+    localStorage.setItem('pharmacyAntibiotics', JSON.stringify({
+        available: availableAntibiotics,
+        unavailable: unavailableAntibiotics
+    }));
+}
 
-    <!-- Metronidazole Modal -->
-    <div id="metronidazoleModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('metronidazole')">&times;</span>
-            <div class="modal-header">
-                <h2>Metronidazole</h2>
-                <div class="drug-class">Nitroimidazole (Anaerobic) | IV/PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Intra-abdominal/GI (peritonitis, appendicitis):</strong><br/>7.5 mg/kg/dose IV every 8 hours (maximum 500 mg/dose)</div>
-                <div class="dosing-item"><strong>Neonatal (metronidazole):</strong><br/>Body Wt <2000g: 7.5 mg/kg/dose q24h (0–7 days), q12h (8–28 days)<br/>Body Wt >2000g: 7.5 mg/kg/dose q12h (0–28 days)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Peritonitis/GI/Appendicitis:</strong><br/>12.5 mg/kg/dose q12h (e.g., 250 mg q12h for adolescents)</div>
-                <div class="dosing-item"><strong>Neonatal:</strong><br/>Age- and weight-dependent; refer to neonatal section</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Anaerobic intra-abdominal infections:</strong><br/>500 mg IV every 8 hours (1.5 g/day); OR 500 mg PO every 6–8 hours (2–4 g/day)</div>
-                <div class="dosing-item"><strong>Severe anaerobic sepsis:</strong><br/>Loading dose: 15 mg/kg IV, then 7.5 mg/kg IV every 6–8 hours</div>
-                <div class="dosing-item"><strong>Pseudomembranous colitis (C. difficile):</strong><br/>500 mg orally three times daily for 10–14 days (now often replaced by fidaxomicin for fulminant)</div>
-                <div class="dosing-item"><strong>Giardiasis:</strong><br/>250 mg orally three times daily for 5–7 days (or 2 g once daily for 3 days)</div>
-                <div class="dosing-item"><strong>Trichomoniasis (vaginitis):</strong><br/>2 g orally as single dose OR 500 mg twice daily for 7 days</div>
-                <div class="dosing-item"><strong>Amebiasis (intestinal):</strong><br/>750 mg orally three times daily for 5–10 days (followed by luminal agent like paromomycin)</div>
-                <div class="dosing-item"><strong>Helminths/Giardia (alternative):</strong><br/>400 mg every 8 hours for 5–7 days</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>Minimal adjustment; can use standard dosing even with severe renal disease</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent anaerobic coverage (Bacteroides, Peptostreptococcus, Clostridium, Prevotella), good CNS penetration (60–80% CSF levels), IV/PO option, inexpensive. <strong>Caution:</strong> Metallic taste, disulfiram-like reaction with alcohol (avoid), peripheral neuropathy/CNS toxicity with prolonged use (>3 weeks), seizures (rare, high doses/renal failure), interaction with warfarin. <strong>Adverse effects:</strong> GI upset, dark/brown urine (harmless). <strong>Half-life:</strong> 6–8 hours.
-            </div>
-        </div>
-    </div>
+function openPharmacyFilter() {
+    document.getElementById('pharmacyModal').classList.add('show');
+    populatePharmacyLists();
+}
 
-    <!-- Ciprofloxacin Modal -->
-    <div id="ciprofloxacinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ciprofloxacin')">&times;</span>
-            <div class="modal-header">
-                <h2>Ciprofloxacin</h2>
-                <div class="drug-class">Fluoroquinolone | IV/PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Meningitis (immediate-type hypersensitivity alternative):</strong><br/>Ciprofloxacin IV 10 mg/kg/dose 8-hourly (maximum 400 mg/dose)</div>
-                <div class="dosing-item"><strong>Prophylaxis for N. meningitidis (alternative to Rifampicin):</strong><br/>3 months–5 years: 30 mg/kg (up to 125 mg) orally as a single dose<br/>5–12 years: 250 mg orally as a single dose<br/>>12 years: 500 mg orally as a single dose</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Orthopedic (Gram-negative osteo):</strong><br/>Ciprofloxacin recommended for selected cases</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Uncomplicated UTI:</strong><br/>250 mg orally twice daily for 3 days</div>
-                <div class="dosing-item"><strong>Uncomplicated cystitis (acute):</strong><br/>500 mg orally twice daily for 3 days</div>
-                <div class="dosing-item"><strong>Complicated UTI/pyelonephritis:</strong><br/>500 mg orally twice daily for 7–14 days (or 400 mg IV every 12 hours)</div>
-                <div class="dosing-item"><strong>Respiratory/lower respiratory infection:</strong><br/>500–750 mg orally twice daily for 7–14 days</div>
-                <div class="dosing-item"><strong>Bone & joint (osteomyelitis):</strong><br/>750 mg orally twice daily for 4–6 weeks</div>
-                <div class="dosing-item"><strong>Gram-negative sepsis/serious infection:</strong><br/>400 mg IV every 8–12 hours (1.2 g/day)</div>
-                <div class="dosing-item"><strong>Meningitis prophylaxis (N. meningitidis):</strong><br/>500 mg orally as single dose (or 250 mg IM if available)</div>
-                <div class="dosing-item"><strong>Anthrax prophylaxis (post-exposure):</strong><br/>500 mg orally twice daily for 60 days</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >50: standard dosing<br/>CrCl 30–50: reduce to 500 mg q12h (not 750 mg)<br/>CrCl <30: 250–500 mg q12h</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Good Gram-negative coverage (including Pseudomonas), fluoroquinolone class, excellent oral bioavailability (70%), IV/PO option, good urinary penetration. <strong>Caution:</strong> QT prolongation risk, CNS effects (tremor, confusion, seizures—rare), tendinopathy (especially with age >60, corticosteroid use), C. difficile risk, photosensitivity (rare). <strong>Note:</strong> Resistance to Staph/Strep common; moderate anaerobic coverage.
-            </div>
-        </div>
-    </div>
+function closePharmacyFilter() {
+    document.getElementById('pharmacyModal').classList.remove('show');
+    savePharmacySettings();
+    renderTable();
+}
 
-    <!-- Azithromycin Modal -->
-    <div id="azithromycinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('azithromycin')">&times;</span>
-            <div class="modal-header">
-                <h2>Azithromycin</h2>
-                <div class="drug-class">Macrolide | IV/PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Pertussis:</strong><br/>≤6 months: 10 mg/kg orally once daily (maximum 500 mg/day) for 5 days<br/>>6 months: 10 mg/kg on Day 1 (maximum 500 mg), then 5 mg/kg daily on Days 2–5 (maximum 250 mg/day)</div>
-                <div class="dosing-item"><strong>Lower respiratory (PICU, if M. pneumoniae suspected):</strong><br/>Azithromycin IV 10 mg/kg once daily (maximum 500 mg/day). Switch to oral azithromycin after 24 hours.</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Respiratory (mycoplasma):</strong><br/>4 mg/kg/dose q12h (RCH notes roxithromycin for mycoplasma)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Community-acquired pneumonia (CAP):</strong><br/>500 mg orally on Day 1, then 250 mg daily for 4 more days (Z-pack regimen, total 1.5 g)</div>
-                <div class="dosing-item"><strong>Respiratory infection (alternative course):</strong><br/>500 mg once daily for 3 days (total 1.5 g)</div>
-                <div class="dosing-item"><strong>Atypical pathogens (Chlamydia/Mycoplasma/Legionella):</strong><br/>500 mg on Day 1, then 250 mg daily for 4–6 days</div>
-                <div class="dosing-item"><strong>Acute otitis media or sinusitis:</strong><br/>500 mg once daily for 3 days</div>
-                <div class="dosing-item"><strong>Pertussis (whooping cough):</strong><br/>500 mg on Day 1, then 250 mg daily for 4 days</div>
-                <div class="dosing-item"><strong>Gonorrhea (single dose):</strong><br/>2 g orally as single dose (now less common; used with ceftriaxone)</div>
-                <div class="dosing-item"><strong>Helicobacter pylori eradication (triple therapy):</strong><br/>500 mg orally daily with PPI + amoxicillin for 10–14 days</div>
-                <div class="dosing-item"><strong>MAC prophylaxis (CD4 <50 in HIV):</strong><br/>1.2 g once weekly (or 600 mg twice weekly)</div>
-                <div class="dosing-item"><strong>Renal dosing:</strong><br/>Minimal adjustment needed; mainly hepatic metabolism</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent atypical coverage (Chlamydia, Mycoplasma, Legionella), long half-life (~68 hours allowing once-daily dosing), good lung/tissue penetration, oral option, inexpensive. <strong>Caution:</strong> QT prolongation risk (especially with other QT-prolonging drugs, electrolyte abnormalities, or old age); C. difficile risk; interactions with many drugs (CYP3A4 inhibitor); caution in cardiac patients. <strong>Adverse effects:</strong> GI upset, taste disturbance, hepatotoxicity (rare).
-            </div>
-        </div>
-    </div>
+function populatePharmacyLists() {
+    const availableList = document.getElementById('availableList');
+    const unavailableList = document.getElementById('unavailableList');
+    
+    availableList.innerHTML = '';
+    unavailableList.innerHTML = '';
 
-    <!-- Additional Modals (abbreviated for space) -->
+    availableAntibiotics.forEach(drug => {
+        availableList.appendChild(createDrugTag(drug, 'available'));
+    });
 
-    <!-- Cefazolin Modal -->
-    <div id="cefazolinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cefazolin')">&times;</span>
-            <div class="modal-header">
-                <h2>Cefazolin</h2>
-                <div class="drug-class">Beta-lactam (1st-generation Cephalosporin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Osteomyelitis/Septic Arthritis (<5 years):</strong><br/>50 mg/kg/dose (maximum 2 g/dose) every 8 hours</div>
-                <div class="dosing-item"><strong>Periorbital/Orbital Cellulitis (<5 years, not HiB-vaccinated):</strong><br/>50 mg/kg/dose every 6 hours (maximum 2 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Mild-to-moderate infections (skin, soft tissue, bone/joint):</strong><br/>500 mg–1 g IV/IM every 8 hours (1.5–3 g/day)</div>
-                <div class="dosing-item"><strong>Moderate-to-severe infections:</strong><br/>1–2 g IV/IM every 8 hours (3–6 g/day)</div>
-                <div class="dosing-item"><strong>Endocarditis (native valve, streptococcal):</strong><br/>2 g IV every 8 hours (6 g/day)</div>
-                <div class="dosing-item"><strong>Surgical site prophylaxis (SSP):</strong><br/>Loading: 1–2 g IV at induction (or 15–30 min before incision)<br/>Redose: 500 mg–1 g IV/IM every 2–4 hours intraoperatively (based on half-life)<br/>Discontinue within 24 hours post-op (48 hours for cardiac surgery)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >54: standard dosing<br/>CrCl 35–54: 0.5–1 g every 8 hours<br/>CrCl 11–34: 0.5–1 g every 12 hours<br/>CrCl <11: 0.5–1 g every 18–24 hours</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent skin/soft tissue penetration, good Staph/Strep coverage, good bone penetration (especially orthopedic), inexpensive, excellent surgical prophylaxis agent, half-life ~1.5 hours. <strong>Limited CNS:</strong> Do NOT use for meningitis. <strong>Caution:</strong> Cross-reactivity with penicillins ~2% (low); <strong>Renal adjustment:</strong> Yes (moderate).
-            </div>
-        </div>
-    </div>
+    unavailableAntibiotics.forEach(drug => {
+        unavailableList.appendChild(createDrugTag(drug, 'unavailable'));
+    });
+}
 
-    <!-- Penicillin G Modal -->
-    <div id="penicillin-gModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('penicillin-g')">&times;</span>
-            <div class="modal-header">
-                <h2>Penicillin G (Benzylpenicillin)</h2>
-                <div class="drug-class">Beta-lactam (Natural Penicillin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>CNS/Meningitis (if susceptible Streptococcus pneumoniae):</strong><br/>Penicillin G (if susceptible)</div>
-                <div class="dosing-item"><strong>Lower respiratory (community-acquired pneumonia >5 years):</strong><br/>Referenced as primary for Streptococcus pneumoniae</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Pneumonia (S. pneumoniae lobar distribution):</strong><br/>Benzylpenicillin IV 30 mg/kg/dose q6h (maximum 1.2 g/dose)</div>
-                <div class="dosing-item"><strong>Respiratory (5–15 years):</strong><br/>30 mg/kg/dose q6h (maximum 1.2 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard streptococcal infections (respiratory, skin):</strong><br/>2–4 million units IV/IM every 4–6 hours (12–24 million units/day total)</div>
-                <div class="dosing-item"><strong>Streptococcal pneumonia (pneumonia, non-meningitis):</strong><br/>2–3 million units IV every 4–6 hours (12–18 million units/day)</div>
-                <div class="dosing-item"><strong>Meningitis (S. pneumoniae or S. pyogenes):</strong><br/>4 million units IV every 4 hours (18–24 million units/day); some recommend up to 4 million q2–3h for optimal CSF</div>
-                <div class="dosing-item"><strong>Endocarditis (streptococcal native valve):</strong><br/>3–4 million units IV every 4 hours (18–24 million units/day) for 4 weeks</div>
-                <div class="dosing-item"><strong>Syphilis (neurosyphilis/meningitis):</strong><br/>4 million units IV every 4 hours for 10–14 days (18–24 million units/day)</div>
-                <div class="dosing-item"><strong>Clostridial infection (gas gangrene):</strong><br/>3–4 million units IV every 4 hours (with surgical debridement)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >50: standard dosing<br/>CrCl 10–50: 50% of usual dose at standard interval<br/>CrCl <10: give 25–50% at standard interval</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent Gram-positive coverage (Streptococci, Meningococci, Clostridium), good CNS penetration (15–30% CSF), IV/IM option, inexpensive, naturally bactericidal. <strong>Allergy risk:</strong> ~1–3% cross-reactivity with cephalosporins (lower than previously thought). <strong>Renal adjustment:</strong> Yes (minimal to moderate).
-            </div>
-        </div>
-    </div>
+function createDrugTag(drug, status) {
+    const tag = document.createElement('div');
+    tag.className = `antibiotic-tag ${status}`;
+    tag.draggable = true;
+    tag.textContent = drug;
+    tag.dataset.drug = drug;
+    tag.dataset.status = status;
 
-    <!-- Piperacillin-Tazobactam Modal -->
-    <div id="piperacillin-tazobactamModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('piperacillin-tazobactam')">&times;</span>
-            <div class="modal-header">
-                <h2>Piperacillin-Tazobactam</h2>
-                <div class="drug-class">Beta-lactam + Beta-lactamase Inhibitor | IV</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Intra-abdominal/GI (complicated appendicitis, peritonitis):</strong><br/>100 mg/kg/dose IV every 6 hours (maximum 4 g/dose piperacillin component)</div>
-                <div class="dosing-item"><strong>Severe respiratory (PICU, if life-threatening or MRSA):</strong><br/>Referenced for complex cases</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard infections (community-acquired intra-abdominal, UTI, nosocomial pneumonia):</strong><br/>3.375 g IV every 6 hours (13.5 g/day); piperacillin/tazobactam 3 g/0.375 g per dose</div>
-                <div class="dosing-item"><strong>Serious/severe infections (hospital-acquired, immunocompromised):</strong><br/>4.5 g IV every 6–8 hours (18–27 g/day piperacillin component); piperacillin/tazobactam 4 g/0.5 g per dose</div>
-                <div class="dosing-item"><strong>Pseudomonas coverage (CF patients, severe HAP):</strong><br/>4.5 g IV every 6 hours (18 g piperacillin/day)</div>
-                <div class="dosing-item"><strong>Febrile neutropenia (empiric coverage):</strong><br/>4.5 g IV every 6–8 hours until afebrile/ANC >500</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >40: standard dosing<br/>CrCl 20–40: 3.375 g every 8 hours (10 g piperacillin/day)<br/>CrCl <20: 2.25 g every 8 hours (6 g piperacillin/day)<br/>Hemodialysis: 2.25 g every 12 hours (give additional 0.75 g dose after dialysis)</div>
-                <div class="dosing-item"><strong>Continuous/extended infusion (alternative strategy):</strong><br/>3–4 g loading, then continuous infusion 12–16 g/day piperacillin</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Broad spectrum (Gram-positive/negative + anaerobes), excellent Pseudomonas coverage, beta-lactamase inhibitor (tazobactam) adds coverage for beta-lactamase producers, IV option only. <strong>Note:</strong> Does NOT provide CNS penetration—avoid for meningitis. <strong>Caution:</strong> High sodium content (2.6 mEq/g piperacillin); seizures (rare, especially with renal impairment); C. difficile risk. <strong>Renal adjustment:</strong> Yes (significant).
-            </div>
-        </div>
-    </div>
+    const moveBtn = document.createElement('button');
+    moveBtn.className = 'move-btn';
+    moveBtn.textContent = status === 'available' ? '→' : '←';
+    moveBtn.onclick = (e) => {
+        e.stopPropagation();
+        moveDrug(drug, status);
+    };
 
-    <!-- Cephalexin Modal -->
-    <div id="cephalexinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cephalexin')">&times;</span>
-            <div class="modal-header">
-                <h2>Cephalexin</h2>
-                <div class="drug-class">Beta-lactam (1st-generation Cephalosporin) | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Uncomplicated UTI (>3 months):</strong><br/>Cefalexin orally 30 mg/kg/dose every 8 hours (maximum 1 g/dose) for 3 days</div>
-                <div class="dosing-item"><strong>Mild cellulitis (outpatient):</strong><br/>Cefalexin orally 30 mg/kg/dose every 8 hours (maximum 1 g/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (RCH 2005)</h3>
-                <div class="dosing-item"><strong>Orthopedic (outpatient cellulitis):</strong><br/>Cephalexin PO 12.5 mg/kg/dose q6h (maximum 500 mg/dose)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Mild-to-moderate infections (skin, soft tissue, respiratory):</strong><br/>250–500 mg orally four times daily (1–2 g/day)</div>
-                <div class="dosing-item"><strong>Serious infections:</strong><br/>500 mg orally every 6 hours (2 g/day)</div>
-                <div class="dosing-item"><strong>Uncomplicated cystitis (UTI):</strong><br/>500 mg orally four times daily for 7–10 days (or 250 mg q6h)</div>
-                <div class="dosing-item"><strong>Bone & joint (minor osteomyelitis):</strong><br/>500 mg orally four times daily for 4–6 weeks</div>
-                <div class="dosing-item"><strong>Surgical site infection prophylaxis (minor):</strong><br/>500 mg orally before procedure, then 500 mg q6h for 24 hours post-op</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >50: standard dosing<br/>CrCl 10–50: 250–500 mg q8–12h<br/>CrCl <10: 250 mg q12h</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Oral option, good Staph/Strep coverage, good bioavailability (60%), inexpensive, first-generation cephalosporin. <strong>Limited CNS:</strong> Do NOT use for meningitis. <strong>Caution:</strong> Cross-reactivity with penicillins ~2% (low); <strong>Renal adjustment:</strong> Yes (moderate). <strong>Note:</strong> Food increases absorption slightly (take without regard to food).
-            </div>
-        </div>
-    </div>
+    tag.appendChild(moveBtn);
+    return tag;
+}
 
-    <!-- Doxycycline Modal -->
-    <div id="doxycyclineModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('doxycycline')">&times;</span>
-            <div class="modal-header">
-                <h2>Doxycycline</h2>
-                <div class="drug-class">Tetracycline | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>General (>8 years, without tooth development concerns):</strong><br/>2–4 mg/kg/day orally divided into 2 doses (usual: 100 mg twice daily for adolescents)</div>
-                <div class="dosing-item"><strong>Atypical respiratory pathogens:</strong><br/>Referenced as alternative for Chlamydia, Mycoplasma</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Standard infections (respiratory, skin, STI):</strong><br/>100 mg orally twice daily (200 mg/day) for 7–14 days</div>
-                <div class="dosing-item"><strong>Acute exacerbation of chronic bronchitis:</strong><br/>100 mg orally twice daily for 5–10 days</div>
-                <div class="dosing-item"><strong>Atypical pneumonia (Mycoplasma, Chlamydia):</strong><br/>100 mg orally twice daily for 7–10 days</div>
-                <div class="dosing-item"><strong>Chlamydia trachomatis (urethritis/cervicitis):</strong><br/>100 mg orally twice daily for 7 days</div>
-                <div class="dosing-item"><strong>Gonorrhea (with ceftriaxone):</strong><br/>100 mg orally twice daily for 7 days</div>
-                <div class="dosing-item"><strong>Pelvic inflammatory disease (PID):</strong><br/>100 mg orally twice daily for 14 days (with ceftriaxone loading)</div>
-                <div class="dosing-item"><strong>Lyme disease (early):</strong><br/>100 mg orally twice daily for 14–21 days</div>
-                <div class="dosing-item"><strong>Rickettsial infections (RMSF, Q fever):</strong><br/>100 mg orally twice daily for 5–7 days (or until 24–48 h afebrile)</div>
-                <div class="dosing-item"><strong>Anthrax post-exposure prophylaxis:</strong><br/>100 mg orally twice daily for 60 days</div>
-                <div class="dosing-item"><strong>Malaria prophylaxis:</strong><br/>100 mg orally once daily (start 1–2 days before travel, continue during, 4 weeks after)</div>
-                <div class="dosing-item"><strong>Renal/hepatic dosing:</strong><br/>No adjustment needed; doxycycline does not require renal clearance (biliary excretion)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent atypical pathogen coverage (Mycoplasma, Chlamydia, Rickettsia, Spirochetes), good oral bioavailability (60–70%), IV option available, no renal adjustment needed, good tissue penetration. <strong>Caution in pediatrics:</strong> Avoid in children <8 years (risk of tooth discoloration/enamel hypoplasia); in older children & adults, risk is minimal. <strong>Adverse effects:</strong> Photosensitivity (sun exposure), esophageal irritation (take with full glass of water, upright position 30 min), vaginal candidiasis, C. difficile. <strong>Drug interactions:</strong> Reduced absorption with antacids, dairy, iron; avoid in pregnancy.
-            </div>
-        </div>
-    </div>
+function moveDrug(drug, currentStatus) {
+    if (currentStatus === 'available') {
+        availableAntibiotics = availableAntibiotics.filter(d => d !== drug);
+        unavailableAntibiotics.push(drug);
+    } else {
+        unavailableAntibiotics = unavailableAntibiotics.filter(d => d !== drug);
+        availableAntibiotics.push(drug);
+    }
+    populatePharmacyLists();
+}
 
-    <!-- Levofloxacin Modal -->
-    <div id="levofloxacinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('levofloxacin')">&times;</span>
-            <div class="modal-header">
-                <h2>Levofloxacin</h2>
-                <div class="drug-class">Fluoroquinolone | IV/PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Reserved for serious/complicated infections:</strong><br/>8–10 mg/kg IV or PO once daily (max 750 mg/day)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Community-acquired pneumonia (CAP):</strong><br/>500 mg orally once daily for 7–14 days (or 750 mg once daily for 5 days in severe CAP)</div>
-                <div class="dosing-item"><strong>Acute exacerbation of chronic bronchitis (AECB):</strong><br/>500 mg orally once daily for 3 days</div>
-                <div class="dosing-item"><strong>Acute sinusitis:</strong><br/>500 mg orally once daily for 10–14 days</div>
-                <div class="dosing-item"><strong>Complicated UTI/pyelonephritis:</strong><br/>250 mg orally once daily for 10 days (or 750 mg once daily for 5 days)</div>
-                <div class="dosing-item"><strong>Skin & soft tissue infection:</strong><br/>500 mg orally once daily for 7–14 days</div>
-                <div class="dosing-item"><strong>Bone & joint infection (osteomyelitis):</strong><br/>500–750 mg orally once daily for 4–6 weeks</div>
-                <div class="dosing-item"><strong>Prostatitis (chronic bacterial):</strong><br/>500 mg orally once daily for 28 days</div>
-                <div class="dosing-item"><strong>Inhalational anthrax (post-exposure):</strong><br/>500 mg orally once daily for 60 days</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl 50–80: standard dosing<br/>CrCl 30–50: 500 mg once daily (or 250 mg if dose normally 250 mg)<br/>CrCl <30: 500 mg once daily then 250 mg daily (or 250 mg once daily)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent respiratory penetration, once-daily dosing, good Gram-negative + atypical coverage, IV/PO option, low cost. <strong>Caution:</strong> QT prolongation (especially with other risk factors), peripheral neuropathy (rare), tendinopathy, C. difficile risk, photosensitivity. <strong>Note:</strong> Active against Legionella, Mycoplasma, Chlamydia; good coverage in CAP; avoid with QT-prolonging drugs or in electrolyte abnormalities.
-            </div>
-        </div>
-    </div>
+function resetPharmacyDefaults() {
+    availableAntibiotics = [...allAntibiotics];
+    unavailableAntibiotics = [];
+    populatePharmacyLists();
+}
 
-    <!-- TMP-SMX Modal -->
-    <div id="tmp-smxModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('tmp-smx')">&times;</span>
-            <div class="modal-header">
-                <h2>Trimethoprim-Sulfamethoxazole (TMP-SMX)</h2>
-                <div class="drug-class">Sulfonamide Combination | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Uncomplicated UTI (>3 months):</strong><br/>TMP-SMX 4 mg/kg/dose orally twice daily (maximum 160 mg/dose TMP component) for 3 days</div>
-                <div class="dosing-item"><strong>Mild cellulitis/skin (if nmMRSA risk):</strong><br/>4 mg/kg/dose orally twice daily (maximum 160 mg/dose TMP component)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Uncomplicated cystitis (acute UTI):</strong><br/>One double-strength (DS) tablet (800 mg TMP/160 mg SMX) orally twice daily for 3 days (or single-strength (SS) twice daily)</div>
-                <div class="dosing-item"><strong>Complicated UTI/pyelonephritis:</strong><br/>One DS tablet orally twice daily for 7–14 days</div>
-                <div class="dosing-item"><strong>Prostatitis (chronic bacterial):</strong><br/>One DS tablet orally twice daily for 12 weeks</div>
-                <div class="dosing-item"><strong>Skin & soft tissue infections (MRSA):</strong><br/>One DS tablet orally twice daily for 7–10 days</div>
-                <div class="dosing-item"><strong>Shigellosis (severe):</strong><br/>One DS tablet orally twice daily for 5 days</div>
-                <div class="dosing-item"><strong>Pneumocystis pneumonia (PCP) prophylaxis:</strong><br/>One DS tablet orally once daily (or three times weekly if intolerant)</div>
-                <div class="dosing-item"><strong>PCP treatment (acute):</strong><br/>15–20 mg/kg/day TMP component in 3–4 divided doses for 14–21 days</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >30: standard dosing<br/>CrCl 15–30: standard dose but extended interval (double dosing interval)<br/>CrCl <15: avoid or use with extreme caution</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent oral bioavailability, good UTI coverage (especially uropathogens), MRSA coverage (if susceptible), inexpensive, good for prophylaxis (PCP, Toxoplasmosis in HIV). <strong>Caution:</strong> Sulfonamide allergy (3–5% general population, higher with HIV); hyperkalemia risk (TMP blocks renal K+ secretion); renal impairment exacerbates; Stevens-Johnson syndrome (rare); folate deficiency (with prolonged use). <strong>Allergy cross-reactivity:</strong> Low with penicillins, ~10% with other sulfonamides. <strong>Renal adjustment:</strong> Yes (significant).
-            </div>
-        </div>
-    </div>
+// ============ TABLE & DOSING DATA ============
 
-    <!-- Nafcillin Modal -->
-    <div id="nafcillinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('nafcillin')">&times;</span>
-            <div class="modal-header">
-                <h2>Nafcillin (Oxacillin alternative)</h2>
-                <div class="drug-class">Beta-lactam (Anti-Staph Penicillin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Bone & Joint (MSSA):</strong><br/>50 mg/kg/dose IV every 4–6 hours (maximum 2 g/dose)</div>
-                <div class="dosing-item"><strong>Endocarditis (MSSA):</strong><br/>Referenced for native valve endocarditis</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Mild-to-moderate MSSA infections (skin, soft tissue, respiratory):</strong><br/>1 g IV every 4–6 hours (4–6 g/day)</div>
-                <div class="dosing-item"><strong>Moderate-to-severe infections:</strong><br/>1–2 g IV every 4–6 hours (6–12 g/day)</div>
-                <div class="dosing-item"><strong>Bone & joint infections (osteomyelitis, septic arthritis):</strong><br/>1–2 g IV every 4 hours (6–8 g/day) for 4–6 weeks</div>
-                <div class="dosing-item"><strong>Endocarditis (native valve MSSA):</strong><br/>2 g IV every 4 hours (12 g/day) for 4–6 weeks</div>
-                <div class="dosing-item"><strong>Prosthetic valve endocarditis (MSSA):</strong><br/>2 g IV every 4 hours (12 g/day) for 6 weeks</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>Generally no significant adjustment; hepatic metabolism (~90%)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent MSSA/Staph coverage (better than cefazolin for endocarditis), good bone/tissue penetration, IV option. <strong>Half-life:</strong> ~1 hour. <strong>Note:</strong> Do NOT use for MRSA. Primarily for serious Staph infections (endocarditis, osteomyelitis) where superior bone penetration is desired. <strong>Disadvantage:</strong> Less convenient dosing than cephalosporins (q4h vs q8h); central line often needed due to vein irritation.
-            </div>
-        </div>
-    </div>
+const tableData = {
+    'CNS / Meningitis': {
+        'Streptococci': ['Penicillin G', 'Ceftriaxone', 'Cefotaxime'],
+        'MSSA': ['Nafcillin', 'Oxacillin', 'Cefazolin'],
+        'MRSA': ['Vancomycin', 'Linezolid', 'Daptomycin'],
+        'Enterococci': ['Ampicillin', 'Ceftriaxone', 'Vancomycin'],
+        'Enterobacteriaceae': ['Ceftriaxone', 'Cefotaxime', 'Cefepime', 'Meropenem'],
+        'Pseudomonas': ['Ceftazidime', 'Cefepime', 'Piperacillin-tazobactam'],
+        'Atypicals': '—'
+    },
+    'Ear (Otitis Media)': {
+        'Streptococci': ['Amoxicillin', 'Penicillin V', 'Cefdinir'],
+        'MSSA': ['Dicloxacillin', 'Flucloxacillin', 'Cephalexin'],
+        'MRSA': '—',
+        'Enterococci': '—',
+        'Enterobacteriaceae': ['Amoxicillin-clavulanate', 'Cefdinir', 'Levofloxacin'],
+        'Pseudomonas': '—',
+        'Atypicals': '—'
+    },
+    'Sinus / Upper Respiratory': {
+        'Streptococci': ['Amoxicillin', 'Amoxicillin-clavulanate', 'Cefdinir'],
+        'MSSA': '—',
+        'MRSA': '—',
+        'Enterococci': '—',
+        'Enterobacteriaceae': ['Amoxicillin-clavulanate', 'Doxycycline'],
+        'Pseudomonas': '—',
+        'Atypicals': ['Doxycycline', 'Azithromycin', 'Clarithromycin']
+    },
+    'Lower Respiratory (CAP, HAP, Aspiration)': {
+        'Streptococci': ['Ceftriaxone', 'Levofloxacin', 'Amoxicillin'],
+        'MSSA': ['Cefazolin', 'Nafcillin', 'Amoxicillin-clavulanate'],
+        'MRSA': ['Vancomycin', 'Linezolid', 'Doxycycline'],
+        'Enterococci': ['Ampicillin', 'Vancomycin'],
+        'Enterobacteriaceae': ['Ceftriaxone', 'Piperacillin-tazobactam', 'Cefepime', 'Levofloxacin'],
+        'Pseudomonas': ['Piperacillin-tazobactam', 'Cefepime', 'Ceftazidime', 'Levofloxacin'],
+        'Atypicals': ['Azithromycin', 'Doxycycline', 'Levofloxacin', 'Moxifloxacin']
+    },
+    'Oral / Dental': {
+        'Streptococci': ['Penicillin V', 'Amoxicillin', 'Clindamycin'],
+        'MSSA': ['Dicloxacillin', 'Cephalexin'],
+        'MRSA': ['Clindamycin', 'Doxycycline', 'TMP-SMX'],
+        'Enterococci': '—',
+        'Enterobacteriaceae': '—',
+        'Pseudomonas': '—',
+        'Atypicals': ['Amoxicillin-clavulanate', 'Clindamycin', 'Metronidazole']
+    },
+    'Intra-abdominal / GI': {
+        'Streptococci': ['Ceftriaxone', 'Ampicillin-sulbactam'],
+        'MSSA': '—',
+        'MRSA': ['Ampicillin', 'Vancomycin'],
+        'Enterococci': ['Ceftriaxone', 'Piperacillin-tazobactam', 'Cefepime', 'Ertapenem'],
+        'Enterobacteriaceae': ['Piperacillin-tazobactam', 'Cefepime', 'Ceftazidime', 'Meropenem'],
+        'Pseudomonas': ['Metronidazole', 'Piperacillin-tazobactam', 'Ertapenem', 'Linezolid'],
+        'Atypicals': '—'
+    },
+    'Bladder / Lower UTI': {
+        'Streptococci': '—',
+        'MSSA': '—',
+        'MRSA': '—',
+        'Enterococci': ['Nitrofurantoin', 'Fosfomycin'],
+        'Enterobacteriaceae': ['Nitrofurantoin', 'TMP-SMX', 'Fosfomycin'],
+        'Pseudomonas': '—',
+        'Atypicals': '—'
+    },
+    'Pyelonephritis / Upper UTI': {
+        'Streptococci': '—',
+        'MSSA': '—',
+        'MRSA': '—',
+        'Enterococci': ['Ampicillin', 'Vancomycin'],
+        'Enterobacteriaceae': ['Ceftriaxone', 'Ciprofloxacin', 'Levofloxacin', 'TMP-SMX', 'Piperacillin-tazobactam', 'Cefepime'],
+        'Pseudomonas': '—',
+        'Atypicals': '—'
+    },
+    'Skin & Soft Tissue': {
+        'Streptococci': ['Penicillin V', 'Cephalexin'],
+        'MSSA': ['Dicloxacillin', 'Flucloxacillin', 'Cefazolin', 'Cephalexin'],
+        'MRSA': ['TMP-SMX', 'Doxycycline', 'Clindamycin', 'Linezolid'],
+        'Enterococci': '—',
+        'Enterobacteriaceae': ['TMP-SMX', 'Ciprofloxacin'],
+        'Pseudomonas': ['Ciprofloxacin', 'Piperacillin-tazobactam'],
+        'Atypicals': '—'
+    },
+    'Bone & Joint': {
+        'Streptococci': ['Penicillin G'],
+        'MSSA': ['Nafcillin', 'Oxacillin', 'Cefazolin'],
+        'MRSA': ['Vancomycin', 'Daptomycin', 'Linezolid'],
+        'Enterococci': '—',
+        'Enterobacteriaceae': ['Ciprofloxacin', 'Cefepime'],
+        'Pseudomonas': ['Ceftazidime', 'Cefepime', 'Piperacillin-tazobactam'],
+        'Atypicals': '—'
+    },
+    'Pelvic / STI': {
+        'Streptococci': '—',
+        'MSSA': '—',
+        'MRSA': '—',
+        'Enterococci': '—',
+        'Enterobacteriaceae': ['Ceftriaxone', 'Cefixime', 'Doxycycline'],
+        'Pseudomonas': '—',
+        'Atypicals': ['Metronidazole', 'Clindamycin']
+    }
+};
 
-    <!-- Nitrofurantoin Modal -->
-    <div id="nitrofurantoinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('nitrofurantoin')">&times;</span>
-            <div class="modal-header">
-                <h2>Nitrofurantoin</h2>
-                <div class="drug-class">Nitrofuran (Urinary Antiseptic) | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Uncomplicated Lower UTI/Cystitis:</strong><br/>Referenced as option; check local guidelines for dosing</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Uncomplicated acute cystitis:</strong><br/>100 mg orally twice daily for 5–7 days (immediate-release microcrystalline)</div>
-                <div class="dosing-item"><strong>Acute cystitis (extended-release):</strong><br/>100 mg (macrocrystalline extended-release) orally once daily for 7 days</div>
-                <div class="dosing-item"><strong>Acute uncomplicated UTI (alternative regimen):</strong><br/>200 mg (macrocrystalline) orally once daily for 7 days</div>
-                <div class="dosing-item"><strong>Asymptomatic bacteriuria (pregnancy):</strong><br/>100 mg orally twice daily for 7 days</div>
-                <div class="dosing-item"><strong>Chronic UTI prophylaxis:</strong><br/>50–100 mg orally once daily at bedtime (long-term)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >60: standard dosing<br/>CrCl 30–60: standard dosing (with caution)<br/>CrCl <30: AVOID (inadequate urinary levels and increased systemic toxicity)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent for uncomplicated cystitis, concentrates in urine, inexpensive, low systemic toxicity (oral option). <strong>Caution:</strong> NOT for pyelonephritis or systemic infection (urine only, not blood); not for CrCl <30 (ineffective & toxic); not for G6PD deficiency (hemolysis risk); peripheral neuropathy with chronic use (especially >1 month). <strong>Adverse effects:</strong> Nausea/GI upset (take with food/milk), peripheral neuropathy, hepatotoxicity (rare), lupus-like syndrome (rare). <strong>Pregnancy:</strong> Safe (category A) except near term (risk of hemolysis in newborn with G6PD).
-            </div>
-        </div>
-    </div>
+function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
 
-    <!-- Ertapenem Modal -->
-    <div id="ertapenemModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ertapenem')">&times;</span>
-            <div class="modal-header">
-                <h2>Ertapenem</h2>
-                <div class="drug-class">Beta-lactam (Carbapenem) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Intra-abdominal/GI (complicated appendicitis, peritonitis):</strong><br/>Referenced as alternative for complex cases</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Infants & children (≥3 months):</strong><br/>15 mg/kg IV/IM every 12 hours (max 1 g/day)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Complicated intra-abdominal infections:</strong><br/>1 g IV/IM once daily for 5–14 days</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Broad spectrum, good anaerobic coverage, IV/IM option. <strong>Caution:</strong> Limited Pseudomonas coverage (not for Pseu aomonnas aeruginosa). <strong>Renal adjustment:</strong> Yes (significant).
-            </div>
-        </div>
-    </div>
+    for (const [site, pathogens] of Object.entries(tableData)) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td><strong>${site}</strong></td>`;
 
-    <!-- Meropenem Modal -->
-    <div id="meropenemModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('meropenem')">&times;</span>
-            <div class="modal-header">
-                <h2>Meropenem</h2>
-                <div class="drug-class">Beta-lactam (Carbapenem) | IV</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Enterobacteriaceae/Gram-negative (lower respiratory, CNS):</strong><br/>Referenced as option for complex infections</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Infants & children:</strong><br/>10–20 mg/kg IV every 8 hours (dose depends on age/infection severity)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Complicated intra-abdominal infections:</strong><br/>1 g IV every 8 hours (3 g/day) for 5–14 days</div>
-                <div class="dosing-item"><strong>Complicated skin/soft tissue infections:</strong><br/>500 mg–1 g IV every 8 hours (1.5–3 g/day)</div>
-                <div class="dosing-item"><strong>Febrile neutropenia/sepsis:</strong><br/>1 g IV every 8 hours (3 g/day)</div>
-                <div class="dosing-item"><strong>Meningitis (excellent CNS penetration):</strong><br/>2 g IV every 8 hours (6 g/day); some use 2 g q6h for optimal CSF levels</div>
-                <div class="dosing-item"><strong>Pseudomonas aeruginosa (HAP, serious infections):</strong><br/>2 g IV every 8 hours (6 g/day)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >50: standard dosing<br/>CrCl 26–50: 1 g every 12 hours (or half-dose more frequently)<br/>CrCl 10–25: 500 mg–1 g every 12 hours<br/>CrCl <10: 500 mg every 24 hours</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Ultra-broad spectrum (Gram-positive/negative + anaerobes + Pseudomonas), excellent CNS penetration (75–90% CSF), excellent for polymicrobial/complex infections, seizure risk lower than imipenem. <strong>Caution:</strong> Seizures (especially in renal impairment, high doses, CNS disease); C. difficile risk; high cost. <strong>Renal adjustment:</strong> Yes (significant).
-            </div>
-        </div>
-    </div>
+        for (const pathogen of ['Streptococci', 'MSSA', 'MRSA', 'Enterococci', 'Enterobacteriaceae', 'Pseudomonas', 'Atypicals']) {
+            const drugs = pathogens[pathogen];
+            let html = '';
 
-    <!-- Ceftazidime Modal -->
-    <div id="ceftazidimeModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ceftazidime')">&times;</span>
-            <div class="modal-header">
-                <h2>Ceftazidime</h2>
-                <div class="drug-class">Beta-lactam (3rd-generation Cephalosporin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Pseudomonas aeruginosa (lower respiratory, bone/joint):</strong><br/>Referenced for Pseudomonas coverage in complex infections</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Pseudomonas infections:</strong><br/>1–2 g IV every 8 hours (3–6 g/day); higher doses for serious infections</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Excellent Pseudomonas coverage, good CNS penetration. <strong>Renal adjustment:</strong> Yes (significant).
-            </div>
-        </div>
-    </div>
-
-    <!-- Cefepime Modal -->
-    <div id="cefepimeModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cefepime')">&times;</span>
-            <div class="modal-header">
-                <h2>Cefepime</h2>
-                <div class="drug-class">Beta-lactam (4th-generation Cephalosporin) | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Broad-spectrum coverage (Gram-negative/Pseudomonas):</strong><br/>Referenced for serious/polymicrobial infections</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Serious infections (including Pseudomonas):</strong><br/>1–2 g IV every 8–12 hours (depending on infection severity)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Broad spectrum including Pseudomonas, good CNS penetration. <strong>Renal adjustment:</strong> Yes (significant).
-            </div>
-        </div>
-    </div>
-
-    <!-- Fosfomycin Modal -->
-    <div id="fosfomycinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('fosfomycin')">&times;</span>
-            <div class="modal-header">
-                <h2>Fosfomycin</h2>
-                <div class="drug-class">Phosphonic Acid | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Uncomplicated UTI (>3 months):</strong><br/>Referenced as alternative to TMP-SMX or cefalexin</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Uncomplicated cystitis:</strong><br/>3 g oral single dose (or 1 g three times daily for 2–3 days in some regions)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Single-dose option, excellent Gram-negative coverage, uncomplicated UTI. <strong>Limited data:</strong> Use in children still emerging.
-            </div>
-        </div>
-    </div>
-
-    <!-- Clarithromycin Modal -->
-    <div id="clarithromycinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('clarithromycin')">&times;</span>
-            <div class="modal-header">
-                <h2>Clarithromycin</h2>
-                <div class="drug-class">Macrolide | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Atypical respiratory pathogens:</strong><br/>7.5 mg/kg orally twice daily (standard pediatric dosing)</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Atypical pathogens:</strong><br/>250–500 mg orally twice daily for 7–14 days</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Good atypical coverage (Chlamydia, Mycoplasma). <strong>Caution:</strong> QT prolongation, many drug interactions.
-            </div>
-        </div>
-    </div>
-
-    <!-- Moxifloxacin Modal -->
-    <div id="moxifloxacinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('moxifloxacin')">&times;</span>
-            <div class="modal-header">
-                <h2>Moxifloxacin</h2>
-                <div class="drug-class">Fluoroquinolone (4th-generation) | PO/IV</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Community-acquired pneumonia:</strong><br/>400 mg orally or IV once daily for 5–14 days</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Enhanced atypical coverage, once-daily dosing, excellent lung penetration. <strong>Caution:</strong> QT prolongation risk, limited pediatric data.
-            </div>
-        </div>
-    </div>
-
-    <!-- Cefdinir Modal -->
-    <div id="cefdinirModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cefdinir')">&times;</span>
-            <div class="modal-header">
-                <h2>Cefdinir</h2>
-                <div class="drug-class">Beta-lactam (3rd-generation Cephalosporin) | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Otitis media, respiratory:</strong><br/>7 mg/kg orally once daily or 3.5 mg/kg twice daily (standard pediatric dosing)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Oral option, good Gram-negative coverage. <strong>Renal adjustment:</strong> Minimal.
-            </div>
-        </div>
-    </div>
-
-    <!-- Cefixime Modal -->
-    <div id="cefiximeModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('cefixime')">&times;</span>
-            <div class="modal-header">
-                <h2>Cefixime</h2>
-                <div class="drug-class">Beta-lactam (3rd-generation Cephalosporin) | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Pelvic inflammatory disease (PID):</strong><br/>Pediatric dosing: 8 mg/kg/day orally (standard: 400 mg once daily for adolescents)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Oral option, good Gram-negative coverage. <strong>Note:</strong> Long half-life allows once-daily dosing.
-            </div>
-        </div>
-    </div>
-
-    <!-- Daptomycin Modal -->
-    <div id="daptomycinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('daptomycin')">&times;</span>
-            <div class="modal-header">
-                <h2>Daptomycin</h2>
-                <div class="drug-class">Cyclic Lipopeptide | IV</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Limited pediatric data.</strong> MRSA bone/joint (alternative to Vancomycin): dosing varies by age/renal function</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Skin & soft tissue infections (MRSA):</strong><br/>4 mg/kg IV once daily for 7–14 days</div>
-                <div class="dosing-item"><strong>Bone & joint infections (MRSA osteomyelitis):</strong><br/>6 mg/kg IV once daily for 4–6 weeks</div>
-                <div class="dosing-item"><strong>Bacteremia/endocarditis (MRSA):</strong><br/>6 mg/kg IV once daily (or 10 mg/kg once daily for native valve infective endocarditis)</div>
-                <div class="dosing-item"><strong>Renal dosing (CrCl):</strong><br/>CrCl >30: standard dosing<br/>CrCl <30 (including dialysis): 4–6 mg/kg every 48 hours (or dose based on renal function)</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> MRSA/VRE coverage, excellent bone/tissue penetration, rapid bactericidal, IV option. <strong>⚠️ CRITICAL — Do NOT use for meningitis/CNS infections</strong> (inactivated by lung surfactant/CSF; fails in pneumonia). <strong>Caution:</strong> Monitor CPK baseline, day 3–5, and weekly (rhabdomyolysis risk, especially if CrCl <30); eosinophilic pneumonia (rare); expensive. <strong>Half-life:</strong> 7–9 hours (allows once-daily dosing).
-            </div>
-        </div>
-    </div>
-
-    <!-- Ampicillin-Sulbactam Modal -->
-    <div id="ampicillin-sulbactamModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('ampicillin-sulbactam')">&times;</span>
-            <div class="modal-header">
-                <h2>Ampicillin-Sulbactam</h2>
-                <div class="drug-class">Beta-lactam + Beta-lactamase Inhibitor | IV/IM</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Intra-abdominal/GI (peritonitis):</strong><br/>Referenced as option; check guidelines for age-specific dosing</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Anaerobic coverage, good abdominal penetration. <strong>Note:</strong> Similar to ampicillin but with added beta-lactamase inhibition.
-            </div>
-        </div>
-    </div>
-
-    <!-- Penicillin V Modal -->
-    <div id="penicillin-vModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('penicillin-v')">&times;</span>
-            <div class="modal-header">
-                <h2>Penicillin V (Phenoxymethylpenicillin)</h2>
-                <div class="drug-class">Beta-lactam (Natural Penicillin) | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Oral/Dental infections:</strong><br/>Penicillin V (standard pediatric dosing)</div>
-                <div class="dosing-item"><strong>Streptococcal infections:</strong><br/>Typical: 12.5 mg/kg orally twice daily</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Mild-to-moderate streptococcal infections:</strong><br/>250–500 mg orally every 6–8 hours (1–2 g/day)</div>
-                <div class="dosing-item"><strong>Oral/Dental infections:</strong><br/>250–500 mg orally every 6 hours (1–2 g/day) for 7–10 days</div>
-                <div class="dosing-item"><strong>Acute rheumatic fever prophylaxis:</strong><br/>250 mg orally twice daily (continuous, long-term)</div>
-                <div class="dosing-item"><strong>S. pyogenes pharyngitis:</strong><br/>250 mg orally every 6–8 hours for 10 days</div>
-                <div class="dosing-item"><strong>Renal dosing:</strong><br/>No adjustment needed</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Oral option, excellent Streptococcus coverage, inexpensive. <strong>Bioavailability:</strong> ~60% without food, ~80% with food. <strong>Note:</strong> Oral penicillin V; for IV use Penicillin G (Benzylpenicillin).
-            </div>
-        </div>
-    </div>
-
-    <!-- Amoxicillin-Clavulanate Modal -->
-    <div id="amoxicillin-clavulanateModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('amoxicillin-clavulanate')">&times;</span>
-            <div class="modal-header">
-                <h2>Amoxicillin-Clavulanate</h2>
-                <div class="drug-class">Beta-lactam + Beta-lactamase Inhibitor | PO/IV</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing (CHQ v12.0)</h3>
-                <div class="dosing-item"><strong>Sinus/Upper respiratory (mixed pathogen):</strong><br/>Amoxicillin-clavulanate (standard pediatric dosing)</div>
-                <div class="dosing-item"><strong>Oral/Dental (animal bites, retropharyngeal abscess):</strong><br/>PO or IV depending on severity</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Adult Dosing</h3>
-                <div class="dosing-item"><strong>Oral:</strong><br/>500/125 mg (amoxicillin/clavulanate) twice daily or 875/125 mg once daily</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Anaerobic + Gram-negative coverage, oral option, good bioavailability. <strong>Caution:</strong> GI upset with high-dose formulations.
-            </div>
-        </div>
-    </div>
-
-    <!-- Dicloxacillin Modal -->
-    <div id="dicloxacilinModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('dicloxacillin')">&times;</span>
-            <div class="modal-header">
-                <h2>Dicloxacillin (Flucloxacillin alternative)</h2>
-                <div class="drug-class">Beta-lactam (Anti-Staph Penicillin) | PO</div>
-            </div>
-            <div class="dosing-section">
-                <h3>Pediatric Dosing</h3>
-                <div class="dosing-item"><strong>Oral/Dental infections (Staph):</strong><br/>12.5 mg/kg orally every 6 hours</div>
-            </div>
-            <div class="dosing-note">
-                <strong>Advantages:</strong> Oral Staph coverage, good bioavailability on empty stomach. <strong>Note:</strong> Flucloxacillin preferred in many regions (higher bioavailability).
-            </div>
-        </div>
-    </div>
-
-    <!-- Close all modals on Escape -->
-    <script>
-        function openModal(drugId) {
-            const modalId = drugId + 'Modal';
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        function closeModal(drugId) {
-            const modalId = drugId + 'Modal';
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Close modal when clicking outside content
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
+            if (drugs === '—') {
+                html = '<span style="color: #95a5a6;">—</span>';
+            } else if (Array.isArray(drugs)) {
+                const filtered = drugs.filter(d => availableAntibiotics.includes(d));
+                if (filtered.length === 0) {
+                    html = '<span style="color: #95a5a6; font-style: italic;">[Not available]</span>';
+                } else {
+                    html = filtered.map(drug => {
+                        const drugClass = getdrugClass(drug);
+                        return `<span class="${drugClass}"><a class="drug-link" onclick="openDrugModal('${drug}')">${drug}</a></span>`;
+                    }).join(', ');
+                }
             }
+
+            const td = document.createElement('td');
+            td.innerHTML = html;
+            row.appendChild(td);
         }
 
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.style.display = 'none';
-                });
-            }
-        });
-    </script>
+        tbody.appendChild(row);
+    }
+}
+
+function getdrugClass(drug) {
+    const classes = {
+        'Ampicillin': 'beta-lactam', 'Amoxicillin': 'beta-lactam', 'Amoxicillin-clavulanate': 'beta-lactam', 
+        'Penicillin G': 'beta-lactam', 'Penicillin V': 'beta-lactam',
+        'Nafcillin': 'beta-lactam', 'Oxacillin': 'beta-lactam', 'Dicloxacillin': 'beta-lactam', 'Flucloxacillin': 'beta-lactam',
+        'Cefazolin': 'beta-lactam', 'Cephalexin': 'beta-lactam', 'Cefdinir': 'beta-lactam', 'Cefixime': 'beta-lactam',
+        'Ceftriaxone': 'beta-lactam', 'Cefotaxime': 'beta-lactam', 'Ceftazidime': 'beta-lactam', 'Cefepime': 'beta-lactam',
+        'Piperacillin-tazobactam': 'beta-lactam', 'Ampicillin-sulbactam': 'beta-lactam', 'Ertapenem': 'beta-lactam', 'Meropenem': 'beta-lactam',
+        'Vancomycin': 'glycopeptide',
+        'Linezolid': 'oxazolidinone', 'Daptomycin': 'oxazolidinone',
+        'Ciprofloxacin': 'fluoroquinolone', 'Levofloxacin': 'fluoroquinolone', 'Moxifloxacin': 'fluoroquinolone',
+        'Azithromycin': 'macrolide', 'Clarithromycin': 'macrolide',
+        'Gentamicin': 'beta-lactam',
+        'Clindamycin': 'anaerobe', 'Metronidazole': 'anaerobe', 'Doxycycline': 'macrolide',
+        'TMP-SMX': 'anaerobe', 'Nitrofurantoin': 'anaerobe', 'Fosfomycin': 'anaerobe'
+    };
+    return classes[drug] || 'beta-lactam';
+}
+
+// ============ DRUG DOSING MODALS ============
+
+const drugDosing = {
+    'Ampicillin': {
+        pediatric: 'Community-acquired pneumonia (Neonates): 50 mg/kg/dose every 6–12 hours; Pyelonephritis (>1 month): 50 mg/kg/dose IV every 6 hours',
+        adult: 'Standard IV/IM: 500 mg–1 g every 6 hours (2–8 g/day); Severe: 2 g every 4–6 hours (8–12 g/day); Meningitis: 2 g every 4 hours (8–12 g/day); Endocarditis: 2–3 g every 4 hours (12–18 g/day)'
+    },
+    'Amoxicillin': {
+        pediatric: 'Community-acquired pneumonia (>1 month): 30 mg/kg/dose PO every 8 hours (max 1 g/dose); Otitis media: 30 mg/kg/dose every 8 hours for 5 days',
+        adult: 'Mild-to-moderate: 500 mg PO every 8 hours or 875 mg twice daily; Severe: 875 mg–1 g every 8 hours (2.6–3 g/day)'
+    },
+    'Vancomycin': {
+        pediatric: 'Meningitis: 15 mg/kg/dose IV every 6 hours (max initial 750 mg); Community sepsis (MRSA): 15 mg/kg every 6 hours; TDM required',
+        adult: 'Standard: 15–20 mg/kg IV every 8–12 hours; Meningitis: 15–20 mg/kg IV every 4–6 hours (2 g q6–8h); Target trough 15–20 mcg/mL (or 20–25 for meningitis). TDM MANDATORY.'
+    },
+    'Ceftriaxone': {
+        pediatric: 'Community-acquired sepsis (>1 month): 100 mg/kg once daily (max 4 g/day); Meningitis: 100 mg/kg once daily (max 4 g/dose); CAP: 50 mg/kg every 6 hours (max 2 g/dose)',
+        adult: 'Standard: 1 g IV/IM every 12 hours (2–4 g/day); Meningitis: 2 g IV every 12 hours (4 g/day); Surgical prophylaxis: 1–2 g IV once'
+    },
+    'Cefotaxime': {
+        pediatric: 'Community-acquired sepsis (>1 month): 50 mg/kg/dose IV every 6 hours (max 2 g/dose); Meningitis: 50 mg/kg/dose every 6 hours (max 2 g/dose)',
+        adult: 'Standard: 1–2 g IV/IM every 8 hours (3–6 g/day); Meningitis: 2 g IV every 4 hours (8 g/day); Superior CNS penetration vs. ceftriaxone'
+    },
+    'Linezolid': {
+        pediatric: 'MRSA coverage (alternative to vancomycin): Referenced for bone/joint and resistant infections',
+        adult: 'Standard infections: 600 mg IV or PO every 12 hours (1.2 g/day); Bone & joint: 600 mg every 8 hours (1.8 g/day); Meningitis: 600 mg every 8 hours with excellent CSF penetration (60–90%)'
+    },
+    'Gentamicin': {
+        pediatric: 'Endocarditis (<10 years): 7.5 mg/kg once daily (max 320 mg/day); (>10 years): 6 mg/kg once daily (max 560 mg/day); TDM required',
+        adult: 'Once-daily: 5–7 mg/kg IV once daily (target peak 20–30, trough <1); Traditional q8h: 1–1.5 mg/kg every 8 hours (target peak 5–10). TDM MANDATORY.'
+    },
+    'Clindamycin': {
+        pediatric: 'Oral/Dental (penicillin-allergic): 10 mg/kg/dose PO three times daily (max 600 mg/dose); MRSA: 15 mg/kg/dose IV every 8 hours (max 1.2 g/dose)',
+        adult: 'Mild-to-moderate (PO): 300 mg every 6–8 hours; Severe (IV): 600–900 mg every 6–8 hours (2.4–3.6 g/day); ⚠️ NO CNS penetration'
+    },
+    'Metronidazole': {
+        pediatric: 'Intra-abdominal/GI: 7.5 mg/kg/dose IV every 8 hours (max 500 mg/dose); Neonatal: <2kg q24h, then q12h; >2kg q12h',
+        adult: 'Intra-abdominal: 500 mg IV every 8 hours (1.5 g/day); C. difficile: 500 mg PO three times daily for 10–14 days; Good anaerobic coverage (60–80% CSF)'
+    },
+    'Ciprofloxacin': {
+        pediatric: 'Meningitis prophylaxis (alternative): Age 3mo–5y: 30 mg/kg (up to 125 mg) PO single dose; >5y: 250–500 mg single dose',
+        adult: 'Uncomplicated UTI: 250 mg PO twice daily for 3 days; Complicated UTI: 500 mg twice daily for 7–14 days; Pyelonephritis: 500 mg twice daily; Respiratory: 500–750 mg twice daily'
+    },
+    'Azithromycin': {
+        pediatric: 'Pertussis: ≤6mo: 10 mg/kg once daily (max 500 mg); >6mo: 10 mg/kg Day 1, then 5 mg/kg Days 2–5; Respiratory: IV 10 mg/kg once daily',
+        adult: 'CAP (Z-pack): 500 mg Day 1, then 250 mg daily for 4 more days; Atypical pathogens: 500 mg Day 1, then 250 mg daily for 4–6 days; QT prolongation risk'
+    },
+    'Cefazolin': {
+        pediatric: 'Osteomyelitis (<5 years): 50 mg/kg/dose (max 2 g) every 8 hours; Periorbital cellulitis (<5 years): 50 mg/kg/dose every 6 hours',
+        adult: 'Mild-to-moderate: 500 mg–1 g IV every 8 hours; Moderate-to-severe: 1–2 g every 8 hours; Surgical prophylaxis: 1–2 g IV pre-op'
+    },
+    'Piperacillin-tazobactam': {
+        pediatric: 'Intra-abdominal/GI: 100 mg/kg/dose IV every 6 hours (max 4 g piperacillin/dose)',
+        adult: 'Standard infections: 3.375 g IV every 6 hours (13.5 g/day); Serious/Pseudomonas: 4.5 g every 6–8 hours (18–27 g/day); ⚠️ NO CNS penetration'
+    },
+    'Meropenem': {
+        pediatric: 'Referenced for complex Gram-negative infections and CNS involvement',
+        adult: 'Intra-abdominal: 1 g IV every 8 hours (3 g/day); Meningitis: 2 g IV every 8 hours (6 g/day) with excellent CNS penetration (75–90%); Pseudomonas: 2 g q8h'
+    },
+    'Doxycycline': {
+        pediatric: '>8 years: 2–4 mg/kg/day PO in 2 divided doses (usual: 100 mg twice daily for adolescents)',
+        adult: 'Standard infections: 100 mg PO twice daily (200 mg/day) for 7–14 days; Lyme disease: 100 mg twice daily for 14–21 days; Rickettsial: 100 mg twice daily until 24–48h afebrile'
+    },
+    'Levofloxacin': {
+        pediatric: 'Reserved for serious infections: 8–10 mg/kg IV or PO once daily (max 750 mg/day)',
+        adult: 'CAP: 500 mg PO once daily for 7–14 days (or 750 mg once daily for 5 days severe); Pyelonephritis: 250 mg once daily for 10 days; Osteomyelitis: 500–750 mg once daily for 4–6 weeks'
+    },
+    'TMP-SMX': {
+        pediatric: 'Uncomplicated UTI (>3 months): 4 mg/kg/dose PO twice daily (max 160 mg/dose TMP) for 3 days; Mild cellulitis: 4 mg/kg/dose twice daily',
+        adult: 'Uncomplicated cystitis: One DS tablet (800/160 mg) twice daily for 3 days; Complicated UTI: DS twice daily for 7–14 days; Prostatitis: DS twice daily for 12 weeks'
+    },
+    'Nitrofurantoin': {
+        pediatric: 'Not detailed in CHQ guidelines; refer to hospital protocols',
+        adult: 'Uncomplicated cystitis: 100 mg PO twice daily for 5–7 days (macrocrystalline); 100 mg once daily for 7 days (extended-release); NOT for pyelonephritis or CrCl <30'
+    },
+    'Cephalexin': {
+        pediatric: 'Uncomplicated UTI (>3 months): 30 mg/kg/dose PO every 8 hours (max 1 g/dose) for 3 days; Mild cellulitis: 30 mg/kg/dose every 8 hours',
+        adult: 'Mild-to-moderate: 250–500 mg PO four times daily (1–2 g/day); Serious: 500 mg every 6 hours (2 g/day); Uncomplicated UTI: 500 mg four times daily for 7–10 days'
+    },
+    'Nafcillin': {
+        pediatric: 'Not detailed in CHQ guidelines; generally reserved for serious MSSA infections',
+        adult: 'Mild-to-moderate MSSA: 1 g IV every 4–6 hours (4–6 g/day); Moderate-to-severe: 1–2 g every 4–6 hours (6–12 g/day); Endocarditis: 2 g IV every 4 hours (12 g/day) for 4–6 weeks'
+    },
+    'Oxacillin': {
+        pediatric: 'Not detailed in CHQ; similar to Nafcillin for serious MSSA',
+        adult: 'Similar dosing to Nafcillin: 1–2 g IV every 4–6 hours depending on infection severity'
+    },
+    'Dicloxacillin': {
+        pediatric: 'MSSA skin/soft tissue (oral option)',
+        adult: 'Mild-to-moderate skin/soft tissue: 250–500 mg PO four times daily (1–2 g/day); Serious: 500 mg every 6 hours (2 g/day)'
+    },
+    'Flucloxacillin': {
+        pediatric: 'Not detailed in CHQ; oral MSSA option',
+        adult: 'Similar to Dicloxacillin: 250–500 mg PO four times daily (1–2 g/day)'
+    },
+    'Daptomycin': {
+        pediatric: 'Limited pediatric data; alternative to vancomycin for MRSA bone/joint',
+        adult: 'Skin/soft tissue: 4 mg/kg IV once daily for 7–14 days; Bone & joint: 6 mg/kg IV once daily for 4–6 weeks; ⚠️ NOT for meningitis (inactivated by surfactant)'
+    },
+    'Moxifloxacin': {
+        pediatric: 'Reserved for serious infections (limited pediatric experience)',
+        adult: 'CAP: 400 mg PO once daily for 7–14 days; Respiratory infections: 400 mg once daily; Good respiratory penetration'
+    },
+    'Clarithromycin': {
+        pediatric: 'Atypical pathogens (Mycoplasma, Chlamydia)',
+        adult: 'CAP (atypical): 500 mg PO twice daily for 7–14 days; H. pylori (triple therapy): 500 mg twice daily for 10–14 days; Good bioavailability'
+    },
+    'Cefdinir': {
+        pediatric: 'Otitis media & upper respiratory (Enterobacteriaceae coverage)',
+        adult: 'Standard infections: 300 mg PO twice daily for 5–10 days; Uncomplicated skin infection: 300 mg twice daily'
+    },
+    'Cefixime': {
+        pediatric: 'Pelvic/STI (Cephalosporin option)',
+        adult: 'Uncomplicated gonorrhea: 400 mg PO single dose (now often with other agents); Respiratory: 400 mg PO once daily or 200 mg twice daily'
+    },
+    'Ceftazidime': {
+        pediatric: 'Pseudomonas coverage (serious infections)',
+        adult: 'Pseudomonas: 2 g IV every 8 hours (6 g/day); Serious Gram-negative: 1–2 g every 8 hours (3–6 g/day)'
+    },
+    'Cefepime': {
+        pediatric: 'Enterobacteriaceae and Pseudomonas coverage in serious infections',
+        adult: 'Serious Gram-negative/Pseudomonas: 2 g IV every 8–12 hours (4–6 g/day); Febrile neutropenia: 2 g every 8 hours'
+    },
+    'Ampicillin-sulbactam': {
+        pediatric: 'Intra-abdominal/GI (Streptococci)',
+        adult: 'Intra-abdominal: 3 g IV every 6 hours (combination drug); Community-acquired infections: dose varies'
+    },
+    'Ertapenem': {
+        pediatric: 'Complex intra-abdominal infections',
+        adult: 'Intra-abdominal: 1 g IV once daily for 5–14 days; Good Gram-negative + anaerobe coverage'
+    },
+    'Fosfomycin': {
+        pediatric: 'UTI coverage (limited pediatric data)',
+        adult: 'Uncomplicated cystitis: 3 g single PO dose; Alternative for resistant Gram-negatives'
+    }
+};
+
+function openDrugModal(drugName) {
+    const modal = document.getElementById('drugModal');
+    const nameEl = document.getElementById('drugName');
+    const classEl = document.getElementById('drugClass');
+    const contentEl = document.getElementById('drugContent');
+
+    nameEl.textContent = drugName;
+    classEl.textContent = `Class: ${getdrugClass(drugName).replace('beta-lactam', 'Beta-lactam').replace('-', ' ')}`;
+
+    const dosing = drugDosing[drugName] || { pediatric: 'Not available', adult: 'Not available' };
+
+    contentEl.innerHTML = `
+        <div class="dosing-section">
+            <h3>Pediatric Dosing (CHQ v12.0)</h3>
+            <div class="dosing-item">${dosing.pediatric}</div>
+        </div>
+        <div class="dosing-section">
+            <h3>Adult Dosing</h3>
+            <div class="dosing-item">${dosing.adult}</div>
+        </div>
+        <div class="dosing-note">
+            <strong>Note:</strong> Click "My Pharmacy" at the top to customize which antibiotics appear in this guide.
+        </div>
+    `;
+
+    modal.classList.add('show');
+}
+
+function closeDrugModal() {
+    document.getElementById('drugModal').classList.remove('show');
+}
+
+// ============ INIT ============
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadPharmacySettings();
+    renderTable();
+});
+
+// Close modals on outside click
+window.onclick = function(event) {
+    const pharmModal = document.getElementById('pharmacyModal');
+    const drugModal = document.getElementById('drugModal');
+    if (event.target == pharmModal) {
+        pharmModal.classList.remove('show');
+    }
+    if (event.target == drugModal) {
+        drugModal.classList.remove('show');
+    }
+};
+
+// Keyboard close
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.getElementById('pharmacyModal').classList.remove('show');
+        document.getElementById('drugModal').classList.remove('show');
+    }
+});
+</script>
+
 </body>
 </html>
